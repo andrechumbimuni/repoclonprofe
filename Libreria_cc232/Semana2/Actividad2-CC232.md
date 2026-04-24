@@ -94,6 +94,17 @@ Construyan una tabla con cuatro columnas:
 - Idea estructural
 - Argumento de costo o espacio
 
+| Archivo | Salida u observable importante | Idea estructural | Argumento de costo o espacio |
+|:-|:-|:-|:-|
+|`demo_array_basico.cpp` | Muestra el contenido y `length` antes y después de `b = a`. | Tamaño fijo (wrapper básico). | La asignación transfiere la propiedad para ahorrar tiempo. |
+|`demo_arraystack.cpp` | Imprime el `size` y cómo cambian los elementos al insertar/eliminar. | Estructura de lista respaldada por un arreglo dinámico. | El costo depende implícitamente de la posición modificada. |
+|`demo_arraystack_explicado.cpp` | Imprime mensajes sobre los desplazamientos a la izquierda/derecha. | Expone la mecánica interna del arreglo al insertar/eliminar. | Costo `O(n-i)` explícito en `add(i,x)` y `remove(i)` por el movimiento de elementos. |
+|`demo_fastarraystack.cpp` |Insertando en medio y al final. | Reemplaza bucles manuales por `std::copy` y `std::copy_backward`. | Mejora el costo constante moviendo bloques de memoria enteros. |
+|`demo_rootisharraystack.cpp` | Muestra inserción y eliminación sin exponer la estructura interna. | Secuencia de arreglos de tamaños crecientes. | Reduce el desperdicio de memoria asociado. |
+|`demo_rootisharraystack_explicado.cpp` | Imprime: `índice lógico -> bloque, offset`. | Detalla la matemática de ubicación en bloques progresivos. | El espacio desperdiciado es proporcional a la raíz cuadrada de `n`. |
+|`demo_deng_vector.cpp`|Imprime `size` y `capacity` paso a paso. | Vector dinámico clásico con variables de estado. | El crecimiento exponencial de `capacity` garantiza tiempo constante (amortizado). |
+|`demo_stl_vector_contraste.cpp` | Imprime `size` y `capacity` usando `std::vector`. | Implementación estándar de la biblioteca de C++. | Crece de manera idéntica al `DengVector`, justificando el análisis amortizado. |
+
 Luego respondan:
 
 1. En `demo_array_basico.cpp`, ¿qué deja claro sobre arreglo, longitud y asignación?

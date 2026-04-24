@@ -97,12 +97,32 @@ Construyan una tabla con cuatro columnas:
 Luego respondan:
 
 1. En `demo_array_basico.cpp`, ¿qué deja claro sobre arreglo, longitud y asignación?
+EL arreglo es de longitud fija (su instanciación a(5)). La asignación b=a no realiza una copia profunda de "a", solo transfiere la memoria (ownership), dejando al arreglo "a" vacío o inutilizado y transfiere todo al nuevo arreglo b.
+
 2. En `demo_arraystack_explicado.cpp`, ¿qué operación muestra mejor el costo por desplazamientos?
+esplazamientos?
+add y remove (desplaza elementos hacia la derecha desde la posición i hasta n-1, y remove(i) hace lo inverso desplazando hacia la izquierda desde i+1 hasta n-1).
+
 3. En `demo_fastarraystack.cpp`, ¿qué cambia en la implementación aunque no cambie la complejidad asintótica?
+Aunque la complejidad asintótica es O(n-i), la implementación sustituye los bucles for por funciones optimizadas:
+
+Usa std::copy_backward en la operación add (para desplazar el bloque hacia la derecha), usa std::copy en la operación remove(desplazar el bloque hacia la izquierda).
+
+Este cambio permite realizar manipulaciones de bloques de memoria a bajo nivel, lo que reduce drásticamente el factor constante del tiempo de ejecución en la práctica.
+
 4. En `demo_rootisharraystack_explicado.cpp`, ¿qué ejemplo explica mejor el mapeo de índice lógico a bloque y offset?
+La función print_location al ejecutarla, se imprime en consola cómo un [bloque, offset], se demuestra cómo la estructura ubica elementos en arreglos de tamaños 1, 2, ect.
+
 5. En `demo_deng_vector.cpp`, ¿qué observable permite defender el crecimiento de `capacity`?
+El std::cout dentro del bucle for imprime size y capacity en cada inserción. Observando directamente cómo capacity se duplica cuando size lo iguala.
+
 6. En `demo_stl_vector_contraste.cpp`, ¿qué similitud conceptual observan con `DengVector`?
+Comparten el size y capacity . La estrategia de duplicación al rebasar la capacidad es basicamente la misma.
+
 7. ¿Qué demo sirve mejor para defender **amortización** y cuál sirve mejor para defender **uso de espacio**?
+Amortización: demo_deng_vector.cpp (o demo_stl_vector_contraste.cpp), ya que el la vireasignación de memoria ocurre con tan poca frecuencia que el costo promedio por inserción es O(1).
+
+Uso de espacio: demo_rootisharraystack_explicado.cpp, ya que explica directamente cómo el uso de bloques crecientes previene el desperdicio masivo de memoria que ocurre al duplicar un arreglo dinámico grande.
 
 #### Bloque 3-Pruebas públicas, stress y correctitud
 

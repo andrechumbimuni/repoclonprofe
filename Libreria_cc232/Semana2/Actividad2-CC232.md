@@ -163,12 +163,38 @@ Revisen:
 Respondan:
 
 1. ¿Qué papel cumplen `_size`, `_capacity` y `_elem`?
+_size: Es la cantidad de elementos reales que el usuario ha insertado y son válidos.
+
+_capacity: Representa la capacidad máxima actual. Es el número total de espacios de memoria que se han reservado para el arreglo antes de necesitar pedir más memoria al sistema.
+
+_elem: Es el puntero que dirige a la dirección de memoria donde está alojado el arreglo dinámico físico.
 2. ¿Cuándo debe ejecutarse `expand()`?
+ Solo se ejecuta cuando el vector está completamente lleno, es decir, cuando _size == _capacity. Si hay espacio disponible no hace nada. Cuando está lleno, duplica la capacidad (_capacity <<= 1) para mantener el costo amortizado $O(1)$.
 3. ¿Por qué `insert(r, e)` necesita desplazar elementos?
+Si quieres insertar un elemento en el índice r (en el medio o al principio del vector), necesitas hacerle "hueco". Para no perder los datos existentes, todos los elementos desde el índice r hasta el final deben ser movidos una posición hacia la derecha.
 4. ¿Qué diferencia conceptual hay entre `remove(r)` y `remove(lo, hi)`?
+remove(lo, hi): Elimina un elementos en bloque y desplaza los elementos restantes hacia la izquierda una sola vez. Retorna la cantidad de elementos eliminados.
+
+remove(r): Borra un solo elemento, pero en lugar de retornar 1(cantidad), guarda temporalmente el dato y lo retorna (T e = _elem[r]), permitiendo al usuario saber qué valor fue eliminado.
 5. ¿Qué evidencia de copia profunda aparece en la demo?
+ods::DengVector<int> copia(v); // copia
+ods::DengVector<int> asignado;
+asignado = copia;     // asignación
+
+Se modifico la copia sumándole 1 a cada elemento, y al asignado multiplicando sus elementos por 2. Al imprimir muestran secuencias numéricas totalmente diferentes. La salida en consola demuestra que cada vector tiene su propia memoria aislada.
+
 6. ¿Por qué `traverse()` es una buena interfaz didáctica?
+Porque ilustra el patrón de diseño Visitor. Enseña como desacoplar la estructura de datos de la lógica de negocio: el vector sabe cómo iterar sobre sí mismo, pero delega qué hacer con cada elemento a una función externa.
+
+Punteros a función: void (*visit)(T&)
+
+Funtores (Objetos función) / Plantillas: template<class VST> void traverse(VST& visit)
+
 7. ¿Qué ventaja tiene implementar un vector propio antes de depender de `std::vector`?
+Implementar uno propio te obliga a construir el motor del auto. Las ventajas son:
+
+Gestión de memoria: Obliga a entender el uso de new[] y delete[], y cómo evitar fugas de memoria (memory leaks).
+Análisis amortizado: Permite ver matemáticamente cómo la estrategia de duplicar la capacidad garantiza que la inserción cueste $O(1)$ en promedio.
 
 #### Bloque 5 - RootishArrayStack: espacio y mapeo
 
@@ -197,6 +223,7 @@ Revisen:
 Respondan brevemente:
 
 1. ¿Qué aporta `operator[]` a la idea de vector?
+
 2. ¿Qué supone `find(e)` sobre igualdad entre elementos?
 3. ¿Qué muestra `traverse()` sobre procesamiento uniforme de toda la estructura?
 4. ¿Por qué esta lectura sirve como refuerzo natural de `DengVector` aunque no sea el centro exclusivo de la semana?

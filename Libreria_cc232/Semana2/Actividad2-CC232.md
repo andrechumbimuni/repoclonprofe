@@ -224,9 +224,22 @@ Respondan brevemente:
 
 1. ¿Qué aporta `operator[]` a la idea de vector?
 
+Al sobrecargar los corchetes, el vector permite que el usuario acceda a los elementos con la misma sintaxis de un arreglo estático básico (V[i]), pero manteniendo toda la protección, seguridad y encapsulamiento de un ADT.
 2. ¿Qué supone `find(e)` sobre igualdad entre elementos?
+Como find(e) es una búsqueda secuencial, el algoritmo confía en que el elemento sabrá responder "sí" o "no" cuando se le pregunte si es idéntico a e.
 3. ¿Qué muestra `traverse()` sobre procesamiento uniforme de toda la estructura?
+Muestra que el vector no es un almacén pasivo, sino una estructura que facilita operaciones masivas separando responsabilidades. El vector se encarga exclusivamente de la logística de iteración, delegando a un agente externo (como un puntero a función) la lógica (qué acción específica aplicar a cada dato).
+
 4. ¿Por qué esta lectura sirve como refuerzo natural de `DengVector` aunque no sea el centro exclusivo de la semana?
+Porque actúa como la teória detrás del caso práctico del código. Cada decisión de diseño en DengVector se encuentra en este texto:
+
+Las variables _size y _capacity nacen para gestionar la memoria dinámica.
+
+La duplicación de capacidad en expand() se justifica aquí mediante el análisis amortizado para garantizar un rendimiento a largo plazo.
+
+Los bucles manuales de insert y remove reflejan la tensión estructural que es el alto costo temporal que se paga por mantener la contigüidad física de la memoria.
+
+Los constructores especiales existen para garantizar la copia profunda.
 
 #### Bloque 7 - Cierre comparativo
 

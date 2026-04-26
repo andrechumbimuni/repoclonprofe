@@ -225,8 +225,10 @@ Respondan brevemente:
 1. ¿Qué aporta `operator[]` a la idea de vector?
 
 Al sobrecargar los corchetes, el vector permite que el usuario acceda a los elementos con la misma sintaxis de un arreglo estático básico (V[i]), pero manteniendo toda la protección, seguridad y encapsulamiento de un ADT.
+
 2. ¿Qué supone `find(e)` sobre igualdad entre elementos?
 Como find(e) es una búsqueda secuencial, el algoritmo confía en que el elemento sabrá responder "sí" o "no" cuando se le pregunte si es idéntico a e.
+
 3. ¿Qué muestra `traverse()` sobre procesamiento uniforme de toda la estructura?
 Muestra que el vector no es un almacén pasivo, sino una estructura que facilita operaciones masivas separando responsabilidades. El vector se encarga exclusivamente de la logística de iteración, delegando a un agente externo (como un puntero a función) la lógica (qué acción específica aplicar a cada dato).
 

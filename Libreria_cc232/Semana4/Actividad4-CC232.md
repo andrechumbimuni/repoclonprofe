@@ -72,9 +72,14 @@ Revisa:
 Responde:
 
 1. Explica con tus palabras la diferencia entre acceso `LIFO` y acceso `FIFO`.
+LIFO como indica el nombre es el ultimo en entrar es el primero en salir y FIFO es el primero en entrar y primero en salir.
 2. Explica por qué `Stack` resuelve naturalmente problemas donde importa "lo último pendiente".
+Una Pila Stack es LIFO. Al hacerlo, la información más reciente que guardas se convierte inmediatamente en la primera que vas a procesar
 3. Explica por qué `Queue` modela naturalmente procesos de espera y atención.
+Una Cola Queue funciona bajo el modelo FIFO, que es la representación exacta de la "justicia cronológica": el que llega primero, es atendido primero.
 4. Explica qué significa reemplazar recursión implícita por una estructura explícita.
+Una función recursiva es una función que se llama a sí misma, el programa utiliza la Pila de Llamadas (Call Stack) del sistema para recordar en qué línea se quedó cada función y qué valores tenía.la recursion implicita es cuando tu no lo gestionas si no el SO.
+
 5. Explica qué información mínima debe guardarse para que una pila permita reconstruir una solución parcial.
 6. Compara la conversión de base recursiva e iterativa: ¿qué comparten y qué cambia en el control del proceso?
 7. Explica por qué la verificación iterativa de paréntesis necesita almacenar aperturas pendientes.
@@ -83,6 +88,7 @@ Responde:
 10. Explica por qué la simulación bancaria no se modela bien con pila, pero sí con colas.
 11. Explica qué relación hay entre estructura auxiliar, estado parcial y correctitud.
 12. Explica qué diferencia conceptual hay entre "resolver un problema" y "simular un proceso".
+
 
 #### Bloque 2 - Demostración y trazado guiado
 

@@ -112,6 +112,7 @@ Construye una tabla con cuatro columnas:
 Luego responde:
 
 1. En `demo_stack_queue.cpp`, ¿qué parte de la salida deja más clara la diferencia entre tope y frente?
+Como stack es un pila(LIFO) donde el tope es el elemento 9(cima) sera el primero en salir; y en la cola queue, el primer elemento(frente) es 10 que va a ser el primero en salir (FIFO) 
 2. En `demo_base_conversion.cpp`, ¿qué observable permite afirmar que las versiones recursiva e iterativa producen la misma representación?
 3. En `demo_paren_rpn.cpp`, ¿qué relación observas entre paréntesis balanceados, RPN y valor final?
 4. En `demo_nqueens.cpp`, ¿qué significan `solutions` y `checks`, y por qué no miden lo mismo?

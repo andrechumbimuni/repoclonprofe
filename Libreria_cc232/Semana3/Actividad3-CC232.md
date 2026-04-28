@@ -86,15 +86,68 @@ Revisen:
 Respondan:
 
 1. Expliquen con sus palabras qué cambia cuando una estructura pasa de almacenamiento contiguo a almacenamiento dinámico.
+
+Se pierde el acceso directo , ya no puedes "saltar" a una posición(el contiguo); debes "navegar" la estructura siguiendo el rastro de enlaces desde el inicio y ganas la libertad de que la estructura crezca o se encoja orgánicamente(el dinamico).
+
 2. Expliquen la diferencia entre acceso por rango y acceso por posición o enlace.
+
+Acceso por posición (ligado a memoria contigua): Es un mecanismo de acceso directo. Al conocer el índice, el sistema calcula su dirección exacta en memoria en tiempo constante O(1).
+
+Acceso por enlace (ligado a memoria dinámica): Es un mecanismo de recorrido secuencial. Estás obligado a empezar desde el primer nodo (la cabeza) y seguir la cadena de referencias de uno en uno. El tiempo de acceso depende directamente de qué tan lejos esté en la secuencia.
+
 3. Expliquen por qué una lista enlazada mejora inserciones y eliminaciones locales, pero empeora el acceso por índice.
+
+Empeora el acceso por índice porque los nodos están dispersos y conectados por referencias, la computadora es ciega a la estructura global. Para leer el índice i, forzosamente debe recorrer secuencialmente todos los nodos anteriores, lo que eleva el costo de acceso a una complejidad de tiempo O(n).
+
+Insertar o eliminar solo requiere "romper" y "reconectar" un par de referencias (punteros) entre los nodos vecinos. En contraste, en una estructura contigua (como un vector), insertar un dato en el medio obliga a desplazar físicamente todos los elementos posteriores hacia la derecha lo cual es costoso.
+
 4. Expliquen por qué `SLList` implementa bien operaciones de `Stack` y `Queue`.
+
+Una lista enlazada simple (SLList) incluye no solo un puntero head (cabeza), sino también un puntero tail (cola).
+
+Para un Stack (LIFO): Las operaciones ocurren en un solo extremo. En SLList, push(x) inserta un nuevo nodo al inicio (apuntando al antiguo head) y pop() elimina el head actual, actualizándolo al siguiente nodo.
+
+Para una Queue (FIFO): La operación de encolar (add(x)) se hace en tiempo O(1) simplemente conectando el nuevo nodo a tail->next y actualizando el tail. 
+
 5. Expliquen por qué `SLList` no implementa naturalmente todas las operaciones de un `Deque` con el mismo costo.
+
+Un Deque (Double-Ended Queue) exige que las operaciones de inserción y eliminación en ambos extremos tengan una complejidad de O(1).
+
+Mientras que SLList puede insertar al final en O(1) (gracias al tail), eliminar en el final (pop_back) le resulta costoso. Dado que los enlaces son unidireccionales (solo apuntan a next), para eliminar el último nodo necesitarias conocer cuál es el penúltimo nodo. La única forma es recorrerla secuencialmente desde el head hasta el final, lo que degrada el costo de eliminación al final a O(n).
+
 6. Expliquen qué aporta el nodo centinela `dummy` en `DLList`.
+
+El nodo centinela (dummy) en la implementación de ods::DLList aporta simetría estructural y eliminación de casos borde (edge cases).
+
+En lugar de usar punteros nulos para representar el inicio o el fin, dummy es un nodo circular donde dummy.next actúa como el head y dummy.prev como el tail lógico. Cuando la lista está vacía, dummy se apunta a sí mismo.
+Esto simplifica ya que no es necesario escribir condicionales como if (head == nullptr) o if (u->next != nullptr).
+
 7. Expliquen por qué `DLList` permite justificar `get(i)`, `set(i,x)`, `add(i,x)` y `remove(i)` con costo `O(1 + min(i, n-i))`.
+
+En el método getNode(i), la lista no empieza a recorrer desde el principio siempre sino que evalúa la condición if (i < n / 2).
+
+Si el índice buscado está en la primera mitad de la lista, recorre hacia adelante desde el inicio (dummy.next). En este caso, dará i pasos.
+
+Si el índice está en la segunda mitad, recorre hacia atrás desde el final (dummy.prev). En este caso, dará n - i pasos.
+
+El algoritmo siempre elige el camino más corto. Por tanto, el número máximo de pasos que dará es el min(i, n - i). El +1 constante representa las operaciones locales de desenlace o actualización de valores una vez que se llega al nodo.
+
 8. Expliquen cuál es la idea espacial central de `SEList`.
+
+La idea central de la SEList es reducir el desperdicio de memoria y mejorar la localidad espacial (cache locality).
+En una lista doble tradicional (DLList), por cada elemento almacenado se gastan dos punteros extra (next y prev). La SEList soluciona esto agrupando múltiples elementos dentro de un solo nodo (una lista desenrollada o unrolled linked list). Cada nodo contiene un pequeño bloque contiguo. De este modo, los punteros next y prev van a cada bloque de elementos, amortizando drásticamente el consumo de memoria dinámica.
+
 9. Expliquen por qué `SEList` reutiliza una `BDeque` basada en `ArrayDeque`.
+
+Dentro de cada nodo de la SEList, los elementos se almacenan en una BDeque (Block Deque), la cual hereda de ArrayDeque.
+
+Un ArrayDeque funciona como un arreglo circular. Esto es crucial porque, cuando la SEList inserta o elimina elementos, a menudo necesita reacomodar los datos hacia otros nodos (operaciones internas spread y gather). Al ser un ArrayDeque, el bloque permite añadir o retirar elementos por cualquiera de sus dos extremos en tiempo O(1) sin tener que desplazar físicamente todos los elementos internos.
+
 10. Expliquen qué papel cumple `DengList` dentro de esta semana y por qué no reemplaza a las estructuras de Morin.
+
+Las estructuras de Pat Morin (ods::DLList, ods::SEList) están diseñadas con un enfoque minimalista: se limitan exclusivamente a retener datos y proveer operaciones de acceso y mutación elementales (CRUD) con alta eficiencia.
+
+Por el contrario, DengList representa un enfoque académico más algorítmico. Expone métodos complejos como sort(), dedup(), uniquify(), y reverse().
 
 #### Bloque 2 - Demostración y trazado guiado
 
@@ -118,16 +171,53 @@ Construyan una tabla con cuatro columnas:
 - Idea estructural
 - Argumento de costo, espacio o diseño
 
+
+| Archivo | Salida u observable importante | Idea estructural | Argumento de costo, espacio o diseño |
+| :--- | :--- | :--- | :--- |
+| `demo_sllist.cpp` | `size = 3`, `peek = 5`, `pop = 5`, `remove = 10` | Lista simplemente enlazada con punteros `head` y `tail`. | Operaciones en extremos (Pila/Cola) con costo $O(1)$. No apta para borrado al final $O(N)$. |
+| `demo_dllist.cpp` | `DLList: 10 20 30` | Lista doblemente enlazada con nodo centinela (`dummy`). | Navegación bidireccional en $O(1 + \min(i, n-i))$. El centinela elimina *edge cases*. |
+| `demo_selist.cpp` | `SEList: 0 10 20 ... 90` | Nodos enlazados que contienen bloques contiguos (`BDeque`). | Reduce el *overhead* de punteros (ahorro espacial) y mejora la localidad de caché. |
+| `demo_deng_list.cpp` | `ordenada: 5 10 20 30` | *Wrapper* o fachada que encapsula una lista para algoritmos complejos. | Abstracción de alto nivel enfocada en utilidad (ADT completo) más que en estructura base. |
+| `demo_morin_deng_bridge.cpp` | `DLList reforzada... 1 2 3 4` | Patrón adaptador temporal (Puente) entre librerías. | Reutilización de código (DRY). Permite ordenar una `DLList` minimalista sin modificar su fuente. |
+| `demo_min_structures.cpp` | `MinStack min=3 top=7` | Aumento de estructura con metadatos (pila/cola monótona). | Intercambia memoria adicional para lograr consulta de mínimo en tiempo constante $O(1)$. |
+| `demo_linked_adapters.cpp` | Operaciones estrictas de Stack/Queue. | Adaptador de interfaz que restringe una estructura base. | Diseño seguro. Previene violaciones de política (LIFO/FIFO) ocultando métodos de acceso aleatorio. |
+| `demo_contiguous_vs_linked.cpp` | Comparación de `get(4)` entre `ArrayDeque` y `DLList`. | Contraste entre memoria contigua (índices) y dinámica (enlaces). | *Trade-off*: Contiguo gana en acceso $O(1)$ y caché; Enlazado en mutación local sin desplazar memoria. |
+
 Luego respondan:
 
 1. En `demo_sllist.cpp`, ¿qué secuencia deja más clara la coexistencia de comportamiento tipo pila y tipo cola dentro de `SLList`?
+
+La secuencia donde primero se inserta al final usando q.add(10) y q.add(20) (FIFO) y luego se inserta al inicio usando q.push(5) (LIFO). La estructura soporta ambas gracias a sus punteros head y tail.
+
 2. En `demo_dllist.cpp`, ¿qué operación muestra mejor la inserción en una posición intermedia?
+
+La ejecución de d.add(1, 20). Previamente se insertó el 10 en el índice 0 y el 30 en el índice 1. Al insertar el 20 en el índice 1, la estructura esta en el punto medio y reconecta los punteros adyacentes, desplazando el 30 sin tener que mover toda la memoria.
+
 3. En `demo_selist.cpp`, ¿qué observable permite defender que la lista mantiene orden lógico aunque internamente trabaje por bloques?
+
+El bucle de impresión final imprime la secuencia: 0 10 20 ... 90. Para el usuario, la estructura se comporta exactamente como una secuencia lineal. El usuario no se entera de que internamente los valores están saltando entre distintos BDeque de tamaño 3.
+
 4. En `demo_deng_list.cpp`, ¿qué evidencia muestra que la lista reforzada por Deng ofrece operaciones más cercanas a un ADT de lista completo?
+
+El uso directo del método lista.sort(), las estructuras minimalistas de Open Data Structures (ods) solo guardan y sacan datos. DengList asume la responsabilidad de proveer algoritmos de transformación (ordenamiento, desduplicación), comportándose como un ADT.
+
 5. En `demo_morin_deng_bridge.cpp`, ¿qué parte de la salida permite justificar que se reutilizan algoritmos sin reescribir la estructura base?
+
+El hecho de que logramos imprimir una DLList (estructura de Morin) totalmente ordenada y sin duplicados (1 2 3 4). Esto fue mediante funciones como stable_sort_with_deng(lista), las cuales transforman temporalmente la DLList en una DengList, la ordenan con la lógica de Deng, y la devuelven.
+
 6. En `demo_min_structures.cpp`, ¿qué diferencia conceptual observan entre almacenar valores y almacenar información adicional para responder `min()`?
+
+Almacenar valores representa guardar la secuencia de datos real del problema. Almacenar información adicional para responder min() representa guardar metadatos de estado operativo. Requiere mantener una estructura secundaria paralela que rastree el mínimo histórico en cada momento, pagando costo espacial para ganar velocidad de consulta.
+
 7. En `demo_linked_adapters.cpp`, ¿qué adaptador representa mejor la idea de reutilizar una estructura existente para ofrecer una interfaz nueva?
+
+Los tres lo hacen LinkedStack, LinkedQueue, LinkedDeque. Un adaptador toma una clase flexible y restringe sus capacidades para ofrecer una interfaz estricta ej: LinkedStack solo te deja usar push, pop y top.
+
 8. En `demo_contiguous_vs_linked.cpp`, ¿qué contraste se observa entre acceso por índice, inserción local y localidad de memoria?
+
+El ArrayDeque gana en el acceso por índice (get(4)) porque calcula la posición matemáticamente en O(1) y aprovecha la caché del procesador (localidad de memoria). Sin embargo, sufre al insertar en medio porque debe desplazar datos.
+
+La DLList (enlazada) no tiene localidad de memoria (los nodos están dispersos) y debe recorrerse secuencialmente para el get(4). Pero es mejor en inserción local: una vez hallado el lugar, reconectar punteros es rapido sin desplazar bloques de memoria.
 
 #### Bloque 3 - Pruebas públicas, stress y correctitud
 

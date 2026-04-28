@@ -116,9 +116,7 @@ add y remove (desplaza elementos hacia la derecha desde la posición i hasta n-1
 
 3. En `demo_fastarraystack.cpp`, ¿qué cambia en la implementación aunque no cambie la complejidad asintótica?
 Aunque la complejidad asintótica es O(n-i), la implementación sustituye los bucles for por funciones optimizadas:
-
 Usa std::copy_backward en la operación add (para desplazar el bloque hacia la derecha), usa std::copy en la operación remove(desplazar el bloque hacia la izquierda).
-
 Este cambio permite realizar manipulaciones de bloques de memoria a bajo nivel, lo que reduce drásticamente el factor constante del tiempo de ejecución en la práctica.
 
 4. En `demo_rootisharraystack_explicado.cpp`, ¿qué ejemplo explica mejor el mapeo de índice lógico a bloque y offset?
@@ -132,7 +130,6 @@ Comparten el size y capacity . La estrategia de duplicación al rebasar la capac
 
 7. ¿Qué demo sirve mejor para defender **amortización** y cuál sirve mejor para defender **uso de espacio**?
 Amortización: demo_deng_vector.cpp (o demo_stl_vector_contraste.cpp), ya que el la vireasignación de memoria ocurre con tan poca frecuencia que el costo promedio por inserción es O(1).
-
 Uso de espacio: demo_rootisharraystack_explicado.cpp, ya que explica directamente cómo el uso de bloques crecientes previene el desperdicio masivo de memoria que ocurre al duplicar un arreglo dinámico grande.
 
 #### Bloque 3-Pruebas públicas, stress y correctitud
@@ -170,12 +167,15 @@ _capacity: Representa la capacidad máxima actual. Es el número total de espaci
 _elem: Es el puntero que dirige a la dirección de memoria donde está alojado el arreglo dinámico físico.
 2. ¿Cuándo debe ejecutarse `expand()`?
  Solo se ejecuta cuando el vector está completamente lleno, es decir, cuando _size == _capacity. Si hay espacio disponible no hace nada. Cuando está lleno, duplica la capacidad (_capacity <<= 1) para mantener el costo amortizado $O(1)$.
+
 3. ¿Por qué `insert(r, e)` necesita desplazar elementos?
 Si quieres insertar un elemento en el índice r (en el medio o al principio del vector), necesitas hacerle "hueco". Para no perder los datos existentes, todos los elementos desde el índice r hasta el final deben ser movidos una posición hacia la derecha.
+
 4. ¿Qué diferencia conceptual hay entre `remove(r)` y `remove(lo, hi)`?
 remove(lo, hi): Elimina un elementos en bloque y desplaza los elementos restantes hacia la izquierda una sola vez. Retorna la cantidad de elementos eliminados.
 
 remove(r): Borra un solo elemento, pero en lugar de retornar 1(cantidad), guarda temporalmente el dato y lo retorna (T e = _elem[r]), permitiendo al usuario saber qué valor fue eliminado.
+
 5. ¿Qué evidencia de copia profunda aparece en la demo?
 ods::DengVector<int> copia(v); // copia
 ods::DengVector<int> asignado;

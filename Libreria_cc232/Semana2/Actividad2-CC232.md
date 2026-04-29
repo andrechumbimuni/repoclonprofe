@@ -97,21 +97,36 @@ Uso de espacio: demo_rootisharraystack_explicado.cpp, ya que explica directament
 
 #### Bloque 3-Pruebas públicas, stress y correctitud
 
-Revisen:
-- `Semana2/pruebas_publicas/README.md`
-- `Semana2/pruebas_publicas/test_public_week2.cpp`
-- `Semana2/pruebas_internas/test_internal_week2.cpp`
-- `Semana2/pruebas_internas/resize_stress_week2.cpp`
-
-Respondan:
-
 1. ¿Qué operaciones mínimas valida la prueba pública para `ArrayStack`?
+
+Comprueba: inserción al final (add(1)), inserción intermedia provocando desplazamiento (add(1, 99)), actualización correcta del tamaño (size() == 3), integridad del acceso tras el desplazamiento (get()), y que remove(1) devuelva el elemento correcto y ajuste el tamaño de vuelta.
+
 2. ¿Qué operaciones mínimas valida la prueba pública para `FastArrayStack`?
+
+Valida las inserciones al final y en medio, pero hace un énfasis crítico en probar remove(0). Eliminar en la cabeza es el "peor caso" para un arreglo contiguo.
+
 3. ¿Qué operaciones mínimas valida la prueba pública para `RootishArrayStack`?
+
+Verifica que el cálculo de get(4), introduce la prueba de set(4, 40) (mutación en sitio sin desplazamiento) y verifica que una eliminación (remove(2)).
+
 4. ¿Qué sí demuestra una prueba pública sobre una estructura?
+
+Demuestra correctitud funcional básica. Garantiza que la lógica pura de los índices, los "off-by-one errors" y los desplazamientos locales están bien programados.
+
 5. ¿Qué no demuestra una prueba pública?
+
+No demuestra la eficiencia asintótica ni la correctitud del manejo dinámico de memoria. Una prueba pública con 6 elementos nunca detonará múltiples redimensionamientos, no evaluará si el costo amortizado $O(1)$.
+
 6. En `resize_stress_week2.cpp`, ¿qué comportamiento intenta estresar sobre crecimiento, reducción o estabilidad?
+
+Crecimiento (Expand/Grow): Inserta cientos o miles de elementos, forzando a las estructuras a pedir memoria y copiar datos repetidas veces.
+
+Reducción (Shrink): Elimina franjas masivas de datos. Esto fuerza al factor de carga a caer por debajo del límite, detonando reducciones de memoria, probando que no haya errores.
+
 7. ¿Por qué pasar pruebas no reemplaza una explicación de invariantes y complejidad?
+
+Porque las pruebas comprueban qué hace el programa, pero no cómo lo hace ni cuánto cuesta.
+Las invariantes y la complejidad demuestran que tu diseño no solo es funcional, sino que respeta la arquitectura teórica prometida.
 
 #### Bloque 4-Vector como puente entre teoría y código
 
@@ -162,22 +177,38 @@ Análisis amortizado: Permite ver matemáticamente cómo la estrategia de duplic
 
 #### Bloque 5 - RootishArrayStack: espacio y mapeo
 
-Revisen:
-- `Semana2/include/RootishArrayStack.h`
-- `Semana2/include/RootishArrayStackExplicado.h`
-- `Semana2/demos/demo_rootisharraystack.cpp`
-- `Semana2/demos/demo_rootisharraystack_explicado.cpp`
-- **Lectura5-Morin**
-
-Respondan:
-
 1. ¿Cómo se distribuyen los elementos entre bloques?
+
+El primer bloque (índice 0) tiene tamaño 1; el segundo bloque tiene tamaño 2 y así sucesivamente. Cuando un bloque se llena, los siguientes elementos continúan en la posición 0 del siguiente bloque.
+
 2. ¿Por qué con `r` bloques la capacidad total es `r(r+1)/2`?
+
+Porque el tamaño de los bloques forma la progresión aritmética $1, 2, 3, ..., $r$. La suma de los primeros $r$ números enteros consecutivos se calcula exactamente con la fórmula de Gauss: $\frac{r(r+1)}{2}$.
+
 3. ¿Qué problema resuelve `i2b(i)`?
+
+Resuelve el mapeo inverso (acceso directo sin iteración). Dado un índice lógico i (por ejemplo, el elemento 50 de la secuencia), la estructura necesita saber físicamente en qué bloque está. i2b(i) toma la fórmula de Gauss, calcula de forma matemática el índice.
+
 4. ¿Qué información produce `locate(i)` en la versión explicada?
+
+Produce una tupla o par de valores (std::pair<int, int>) que traduce la coordenada unidimensional lógica a una coordenada bidimensional física:
+
+b: El número del bloque físico donde está el dato.
+
+j: El desplazamiento interno u offset.
+
 5. ¿Qué se gana en espacio frente a `ArrayStack`?
+
+Un ArrayStack clásico puede llegar a tener un 50% de sus celdas vacías. En cambio, RootishArrayStack solo desperdicia espacio en el último bloque agregado. Como el tamaño de ese último bloque es aproximadamente $\sqrt{2n}$, el espacio máximo desperdiciado cae a O($\sqrt{n}$).
+
 6. ¿Qué se conserva igual respecto a la interfaz?
+
+Para el programador le sigue pareciendo un arreglo unidimensional simple de tamaño n. Las firmas de los métodos get(i), set(i, x), add(i, x) y remove(i) y sus resultados lógicos son idénticos a los de ArrayStack.
+
 7. ¿Qué parte les parece más difícil de defender oralmente: el mapeo, el análisis espacial o el costo amortizado de `grow/shrink`?
+
+El costo oculto de los desplazamientos en add/remove cruzando fronteras de bloques suele ser lo más difícil de defender.
+Explicar el mapeo es solo aplicar álgebra, y el espacio es solo la suma de Gauss. Sin embargo, la constante temporal en la práctica puede ser considerablemente más lenta, haciendo que el trade-off requiera una justificación muy sólida.
 
 #### Bloque 6-Refuerzo de lectura
 
@@ -207,55 +238,35 @@ Los constructores especiales existen para garantizar la copia profunda.
 
 #### Bloque 7 - Cierre comparativo
 
-Respondan esta pregunta final:
-
 **¿Qué cambia cuando pasamos de "usar un arreglo" a "diseñar una estructura dinámica basada en arreglo"?**
 
-La respuesta debe incluir obligatoriamente:
-- una afirmación sobre representación
-- una afirmación sobre correctitud
-- una afirmación sobre costo amortizado
-- una afirmación sobre uso de espacio
-- una comparación entre `ArrayStack`, `FastArrayStack` y `RootishArrayStack`.
+Pasar de simplemente "usar un arreglo" a "diseñar una estructura dinámica basada en un arreglo" significa abandonar la rigidez de un bloque de memoria estático para construir una abstracción inteligente que gestione su propio ciclo de vida y responda a las necesidades de la aplicación.
 
-#### Formato sugerido de entrega
+Sobre la representación: Al diseñar una estructura dinámica, la representación separa la memoria física de la secuencia lógica. Se crea un arreglo de respaldo con una capacidad y se lleva un registro del tamaño.
 
-```md
-## Actividad 2-CC232
+Sobre la correctitud: La correctitud ya no consiste únicamente en no leer fuera de los límites de la memoria. En una estructura dinámica, implica mantener y restaurar invariantes estructurales después de cada modificación.
 
-### Integrantes
-- Nombre 1
-- Nombre 2
+Sobre el costo amortizado: El diseño dinámico garantiza mediante matemáticas que, al crecer multiplicativamente, este costo se diluye entre muchas operaciones baratas, logrando que el costo amortizado de mantenimiento y de inserciones al final sea $O(1)$.
 
-#### Bloque 1
-(respuestas)
+Sobre el uso de espacio: El diseño dinámico acepta el clásico trade-off de la computación: se paga espacio para comprar tiempo.
 
-#### Bloque 2
-(tabla y respuestas)
+Comparación entre ArrayStack, FastArrayStack y RootishArrayStack:
 
-#### Bloque 3
-(respuestas)
+ArrayStack: Representa el diseño más tradicional. Emplea un solo bloque contiguo y favorece la simplicidad absoluta y la velocidad algorítmica. Su debilidad es el uso de espacio $O(n)$.
 
-#### Bloque 4
-(respuestas)
+FastArrayStack: Es idéntico a ArrayStack en su representación lógica y en su gasto de espacio. Su diferencia radica en que optimiza la velocidad a nivel de hardware.
 
-#### Bloque 5
-(respuestas)
+RootishArrayStack: Priorizar el uso de espacio. Reduce de forma drástica el espacio desperdiciado a solo $O(\sqrt{n})$. Sin embargo, el costo de este diseño es computacional: debe ejecutar complejas fórmulas matemáticas cada vez que necesita averiguar en qué bloque físico reside un índice lógico.
 
-#### Bloque 6
-(respuestas)
-
-#### Bloque 7
-(respuesta final)
 
 #### Autoevaluación breve
-- Qué podemos defender con seguridad:
-- Qué todavía confundimos:
-- Qué evidencia usaríamos en una sustentación:
 ```
+- Qué podemos defender con seguridad:
+La teoría fundamental del trade-off (compromiso) entre tiempo y espacio. Podemos explicar por qué el acceso en memoria contigua es $O(1)$, cómo el crecimiento multiplicativo garantiza un costo amortizado $O(1)$ al final de la secuencia, y cómo RootishArrayStack altera inteligentemente la geometría para reducir el desperdicio de memoria de $O(n)$ a $O(\sqrt{n})$ usando bloques progresivos y la suma de Gauss.
 
-#### Criterio general de trabajo
+- Qué todavía confundimos:
+A veces cuesta separar la complejidad teórica del rendimiento real en el procesador. Puede resultar mentalmente difícil trazar paso a paso cómo un desplazamiento logra cruzar correctamente la frontera invisible entre dos bloques de distintos tamaños en un RootishArrayStack.
 
-Se espera lectura real de los archivos, respuestas breves pero justificadas, y conexión  explícita entre código, correctitud, costo, representación, amortización y uso de espacio.
-
-No basta con ejecutar el programa: deben poder explicar por qué funciona, qué invariante mantiene y qué costo justifica su diseño.
+- Qué evidencia usaríamos en una sustentación:
+Usaríamos las fórmulas implementadas en i2b(i) y locate(i) para demostrar que el mapeo matemático es constante y no iterativo. Además, utilizaríamos resize_stress_week2.cpp como prueba de que nuestra gestión dinámica (grow y shrink) no solo funciona en papel, sino que soporta miles de operaciones sin corromper la memoria, manteniendo estables los índices lógicos.
+```

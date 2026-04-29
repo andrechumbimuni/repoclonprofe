@@ -1,89 +1,10 @@
-### Actividad 3 - Semana 3
+## Actividad 3-CC232
 
-- Duración: 3 horas de clase.
-- Modalidad: Trabajo en parejas.
-- Tiempo de instalación: 15 minutos al inicio.
-- Entrega: Un archivo llamado `actividad3-CC232.md`.
+### Integrantes
 
-#### Objetivo
-
-Consolidar lo trabajado en la Semana 3 a partir de código, demos, pruebas y una defensa escrita breve.
-
-La meta es distinguir con claridad qué cambia cuando pasamos de representaciones contiguas a representaciones enlazadas, por qué en una lista enlazada el acceso importante deja de ser por rango y pasa a ser por posición o enlace, cómo una `SLList` implementa muy bien operaciones de `Stack` y `Queue`, cómo una `DLList` con nodo centinela simplifica inserciones y eliminaciones, y por qué una `SEList` ofrece un trade-off entre acceso, actualización local y uso de espacio.
-
-Además, se busca conectar las implementaciones enlazadas de Morin con la interfaz y operaciones de lista reforzadas por Deng, incluyendo el uso de `DengList` y `MorinDengBridge` para reutilizar operaciones como ordenamiento, eliminación de duplicados y reversa sin reescribir toda la lógica estructural.
-
-#### Material de trabajo
-
-##### Código de la semana
-- `Semana3/README.md`
-- `Semana3/include/SLList.h`
-- `Semana3/include/DLList.h`
-- `Semana3/include/SEList.h`
-- `Semana3/include/ArrayDeque.h`
-- `Semana3/include/array.h`
-- `Semana3/include/LinkedStack.h`
-- `Semana3/include/LinkedQueue.h`
-- `Semana3/include/LinkedDeque.h`
-- `Semana3/include/MinStack.h`
-- `Semana3/include/MinQueue.h`
-- `Semana3/include/MinDeque.h`
-- `Semana3/include/XorList.h`
-- `Semana3/include/CleanList.h`
-- `Semana3/include/DengList.h`
-- `Semana3/include/MorinDengBridge.h`
-- `Semana3/include/Capitulo3.h`
-- `Semana3/demos/demo_sllist.cpp`
-- `Semana3/demos/demo_dllist.cpp`
-- `Semana3/demos/demo_selist.cpp`
-- `Semana3/demos/demo_deng_list.cpp`
-- `Semana3/demos/demo_morin_deng_bridge.cpp`
-- `Semana3/demos/demo_capitulo3_panorama.cpp`
-- `Semana3/demos/demo_min_structures.cpp`
-- `Semana3/demos/demo_xor_list.cpp`
-- `Semana3/demos/demo_linked_adapters.cpp`
-- `Semana3/demos/demo_contiguous_vs_linked.cpp`
-- `Semana3/pruebas_publicas/README.md`
-- `Semana3/pruebas_publicas/test_public_week3.cpp`
-- `Semana3/pruebas_publicas/test_public_deng_bridge.cpp`
-- `Semana3/pruebas_publicas/test_public_extras.cpp`
-- `Semana3/pruebas_publicas/test_public_linked_adapters.cpp`
-- `Semana3/pruebas_publicas/test_public_contiguous_vs_linked.cpp`
-- `Semana3/pruebas_internas/test_internal_week3.cpp`
-- `Semana3/pruebas_internas/test_internal_deng_algorithms.cpp`
-- `Semana3/pruebas_internas/test_internal_extras.cpp`
-- `Semana3/pruebas_internas/stress_selist_week3.cpp`
-- `Semana3/sustentacion/preguntas_semana3.md`
-- `Semana3/sustentacion/rubrica_semana3.md`
-- `Semana3/benchmarks/benchmark_semana3.cpp`
-
-#### Lecturas obligatorias
-
-- `Parte3-Deng.pdf`
-- `Parte3-Morin.pdf`
-
-#### Bloque 0 - Instalación y preparación
-
-1. Dejen lista su carpeta de trabajo.
-2. Verifiquen que pueden abrir `Semana3`, las lecturas y el archivo de entrega.
-3. Creen el archivo `Actividad3-CC232.md`.
-4. Anoten los nombres de los integrantes.
-5. Compilen y ejecuten al menos una demo y una prueba pública de Semana 3.
+Andre Dylan Chumbimuni Ricci
 
 #### Bloque 1 - Núcleo conceptual de la semana
-
-Revisen:
-
-- `Semana3/README.md`
-- `Parte3-Deng.pdf`
-- `Parte3-Morin.pdf`
-- `Semana3/include/SLList.h`
-- `Semana3/include/DLList.h`
-- `Semana3/include/SEList.h`
-- `Semana3/include/DengList.h`
-- `Semana3/include/MorinDengBridge.h`
-
-Respondan:
 
 1. Expliquen con sus palabras qué cambia cuando una estructura pasa de almacenamiento contiguo a almacenamiento dinámico.
 
@@ -151,27 +72,6 @@ Por el contrario, DengList representa un enfoque académico más algorítmico. E
 
 #### Bloque 2 - Demostración y trazado guiado
 
-Revisen:
-
-- `Semana3/demos/demo_sllist.cpp`
-- `Semana3/demos/demo_dllist.cpp`
-- `Semana3/demos/demo_selist.cpp`
-- `Semana3/demos/demo_deng_list.cpp`
-- `Semana3/demos/demo_morin_deng_bridge.cpp`
-- `Semana3/demos/demo_capitulo3_panorama.cpp`
-- `Semana3/demos/demo_min_structures.cpp`
-- `Semana3/demos/demo_xor_list.cpp`
-- `Semana3/demos/demo_linked_adapters.cpp`
-- `Semana3/demos/demo_contiguous_vs_linked.cpp`
-
-Construyan una tabla con cuatro columnas:
-
-- Archivo
-- Salida u observable importante
-- Idea estructural
-- Argumento de costo, espacio o diseño
-
-
 | Archivo | Salida u observable importante | Idea estructural | Argumento de costo, espacio o diseño |
 | :--- | :--- | :--- | :--- |
 | `demo_sllist.cpp` | `size = 3`, `peek = 5`, `pop = 5`, `remove = 10` | Lista simplemente enlazada con punteros `head` y `tail`. | Operaciones en extremos (Pila/Cola) con costo $O(1)$. No apta para borrado al final $O(N)$. |
@@ -183,7 +83,6 @@ Construyan una tabla con cuatro columnas:
 | `demo_linked_adapters.cpp` | Operaciones estrictas de Stack/Queue. | Adaptador de interfaz que restringe una estructura base. | Diseño seguro. Previene violaciones de política (LIFO/FIFO) ocultando métodos de acceso aleatorio. |
 | `demo_contiguous_vs_linked.cpp` | Comparación de `get(4)` entre `ArrayDeque` y `DLList`. | Contraste entre memoria contigua (índices) y dinámica (enlaces). | *Trade-off*: Contiguo gana en acceso $O(1)$ y caché; Enlazado en mutación local sin desplazar memoria. |
 
-Luego respondan:
 
 1. En `demo_sllist.cpp`, ¿qué secuencia deja más clara la coexistencia de comportamiento tipo pila y tipo cola dentro de `SLList`?
 
@@ -221,179 +120,258 @@ La DLList (enlazada) no tiene localidad de memoria (los nodos están dispersos) 
 
 #### Bloque 3 - Pruebas públicas, stress y correctitud
 
-Revisen:
-
-- `Semana3/pruebas_publicas/README.md`
-- `Semana3/pruebas_publicas/test_public_week3.cpp`
-- `Semana3/pruebas_publicas/test_public_deng_bridge.cpp`
-- `Semana3/pruebas_publicas/test_public_extras.cpp`
-- `Semana3/pruebas_publicas/test_public_linked_adapters.cpp`
-- `Semana3/pruebas_publicas/test_public_contiguous_vs_linked.cpp`
-- `Semana3/pruebas_internas/test_internal_week3.cpp`
-- `Semana3/pruebas_internas/test_internal_deng_algorithms.cpp`
-- `Semana3/pruebas_internas/test_internal_extras.cpp`
-- `Semana3/pruebas_internas/stress_selist_week3.cpp`
-
-Respondan:
-
 1. ¿Qué operaciones mínimas valida la prueba pública para `SLList`?
+
+Valida las operaciones de inserción y eliminación elementales: agregar al final (add), agregar al inicio (push), consultar el inicio (peek), eliminar al inicio (pop) y el control del tamaño (size).
+
 2. ¿Qué operaciones mínimas valida la prueba pública para `DLList`?
+
+Valida el acceso y la mutación por índice posicional. Insertar en un índice (add(i, x)), recupera datos por índice (get(i)), elimina por índice (remove(i)) y verifica que el tamaño.
+
 3. ¿Qué operaciones mínimas valida la prueba pública para `SEList`?
+
+Valida el comportamiento como lista indizada comprobando inserciones iniciales en bucle (add(i, x)), recuperación (get(i)), reemplazo (set(i, x)), la eliminación por índice (remove(i)) y el tamaño (size).
+
 4. ¿Qué operaciones nuevas quedan cubiertas por `test_public_extras.cpp`?
+
+Para SLList: recuperación del penúltimo (secondLast), inversión de enlaces (reverse).
+Para DLList: rotación de la lista (rotate), validación de palíndromos (isPalindrome).
+Valida el comportamiento de estructuras especiales: MinStack, MinQueue, MinDeque y la XorList.
+
 5. ¿Qué valida específicamente `test_public_linked_adapters.cpp` sobre `LinkedStack`, `LinkedQueue` y `LinkedDeque`?
+
+Valida sus invariantes (LIFO y FIFO). Comprueba que LinkedStack apile y desapile en el extremo (LIFO); que LinkedQueue encole por un lado y desencole por el otro (FIFO); y que LinkedDeque permita operar por ambos extremos sin romper la estructura subyacente.
+
 6. ¿Qué demuestra `test_public_deng_bridge.cpp` sobre integración y reutilización?
+
+Prueba que es posible tomar estructuras (DLList y SEList), inyectarles temporalmente el algorítmico de la DengList (para aplicar ordenamiento estable, desduplicación o inversión), y devolver los resultados a la estructura original sin haber modificado ni una sola línea del código fuente de Morin.
+
 7. En `stress_selist_week3.cpp`, ¿qué comportamiento intenta estresar sobre crecimiento, borrado y mantenimiento del tamaño lógico?
+
+Intenta forzar múltiples rutinas de reacomodo interno de los BDeque. Al agregar 500 elementos (creación de bloques). Al remover 250 elementos desde el frente (fusión y eliminación de bloques). Finalmente, al agregar 100 elementos más, verifica que la lista no colapsó y reporta el tamaño lógico (350).
+
 8. ¿Qué sí demuestra una prueba pública sobre una estructura enlazada?
+
+Prueba que, para algunos casos borde previstos en los assert, la lógica de enlaces no genera un error de segmentación, que los datos entran y salen en el orden esperado y que los contadores de estado operan bien.
+
 9. ¿Qué no demuestra una prueba pública por sí sola?
+
+No demuestra eficiencia asintótica. Una prueba puede pasar en verde si un push_back tarda un milisegundo (O(1)) o si tarda un minuto recorriendo un millón de nodos (O(n)). Tampoco demuestra el uso correcto de memoria dinámica, a menos que se corra bajo herramientas de análisis como Valgrind o AddressSanitizer.
+
 10. ¿Por qué pasar pruebas no reemplaza una explicación de invariantes, punteros y complejidad?
+
+Porque un código puede "funcionar" por accidente. Pasar las pruebas solo indica que el resultado coincidió con la aserción. Explicar los invariantes demuestra que entiendes la estructura; explicar los punteros demuestra que domina la manipulación de la memoria y argumentar la complejidad justifica por qué esa estructura es útil en el mundo.
 
 #### Bloque 4 - SLList, DLList y SEList: lectura cercana del código
 
-Revisen:
-
-- `Semana3/include/SLList.h`
-- `Semana3/include/DLList.h`
-- `Semana3/include/SEList.h`
-- `Parte3-Morin.pdf`
-- `Parte3-Deng.pdf`
-
-Respondan:
-
 1. En `SLList`, ¿qué papel cumplen `head`, `tail` y `n`?
+
+head: Mantiene la referencia al primer nodo de la lista.
+tail: Mantiene la referencia al último nodo.
+n: Actúa como un caché del tamaño lógico de la estructura.
+
 2. En `SLList::push`, `pop`, `add` y `remove`, ¿qué punteros cambian exactamente?
+
+push(x): El next del nuevo nodo se conecta al actual head. Luego, head se reasigna para apuntar a este nuevo nodo.
+pop() / remove(): El puntero head se avanza al siguiente nodo (head = head->next). El nodo antiguo queda desconectado y se libera (delete).
+add(x): El next del actual tail se conecta al nuevo nodo (tail->next = u). Luego, tail se desplaza al nuevo nodo.
+
 3. Expliquen cómo funciona `secondLast()` y por qué no puede resolverse directamente con solo mirar `tail`.
+
+secondLast() funciona comenzando en head y saltando de nodo en nodo hasta encontrar aquel cuyo enlace next es igual a tail. La estructura es asimétrica y unidireccional: un nodo sabe quién le sigue, pero sabe quién lo precede.
+
 4. Expliquen paso a paso cómo funciona `reverse()` y por qué no necesita estructura auxiliar.
+
+Funciona intercambiando enlaces in-place (sobre la misma memoria) a través de tres punteros en paralelo:Se inicializa prev en nulo y curr en head.Mientras curr no sea nulo, se guarda la referencia al nodo próximo en un temporal next (next = curr->next).Se voltea la flecha: curr->next pasa a apuntar hacia atrás (prev). prev asume el lugar de curr, y curr el de next.Se actualiza head = prev.No requiere estructuras auxiliares porque simplemente invierte el flujo del mapa de punteros existente en espacio extra $O(1)$.
+
 5. Expliquen qué verifica `checkSize()` y por qué esta función ayuda a defender correctitud.
+
+checkSize() iterar manualmente toda la lista desde head contando los nodos uno por uno y registrando el último nodo. Verifica dos invariantes, que el conteo coincida con la variable de control y que el último nodo visitado coincida con el puntero tail. Esto defiende la correctitud de la estructura al detectar si ha ocurrido corrupción de memoria, nodos perdidos, contadores desincronizados o si se ha formado un ciclo infinito por error humano.
+
 6. En `DLList`, expliquen por qué `getNode(i)` puede empezar desde el inicio o desde el final.
+
+Puede hacerlo gracias a la simetría de sus punteros bidireccionales (next y prev) y a que conoce su tamaño n. La función evalúa matemáticamente si el índice deseado i pertenece a la primera o a la segunda mitad. Si pertenece a la primera, inicia desde dummy.next; si no, inicia desde dummy.prev. Esto reduce la complejidad a $O(1 + \min(i, n-i))$.
+
 7. En `DLList::addBefore`, ¿qué enlaces se actualizan y por qué el nodo centinela elimina casos borde?
+
+Al insertar un nodo u antes de w, se actualizan cuatro enlaces: los dos propios del nodo (u->prev = w->prev y u->next = w) y los de sus vecinos inmediatos para "abrazarlo" (u->prev->next = u y u->next->prev = u).
+El nodo centinela (dummy) elimina los casos borde porque garantiza la invariante de que todo nodo en la lista siempre tendrá un predecesor y un sucesor real. Si insertas al inicio de una lista vacía, el predecesor y sucesor es la propia dummy.
+
 8. Expliquen cómo funciona `rotate(r)` sin mover los datos elemento por elemento.
+
+rotate(r) calcula un punto de corte lógico (índice n - r). En lugar de sacar y meter datos, simplemente ubica el nodo que debe convertirse en el nuevo primero, su predecesor (que será el nuevo último), e intercambia cuatro punteros con la dummy y con los viejos extremos de la lista. Esta mueve toda una franja de la lista en una sola operación equivalente a encontrar el nodo.
+
 9. Expliquen cómo `isPalindrome()` aprovecha la naturaleza doblemente enlazada de la estructura.
+
+La función posiciona un puntero left en el inicio físico (dummy.next) y un puntero right en el final físico (dummy.prev). Luego, en cada iteración del ciclo, compara ambos, avanzando el left hacia adelante (->next) y el right hacia atrás (->prev) simultáneamente hasta cruzarse. Esta convergencia bidireccional es exclusiva del doble enlace.
+
 10. En `SEList`, expliquen qué representa `Location`.
+
+Location es una abstracción de coordenadas. Dado que la lista es un híbrido entre enlazado y contiguo, un índice no basta. Location encapsula un puntero u (que te dice "en qué bloque o nodo específico de la cadena está") y índice local j (que te indica "en qué celda específica esta el dato").
+
 11. Expliquen qué hacen `spread()` y `gather()` y en qué situaciones aparecen.
+
+spread(): Se invoca durante el add(i, x). Si el bloque objetivo está completamente saturado (desbordamiento) y los bloques vecinos también lo están, no hay dónde poner el dato. spread toma la data de $b$ bloques atestados y los reparte (o "esparce") a lo largo de $b+1$ bloques (inyectando un nodo nuevo a la lista).
+gather(): Se invoca durante el remove(i). Si el bloque objetivo está por vaciarse peligrosamente (subdesbordamiento) y sus vecinos también están escasos, se genera desperdicio de memoria. gather toma los pocos elementos de $b$ bloques y los compacta en $b-1$ bloques (eliminando el nodo sobrante de la memoria).
+
 12. Expliquen cómo el tamaño de bloque `b` afecta el trade-off entre acceso, actualización y uso de espacio.
+
+El tamaño b es la "perilla de ajuste" del trade-off:
+Si b es muy pequeño (ej. $b=2$), los bloques se llenan y se vacían a la menor provocación; las operaciones locales no mueven casi memoria, pero se gasta mucha sobrecarga espacial por el exceso de punteros prev/next y el acceso se hace linealmente más lento.
+Si b es grande, la estructura ahorra memoria al reducir la sobrecarga de los nodos, y la velocidad de indexación aumenta mucho al operar grandes saltos en la secuencia; sin embargo, las inserciones intermedias comienzan a ser sumamente costosas porque obligan a desplazar mucha memoria contigua en las matrices interiores.
 
 #### Bloque 5 - Adaptadores y estructuras derivadas
 
-Revisen:
-
-- `Semana3/include/LinkedStack.h`
-- `Semana3/include/LinkedQueue.h`
-- `Semana3/include/LinkedDeque.h`
-- `Semana3/include/MinStack.h`
-- `Semana3/include/MinQueue.h`
-- `Semana3/include/MinDeque.h`
-- `Semana3/demos/demo_linked_adapters.cpp`
-- `Semana3/demos/demo_min_structures.cpp`
-
-Respondan:
-
 1. ¿Cómo reutiliza `LinkedStack` a `SLList`?
+
+Reutiliza SLList mediante composición. LinkedStack restringe su interfaz pública para forzar una política LIFO. Mapea sus métodos a las operaciones: push(x) llama a list.push(x), pop() llama a list.pop(), y top() llama a list.peek().
+
 2. ¿Cómo reutiliza `LinkedQueue` a `SLList`?
+
+Usa composición para imponer una política FIFO. Aprovecha que SLList tiene referencias tanto a la cabeza como a la cola. Mapea add(x) a list.add(x) (que inserta al final en tiempo $O(1)$) y remove() a list.remove(). El método front() consulta list.peek().
+
 3. ¿Por qué `LinkedDeque` se construye naturalmente sobre `DLList` y no sobre `SLList`?
+
+Un Deque exige inserciones y eliminaciones en ambos extremos en tiempo $O(1)$. Si bien SLList no puede eliminar al final en tiempo constante. Para hacer un removeLast() en una SLList se debe recorrer toda la estructura. DLList puede hacer mutaciones en ambos extremos en $O(1)$.
+
 4. En `MinStack`, ¿por qué cada entrada guarda el valor y el mínimo acumulado?
+
+Al guardar el mínimo histórico en cada nodo (current_min), la pila "recuerda" cuál era el mínimo en el momento en que se insertó. Esto permite consultar min() en $O(1)$ sin recálculos.
+
 5. En `MinQueue`, ¿por qué usar dos pilas permite mantener semántica FIFO y consulta de mínimo?
+
+Es el clásico algoritmo de simular una cola con dos pilas (in_ y out_). Conocen su propio mínimo en $O(1)$.
+FIFO: Los datos entran por in_. Cuando se necesita sacar un dato, se extrae de out_. Si out_ está vacía, se vacía in_ sobre out_, lo que invierte el orden (LIFO a LIFO = FIFO).
+Mínimo: El mínimo global de la cola es simplemente comparar in_.min() y out_.min().
+
 6. En `MinDeque`, ¿qué problema resuelve el rebalanceo entre `front_` y `back_`?
+
+Resuelve el problema de la "inanición" de uno de los extremos. Imagina que insertas 100 elementos por delante (addFirst); todos irán a front_. Si luego el usuario pide un removeLast(), la pila back_ estará vacía.
+
 7. Comparen "implementar una estructura" y "adaptar una estructura existente" usando ejemplos de este bloque.
+
+Implementar: Implica lidiar con la gestión de memoria cruda, punteros y la invariante interna (ej. SLList y DLList haciendo new Node, ajustando next, prev, y previniendo fugas de memoria).
+
+Adaptar: Implica tomar una estructura robusta ya hecha y usarla como "caja negra" para moldear un comportamiento (ej. LinkedStack no toca un solo puntero; solo restringe lo que el usuario puede hacer).
+
 8. ¿Qué operaciones pueden defender como constantes y cuáles deben defender como amortizadas?
+
+Constantes estrictas $O(1)$: Todas las operaciones de LinkedStack, LinkedQueue, LinkedDeque, y MinStack. En estas estructuras, cada llamada a un método ejecuta un número fijo de instrucciones.
+Constantes amortizadas $O(1)$: Las extracciones en MinQueue (remove, front) y MinDeque (removeFirst, removeLast). Estas operaciones son baratas pero puede haber reconstrucciones totales (rebalance()) que cuestan $O(N)$. Sin embargo, garantizan $N$ operaciones de costo $O(1)$, el costo promedio por operación se "amortiza" a $O(1)$.
 
 #### Bloque 6 - Deng como refuerzo algorítmico y puente de integración
 
-Revisen:
-
-- `Semana3/include/CleanList.h`
-- `Semana3/include/DengList.h`
-- `Semana3/include/MorinDengBridge.h`
-- `Semana3/demos/demo_deng_list.cpp`
-- `Semana3/demos/demo_morin_deng_bridge.cpp`
-- `Semana3/pruebas_publicas/test_public_deng_bridge.cpp`
-- `Semana3/pruebas_internas/test_internal_deng_algorithms.cpp`
-- `Parte3-Deng.pdf`
-
-Respondan:
-
 1. ¿Qué operaciones del ADT de lista aparecen reforzadas en `DengList`?
+
+Búsqueda avanzada: contains(x) y find_index(x).
+
+Ordenamiento: sort() (ordenamiento estable).
+
+Limpieza de datos: dedup() (elimina duplicados) y uniquify() (elimina duplicados consecutivos).
+
+Mutación estructural: reverse() (invierte el orden lógico de los elementos).
+
 2. ¿Qué ventaja tiene encapsular una lista más rica sin cambiar el resto de estructuras de Semana 3?
+
+La principal ventaja es la separación de responsabilidades y el respeto al principio de diseño abierto/cerrado (Open/Closed Principle). Modificarlas directamente para añadir algoritmos complejos ensuciaría su código base y complicaría el análisis de sus invariantes.
+
 3. Expliquen qué hacen `to_deng` y `assign_from_deng`.
+
+to_deng (Exportador): Recibe una estructura base (como DLList o SEList), itera sobre sus elementos desde el índice 0 hasta el tamaño final, e inserta secuencialmente cada elemento en una nueva instancia de DengList.
+assign_from_deng (Importador): Hace la operación inversa. Primero, vacía completamente la estructura destino (dst.clear()). Luego, itera sobre los elementos de la DengList de origen e inserta cada uno de vuelta en la estructura original.
+
 4. Expliquen por qué `stable_sort_with_deng` no obliga a reimplementar ordenamiento dentro de `DLList` o `SEList`.
+
+El ordenamiento se resuelve externamente y la estructura original solo sufre operaciones de vaciado y llenado ordenado.La función extrae los datos de DLList o SEList convirtiéndolos temporalmente a una DengList, invoca el método sort() y finalmente devuelve los datos ordenados a la estructura original (usando assign_from_deng)
+
 5. Expliquen qué hace `dedup_with_deng` y qué relación guarda con `deduplicate()` o `uniquify()` de la teoría.
+
+dedup_with_deng extrae los elementos a una lista temporal DengList, aplica el método de limpieza, guarda la cantidad de elementos eliminados, reasigna los elementos únicos a la lista original y retorna la cantidad de elementos removidos.
+
+dedup() / deduplicate(): Elimina todas las ocurrencias duplicadas de un elemento a lo largo de toda la lista, independientemente de su posición(O(n²)).
+
+uniquify(): Solo elimina duplicados consecutivos. Es altamente eficiente, requiriendo un costo de tiempo lineal O(n), pero exige que la estructura esté previamente ordenada.
+
 6. Expliquen por qué `reverse_with_deng` es un ejemplo de reutilización de algoritmos sobre una interfaz común.
+
+reverse_with_deng, al depender únicamente de operaciones de interfaz comunes (recorrer los elementos y volver a insertarlos) mediante el puente a DengList, logra aplicar una mutación lógica idéntica sobre dos implementaciones físicas distintas, maximizando el reciclaje de código (DRY).
+
 7. ¿Qué costo adicional introduce la conversión entre estructuras y cuándo vale la pena aceptarlo?
+
+Por cada puente realizado, se gasta memoria adicional O(n) para instanciar la DengList, y tiempo O(n) en las iteraciones repetidas de copiar y vaciar/repoblar datos.
+
+Vale la pena aceptarlo cuando: La complejidad del algoritmo a ejecutar (como un ordenamiento o deduplicación exhaustiva) supera ampliamente la sobrecarga lineal de las transferencias. También es justificable cuando la prioridad del sistema es la estabilidad, seguridad y limpieza del código (evitar bugs) sobre el consumo estricto de recursos, especialmente si la cantidad de datos en memoria no es masiva.
 
 #### Bloque 7 - Comparación enlazado vs contiguo, variantes y evidencia experimental
 
-Revisen:
-
-- `Semana3/include/ArrayDeque.h`
-- `Semana3/include/XorList.h`
-- `Semana3/demos/demo_contiguous_vs_linked.cpp`
-- `Semana3/demos/demo_xor_list.cpp`
-- `Semana3/benchmarks/benchmark_semana3.cpp`
-- `Parte3-Morin.pdf`
-
-Respondan:
-
 1. Comparen `ArrayDeque` y `LinkedDeque`: ¿qué cambia en representación y qué cambia en costo observable?
+
+Representación: ArrayDeque se sostiene sobre un arreglo dinámico en memoria contigua, utilizando aritmética modular para conectar lógicamente el final con su principio. LinkedDeque, por su parte, se sostiene sobre una lista doblemente enlazada, dispersando sus elementos en memoria y conectándolos mediante punteros prev y next.
+
+Costo observable: En teoría, ambas logran inserciones y eliminaciones en tiempo O(1). En la práctica, LinkedDeque paga el precio de interactuar con el sistema operativo para asignar y liberar memoria (new y delete) por cada nodo, lo que añade tiempo. ArrayDeque es mucho más rápido asintóticamente en el día a día, aunque su costo O(1) es amortizado.
+
 2. ¿Qué significa que una representación contigua tenga mejor localidad de memoria?
+
+La localidad de memoria significa que los datos lógicamente adyacentes también están físicamente adyacentes en la RAM. Cuando la CPU solicita leer un elemento de un ArrayDeque, no solo trae ese número, sino que arrastra un bloque entero de datos continuos hacia su memoria caché profunda. Las representaciones enlazadas obliga a la CPU a buscar en la lenta memoria RAM tras cada puntero.
+
 3. ¿Qué tipo de operaciones favorecen más a la representación enlazada?
+
+La representación enlazada favorece enormemente a las inserciones y eliminaciones en posiciones intermedias de la colección, siempre que tenga una referencia a dicho nodo. También es imbatible para operaciones como dividir una lista en dos, o concatenar dos listas gigantes.
+
 4. En el benchmark, ¿qué comparación sirve mejor para discutir acceso aleatorio y cuál sirve mejor para discutir operaciones en extremos?
+
+Para discutir acceso aleatorio: La comparación clave es t_array_random_get vs. t_linked_random_get. El arreglo lo resuelve matemáticamente en O(1), mientras que la lista doble se ve obligada a iterar desde un extremo en O(n).
+
+Para discutir operaciones en extremos: La comparación ideal es t_array_deque_ends vs. t_linked_deque_ends. Ambas pruebas insertan repetidamente y luego consumen por ambos extremos. Servirá para demostrar el peso real en microsegundos de invocar a los asignadores de memoria (new Node) frente a simples sumas modulares.
+
 5. ¿Por qué el benchmark no debe leerse como prueba absoluta de superioridad de una estructura sobre otra?
+
+El benchmark está altamente condicionado por su diseño. No mide escenarios donde las listas enlazadas son superiores. Además, ignora el comportamiento de latencia en tiempo real: un sistema crítico podría preferir un LinkedDeque, en lugar de un ArrayDeque. Los resultados también variarán según el hardware local, la optimización del compilador y el tamaño de los datos elegidos.
+
 6. ¿Qué idea intenta mostrar `XorList` respecto al ahorro de punteros?
+
+Busca demostrar que es posible obtener todos los beneficios bidireccionales de una lista doblemente enlazada, pero consumiendo la misma cantidad de memoria que una lista simplemente enlazada. Lo logra almacenando en un solo campo (link) el resultado lógico de aplicar una compuerta XOR a nivel de bits (^) entre las direcciones del nodo anterior y el nodo siguiente.
+
 7. ¿Qué desventaja práctica introduce una estructura como `XorList` aunque sea interesante desde el punto de vista del espacio?.
+
+Navegación con estado: No puedes acceder a un nodo al azar, obligatoriamente necesitas conocer la dirección del nodo exacto desde el que vienes.
+
+Inseguridad de tipos: Requiere saltarse la seguridad del lenguaje (usando reinterpret_cast exhaustivos) para tratar direcciones de memoria como enteros de cálculo.
+
+Incompatibilidad con recolectores de basura y herramientas: Los sistemas modernos de rastreo de memoria o sanitizadores se "rompen" al no ver punteros reales.
 
 #### Bloque 8 - Cierre comparativo y preparación de sustentación
 
-Respondan esta pregunta final:
-
 ¿Qué cambia cuando pasamos de "usar arreglos dinámicos" a "diseñar estructuras enlazadas y adaptadores sobre nodos"?
 
-La respuesta debe incluir obligatoriamente:
+El paso de utilizar arreglos dinámicos a diseñar estructuras enlazadas y adaptadores representa que ya no pensamos en "bloques" físicos rígidos, sino en "grafos" de relaciones dinámicas.
 
-- Una afirmación sobre representación
-- Una afirmación sobre acceso por rango frente a acceso por posición
-- Una afirmación sobre inserciones y eliminaciones locales
-- Una afirmación sobre complejidad de `SLList`, `DLList` y `SEList`
-- Una afirmación sobre reutilización mediante adaptadores o puentes
-- Una comparación entre representación contigua y enlazada.
+1. La separación de la representación lógica y física
 
-#### Formato sugerido de entrega
+2. Acceso por posición frente a acceso por enlace (rango)
 
-    ## Actividad 3-CC232
+3. La agilidad de las inserciones y eliminaciones locales
 
-    ### Integrantes
-    - Nombre 1
-    - Nombre 2
+4. Complejidad y evolución: SLList, DLList y SEList
 
-    #### Bloque 1
-    (respuestas)
+5. Reutilización mediante adaptadores y puentes
+Cuando pasamos a pensar en nodos, manipular punteros constantemente se vuelve propenso a errores (bugs, fugas de memoria).
 
-    #### Bloque 2
-    (tabla y respuestas)
+6. Representación contigua vs. Enlazada
+La representación contigua domina en velocidad de lectura cruda y amigabilidad con la memoria caché del procesador.
+La representación enlazada arruina la localidad de caché.
 
-    #### Bloque 3
-    (respuestas)
-
-    #### Bloque 4
-    (respuestas)
-
-    #### Bloque 5
-    (respuestas)
-
-    #### Bloque 6
-    (respuestas)
-
-    #### Bloque 7
-    (respuestas)
-
-    #### Bloque 8
-    (respuesta final)
-
-    #### Autoevaluación breve
+#### Autoevaluación breve
     - Qué podemos defender con seguridad:
+    Entendemos que un ADT define qué se puede hacer, pero no cómo se organiza en la RAM.
+    Podemos argumentar sólidamente por qué un arreglo dinámico aplasta a una lista en acceso aleatorio pero pierde estrepitosamente cuando toca insertar o eliminar.
+    Sabemos que es mejor "exportar" datos a una estructura rica para aplicar algoritmos complejos (sort, dedup) en lugar de ensuciar el código base de estructuras minimalistas.
+    
     - Qué todavía confundimos:
+    El O(1) amortizado de un arreglo dinámico y el O(1) estricto de una lista enlazada tienen impactos muy distintos en el reloj del procesador.
+    Manipulación de punteros a bajo nivel: Técnicas agresivas como la de XorList todavía resultan contraintuitivas (rompen reglas de seguridad).
+
     - Qué evidencia usaríamos en una sustentación:
-
-#### Criterio general de trabajo
-
-Se espera lectura real de los archivos, respuestas breves pero justificadas, y conexión explícita entre código, correctitud, costo, representación, punteros, invariantes y reutilización.
-
-No basta con ejecutar el programa: deben poder explicar por qué funciona, qué punteros se actualizan, qué invariante mantiene cada estructura y qué costo justifica su diseño.
+    Los resultados del Benchmark (t_array_random_get vs. t_linked_random_get): Demostrar que el acceso en memoria contigua es superior al recorrido por nodos.
+    El código de t_array_deque_ends vs. t_linked_deque_ends: El asignador de memoria añade un "peso" por cada nodo, que se nota el peso en la ejecución.
+    El método assign_from_deng: Reciclamos algoritmos bajo una misma interfaz.

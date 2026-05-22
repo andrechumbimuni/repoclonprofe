@@ -56,14 +56,32 @@ Revisa:
 Responde:
 
 1. Explica con tus palabras qué diferencia hay entre un árbol binario enlazado y un árbol binario almacenado implícitamente en un arreglo.
+
+Un arbol binario enlazado es una estructura que esta hecha por BinNode que guarda punteros padre y 2 hijos, es creada dinamicamente con nodos enlazados; un arbol binario tiene nodos que almacenan un vector, es compacto y buena con la localidad(sus punteros se calculan los indices).
+
 2. Explica qué información guarda un `BinNode`: dato, padre, hijo izquierdo, hijo derecho y altura.
+
+Guarda los datos del nodo al que apunta, el nodo parent, left , right y la altura del subarreglo sino fuera la raiz.
+
 3. Explica por qué el puntero `parent` permite implementar operaciones como `succ()`, `pred()` y actualización ascendente de alturas.
+
+Parent permite subir al la raiz
+
 4. Explica qué responsabilidad tiene `BinTree` frente a `BinNode`.
 5. Explica qué agrega `BinaryTree` sobre la infraestructura base de `BinTree`.
+
+Agrega las funciones de navegacion, tamaño del arbol, el primer nodo , el ultimo.
+
 6. Explica qué propiedad adicional convierte un árbol binario en un `BinarySearchTree`.
+
+Cuando todo valor de la derecho es menor que el derecho (isBST)
+
 7. Explica qué propiedad adicional convierte un arreglo en un `BinaryHeap` mínimo.
 8. Compara la propiedad de orden de un BST con la propiedad de prioridad de un heap.
 9. Explica por qué un recorrido inorden de un BST produce una secuencia ordenada.
+
+Porque primero visita menores , el mismo bst y los mayores.
+
 10. Explica por qué un heap no permite, por sí solo, recorrer los elementos en orden sin destruir o copiar la estructura.
 
 
@@ -79,15 +97,32 @@ Revisa:
 Responde:
 
 1. En `BinNode`, explica qué significan `hasLeft()`, `hasRight()`, `isRoot()`, `isLeaf()`, `isLeftChild()` e `isRightChild()`.
+
+Inspeccionan las estructuras de nodo como: hasLeft(tiene hijo izquierdo), hasRight(tiene hijo derecho), isRoot(es la raiz), isLeaf(es hoja), isLeftChild(el hijo izquierdo de mi padre), isRightChild(el hijo derecho de padre).
+
 2. Explica el caso en que `succ()` baja al subárbol derecho y luego busca el nodo más a la izquierda.
+
+Si el nodo tiene hijo derecho, baja al subarbol  derecho(s=right) y busca el mas a la izquierda(s=s->left)
+
 3. Explica el caso en que `succ()` sube por los ancestros hasta encontrar el primer giro hacia la izquierda.
+
+Si el nodo no tiene hijo derecho , sube por los ancestros mientras seas hijo derecho 
+
 4. Explica simétricamente cómo debe funcionar `pred()`.
 5. Dibuja un árbol de al menos 7 nodos y marca el sucesor y predecesor inorden de tres nodos distintos.
 6. Explica qué calcula `depth(u)` y por qué puede implementarse subiendo por `parent`.
+
+
+
 7. Explica qué calcula `height(u)` y por qué suele implementarse bajando recursivamente por los hijos.
 8. Explica qué calcula `subtreeSize(u)`.
 9. Demuestra que para todo nodo `u` se cumple `depth(u) + height(u) <= height(T)`.
+
+
+
 10. Indica la condición necesaria y suficiente para que se alcance la igualdad anterior.
+
+Si u perteneciera al nodo donde esta el subarreglo mas largo osea la distancia maxima de T.
 
 #### Bloque 3 - Recorridos y trazado guiado
 
@@ -121,14 +156,27 @@ Incluye en la tabla:
 Luego responde:
 
 1. ¿Qué significa visitar un nodo en preorden?
+
+El nodo que esta siendo visitado en preorden cuando se esta ejecutando el visit(), visitar a la raiz antes que a los hijos
+
 2. ¿Qué significa visitar un nodo en inorden?
+
+Esto visita primero al hijo por la izquierda luego la raiz  para luego la derecha.
+
 3. ¿Qué significa visitar un nodo en postorden?
 4. ¿Qué significa visitar un árbol por niveles?
+
+Viajar por niveles: travlevel 
+
 5. ¿Por qué los recorridos recursivos tienen tiempo `O(n)`?
+
 6. ¿Por qué las versiones iterativas también tienen tiempo `O(n)`?
 7. ¿Cuál es la memoria auxiliar de un recorrido recursivo en un árbol balanceado?
 8. ¿Cuál es la memoria auxiliar de un recorrido recursivo en un árbol degenerado?
 9. ¿Qué diferencia hay entre usar una pila explícita y usar la pila de llamadas?
+
+Nosotros la controlamos (explicita) y en la pila de llamadas el computador usa sus propias formas de llamar pero puede causar overflow
+
 10. ¿Por qué la cola del recorrido por niveles puede crecer mucho más en un árbol completo que en un árbol degenerado?.
 
 #### Bloque 4 - Demostración: evidencia observable

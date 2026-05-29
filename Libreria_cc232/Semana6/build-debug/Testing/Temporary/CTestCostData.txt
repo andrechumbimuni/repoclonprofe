@@ -1,0 +1,5 @@
+semana6_public 0 0
+semana6_internal 0 0
+---
+semana6_public
+semana6_internal

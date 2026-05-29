@@ -1,0 +1,35 @@
+Start testing: May 29 09:28 -05
+----------------------------------------------------------
+Unable to find executable: /home/alumno/Documentos/as/repoclonprofe/Libreria_cc232/Semana6/build-debug/sem6_test_public
+1/2 Testing: semana6_public
+1/2 Test: semana6_public
+Command: ""
+Directory: /home/alumno/Documentos/as/repoclonprofe/Libreria_cc232/Semana6/build-debug
+"semana6_public" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"semana6_public" end time: May 29 09:28 -05
+"semana6_public" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /home/alumno/Documentos/as/repoclonprofe/Libreria_cc232/Semana6/build-debug/sem6_test_internal
+2/2 Testing: semana6_internal
+2/2 Test: semana6_internal
+Command: ""
+Directory: /home/alumno/Documentos/as/repoclonprofe/Libreria_cc232/Semana6/build-debug
+"semana6_internal" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"semana6_internal" end time: May 29 09:28 -05
+"semana6_internal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: May 29 09:28 -05

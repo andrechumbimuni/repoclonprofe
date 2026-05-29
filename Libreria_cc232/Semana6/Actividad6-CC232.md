@@ -112,18 +112,24 @@ Responde:
 1. ¿Qué targets de demostraciones o pruebas aparecen para Semana 6?
 las demos, pruebas internas y publicas.
 2. ¿Qué archivos se incluyen desde `Capitulo6.h`?
-Se incluyen los archivos la semana 6 en la carpeta include de PQ.h, PQ_ComplHeap_macro.h, PQ_ComplHeap.h, PQ_ComplHeap_getMax.h ademas de que se apoya en la semana 5 donde explican los arboles y las rotaciones del BST.
+Se incluyen los archivos la semana 6 en la carpeta include de PQ.h, PQ_ComplHeap_macro.h, PQ_ComplHeap.h, PQ_ComplHeap_getMax.h; es un header de la semana6 como una interfaz.
 3. ¿Qué diferencia práctica hay entre `Capitulo6.h` y `Capitulo10.h`?
-El capitulo6.h incluye las include.h de diferentes PQ y el treap , el capitulo10.h incluye el capitulo6.h.
+El capitulo10.h es un alias de compatibilidad del capitulo6.h como si lo estuvieras reutilizando.
 4. ¿Qué partes de Semana 6 dependen conceptualmente de Semana 5?
+Menciona que la semana 6 usas las estructuras de los arboles de semana5.
 5. ¿Qué estructura se usa para prioridad pura?
 6. ¿Qué estructura se usa para búsqueda ordenada?
 7. ¿Qué estructura mezcla búsqueda ordenada con prioridad?
 8. ¿Qué evidencia inicial obtuviste al ejecutar las pruebas sin modificar nada?.
-
+Los targets estan pasando.
 Entrega en este bloque:
 
 - Una tabla con: comando ejecutado, resultado, error si hubo, interpretación.
+
+cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug 
+cmake --build build-debug
+ctest --test-dir build-debug -R semana6 --output-on-failure
+
 - Una lista de los archivos que planeas modificar.
 
 #### Bloque 2 - Modificación de utilidades de heap completo

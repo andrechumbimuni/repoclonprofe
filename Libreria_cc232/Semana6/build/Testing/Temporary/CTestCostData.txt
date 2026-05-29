@@ -1,3 +1,0 @@
-semana6_public 1 0.00175651
-semana6_internal 1 0.00162178
----

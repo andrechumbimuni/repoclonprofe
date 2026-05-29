@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/sem6_demo_bst_rotations.dir/demos/demo_bst_rotations.cpp.o -o sem6_demo_bst_rotations 

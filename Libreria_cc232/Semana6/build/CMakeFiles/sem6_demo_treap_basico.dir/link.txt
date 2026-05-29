@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/sem6_demo_treap_basico.dir/demos/demo_treap_basico.cpp.o -o sem6_demo_treap_basico 

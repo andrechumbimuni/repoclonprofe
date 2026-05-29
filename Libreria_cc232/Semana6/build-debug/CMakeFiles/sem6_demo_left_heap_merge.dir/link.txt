@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/sem6_demo_left_heap_merge.dir/demos/demo_left_heap_merge.cpp.o -o sem6_demo_left_heap_merge 

@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/sem6_demo_pq_complheap_basico.dir/demos/demo_pq_complheap_basico.cpp.o -o sem6_demo_pq_complheap_basico 

@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/sem6_demo_heapsort.dir/demos/demo_heapsort.cpp.o -o sem6_demo_heapsort 

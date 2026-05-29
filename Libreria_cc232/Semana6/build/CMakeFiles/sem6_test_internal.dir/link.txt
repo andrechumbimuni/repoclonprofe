@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/sem6_test_internal.dir/pruebas_internas/test_internal_week6.cpp.o -o sem6_test_internal 

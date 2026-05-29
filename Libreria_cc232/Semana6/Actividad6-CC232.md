@@ -110,8 +110,11 @@ ctest --test-dir build --output-on-failure
 Responde:
 
 1. ¿Qué targets de demostraciones o pruebas aparecen para Semana 6?
+las demos, pruebas internas y publicas.
 2. ¿Qué archivos se incluyen desde `Capitulo6.h`?
+Se incluyen los archivos la semana 6 en la carpeta include de PQ.h, PQ_ComplHeap_macro.h, PQ_ComplHeap.h, PQ_ComplHeap_getMax.h ademas de que se apoya en la semana 5 donde explican los arboles y las rotaciones del BST.
 3. ¿Qué diferencia práctica hay entre `Capitulo6.h` y `Capitulo10.h`?
+El capitulo6.h incluye las include.h de diferentes PQ y el treap , el capitulo10.h incluye el capitulo6.h.
 4. ¿Qué partes de Semana 6 dependen conceptualmente de Semana 5?
 5. ¿Qué estructura se usa para prioridad pura?
 6. ¿Qué estructura se usa para búsqueda ordenada?

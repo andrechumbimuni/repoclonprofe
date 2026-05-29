@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/sem6_demo_compare_with_semana5.dir/demos/demo_compare_with_semana5.cpp.o -o sem6_demo_compare_with_semana5 

@@ -11,10 +11,7 @@ inline constexpr bool pqInHeap(std::size_t i, std::size_t n) noexcept { return i
 inline constexpr bool pqHasParent(std::size_t i) noexcept { return i > 0; }
 inline constexpr bool pqHasLeftChild(std::size_t i, std::size_t n) noexcept {return pqLeftChild(i) < n;}
 inline constexpr bool pqHasRightChild(std::size_t i, std::size_t n) noexcept {return pqRightChild(i) < n;}
-inline constexpr std::size_t pqLastInternal(std::size_t n) noexcept {
-  return n == 0 ? 0 : pqParent(n - 1);
-}
-
+inline constexpr std::size_t pqLastInternal(std::size_t n) noexcept { return n == 0 ? 0 : pqParent(n - 1);}
 inline constexpr bool pqIsLeaf(std::size_t i, std::size_t n) noexcept { return !pqHasLeftChild(i, n);}
 inline constexpr std::size_t pqIsInternal(std::size_t i, std::size_t n) noexcept { return pqHasLeftChild(i, n);}
 

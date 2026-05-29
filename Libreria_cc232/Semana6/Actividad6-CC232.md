@@ -154,14 +154,23 @@ Luego modifica `PQ_ComplHeap_percolateDown.h` para usar esas funciones auxiliare
 Responde:
 
 1. ¿Por qué conviene expresar `parent`, `left`, `right` y pruebas de frontera como funciones pequeñas?
+Para que si vea mas ordenado, que la relacion implicita del heap se vuelvan mas legibles, menos errores ya que son funciones pequeñas.
 2. ¿Qué ventaja tiene `constexpr` frente a macros?
+Se puede definir tipos , respeta ambitos que el macros solo reemplaza texto; tambien permite verificacion semantica y sintactica (como se comporta).
 3. ¿Qué caso borde aparece cuando el nodo tiene solo hijo izquierdo?
 4. ¿Qué condición identifica una hoja en la representación implícita?
-5. ¿Qué cambió en `percolateDown` después de usar las funciones auxiliares?
 
+5. ¿Qué cambió en `percolateDown` después de usar las funciones auxiliares?
+No cambia su complejidad O(log n )
 Entrega en este bloque:
 
 - Fragmento del código modificado.
+
+inline constexpr bool pqHasLeftChild(std::size_t i, std::size_t n) noexcept {return pqLeftChild(i) < n;}
+inline constexpr bool pqHasRightChild(std::size_t i, std::size_t n) noexcept {return pqRightChild(i) < n;}
+inline constexpr bool pqIsLeaf(std::size_t i, std::size_t n) noexcept { return !pqHasLeftChild(i, n);}
+inline constexpr std::size_t pqIsInternal(std::size_t i, std::size_t n) noexcept { return pqHasLeftChild(i, n);}
+
 - Explicación de por qué no cambia la complejidad.
 - Evidencia de compilación.
 

@@ -81,14 +81,25 @@ Una Cola Queue funciona bajo el modelo FIFO, que es la representación exacta de
 Una función recursiva es una función que se llama a sí misma, el programa utiliza la Pila de Llamadas (Call Stack) del sistema para recordar en qué línea se quedó cada función y qué valores tenía.la recursion implicita es cuando tu no lo gestionas si no el SO.
 
 5. Explica qué información mínima debe guardarse para que una pila permita reconstruir una solución parcial.
+El estado actual y las alternativas de caminos pendientes, si un camino falla prueba la siguiente alternativa.
 6. Compara la conversión de base recursiva e iterativa: ¿qué comparten y qué cambia en el control del proceso?
+Comparten que ambos dividen al numero entre la base y guardan los residuos y los leen en orden inverso.
+En la recursiva, el SO controla el LIFO usando la pila de llamadas. En la iterativa,tú controlas el proceso creando explícitamente una estructura de datos Stack.
 7. Explica por qué la verificación iterativa de paréntesis necesita almacenar aperturas pendientes.
+Porque cuando almacena un parentisis de entrada no se sabe cuando aparecera el parentesis de salida, por lo que necesitas recordar el parentisis de entrada.
 8. Explica por qué el evaluador de expresiones necesita dos pilas y no una sola.
+Porque una expresión  es para los números (operandos) y el otro para los símbolos (operadores). Necesitas separarlos para poder aplicar reglas como multiplicar antes de sumar. Una pila guarda los valores acumulados y la otra guarda los operadores en espera de que les llegue su turno de ejecutarse.
 9. Explica por qué N-Reinas y laberinto son ejemplos naturales de backtracking.
+Porque son problemas de ensayo y error. No existe una fórmula directa para saber dónde poner la reina o qué camino tomar.
 10. Explica por qué la simulación bancaria no se modela bien con pila, pero sí con colas.
+Porque un banco real funciona bajo el principio de "justicia". Si usaras una Pila (LIFO), la última persona en entrar es la primera en ser atendida, y la persona que llegó temprano seria la ultima, cosa que en una cola seria al revez.
 11. Explica qué relación hay entre estructura auxiliar, estado parcial y correctitud.
+Estructura auxiliar: Es la memoria (Pila, Cola), el estado parcial es "dónde estoy ahora" en medio del cálculo y la correctitud es que el algoritmo dé la respuesta correcta.
+La relación es si eliges la estructura auxiliar adecuada, esta guardará los estados parciales en el orden correcto (LIFO o FIFO). Al procesarlos en el orden dictado por la naturaleza del problema, garantizas la correctitud del resultado final.
 12. Explica qué diferencia conceptual hay entre "resolver un problema" y "simular un proceso".
 
+Resolver un problema se enfoca en encontrar un resultado final único u óptimo. No importa cómo llegues ahí, lo importante es la respuesta final.
+Simular un proceso se enfoca en imitar el comportamiento de un sistema paso a paso. Aquí no hay una "respuesta final" ganadora; el objetivo es estudiar cómo cambian los estados intermedios a través del tiempo.
 
 #### Bloque 2 - Demostración y trazado guiado
 

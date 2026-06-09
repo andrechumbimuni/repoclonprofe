@@ -485,42 +485,114 @@ En la implementación de Semana 6, una prioridad menor sube más cerca de la ra�
 
 ##### Parte A - Construcción determinística con prioridades fijas
 
-Crea o modifica `demo_treap_basico.cpp` para construir el treap usando `addWithPriority`, no solo `add`, con esta secuencia:
-
-```cpp
-{ {50, 50}, {30, 30}, {70, 70}, {20, 20}, {40, 40}, {60, 60}, {80, 80} }
-```
-
-Cada par representa:
-
-```cpp
-{ clave, prioridad }
-```
-
-Después de cada inserción, imprime:
-
-- clave insertada,
-- prioridad asignada,
-- recorrido inorden,
-- recorrido por niveles,
-- raíz actual,
-- resultado de `isBST()`,
-- resultado de `isHeapByPriority()`,
-- resultado de `isTreap()`.
-
-Responde:
-
 1. ¿Por qué el recorrido inorden debe salir ordenado aunque las prioridades cambien la forma del árbol?
+Porque un Treap está obligado a cumplir dos propiedades al mismo tiempo. Aunque las prioridades cambien la estructura física del árbol mediante rotaciones, estas rotaciones jamás alteran la propiedad de Árbol Binario de Búsqueda (BST) de las claves.
+
 2. ¿Por qué la raíz no necesariamente es la primera clave insertada?
+Porque la raíz final de un Treap está determinada por la prioridad. Si insertas un elemento al final con una prioridad muy alta (o muy baja en un Min-Heap), el algoritmo aplicará rotaciones para empujarlo hacia arriba.
+
 3. ¿Qué nodo debe subir cuando se inserta una clave con prioridad menor que la de sus ancestros?
+Debe subir el nodo recién insertado. Al tener una prioridad menor que su padre, se está violando la regla del montón. Por lo tanto, este nuevo nodo debe "flotar" hacia arriba mediante rotaciones consecutivas hasta encontrar una posición donde su padre tenga una prioridad menor que la suya.
+
 4. ¿Qué propiedad conserva una rotación local sobre las claves?
+Conserva intacta la propiedad de BST (Árbol Binario de Búsqueda). Las rotaciones están diseñadas específicamente para reestructurar los niveles del árbol sin alterar el orden lógico de las claves.
+
 5. ¿Qué propiedad intenta restaurar `bubbleUp` sobre las prioridades?.
+Intenta restaurar la propiedad de Heap (Montículo). Busca garantizar que la prioridad de cualquier nodo padre sea siempre menor o igual que la prioridad de sus nodos hijos. Si un nodo hijo rompe esta jerarquía piramidal al ser insertado, bubbleUp se encarga de corregir el orden de las prioridades de abajo hacia arriba.
 
 Entrega en esta parte:
 
-- demostración modificada,
-- salida de al menos cinco inserciones,
+- demostración modificada:
+```
+#include <iostream>
+#include <vector>
+
+#include "Capitulo6.h"
+
+int main() {
+  ods::Treap<int> t(232);
+  std::vector<std::pair<int, int>> insertions = { {50, 50}, {30, 30}, {70, 70}, {20, 20}, {40, 40}, {60, 60}, {80, 80} };
+
+  std::cout << "Inserciones con prioridades fijas para ver bubbleUp:\n";
+  //imprime las claves,prioridades, recorrido inorden, recorrido por niveles, raiz actual, resultado de isBST, resultado de isHeapByPriority y resultado de isTreap despues de cada insercion.
+  for (const auto& p : insertions) {
+    t.addWithPriority(p.first, p.second);
+    std::cout << "Después de insertar " << p.first << " con prioridad " << p.second << ":\n";
+    std::cout << "Recorrido inorden: ";
+    std::vector<int> inorder;
+    for (const auto& key : t.inorderKeys()) {
+      std::cout << key << " ";
+      inorder.push_back(key);
+    }
+    std::cout << "\n";
+    std::cout << "Recorrido por niveles: ";
+    for (const auto& key : t.levelOrderKeys()) {
+      std::cout << key << " ";
+    }
+    std::cout << "\n";
+    std::cout << "Raíz actual: " << (t.root() ? t.root()->key : -1) << "\n";
+    std::cout << "isBST: " << (t.isBST() ? "true" : "false") << "\n";
+    std::cout << "isHeapByPriority: " << (t.isHeapByPriority() ? "true" : "false") << "\n";
+    std::cout << "isTreap: " << (t.isTreap() ? "true" : "false") << "\n\n";
+  }
+  std::cout << "asciiArt del arbol final:\n" << t << "\n";
+
+}
+```
+- salida de al menos cinco inserciones:
+```
+Inserciones con prioridades fijas para ver bubbleUp:
+Después de insertar 50 con prioridad 50:
+Recorrido inorden: 50 
+Recorrido por niveles: 50 
+Raíz actual: 50
+isBST: true
+isHeapByPriority: true
+isTreap: true
+
+Después de insertar 30 con prioridad 30:
+Recorrido inorden: 30 50 
+Recorrido por niveles: 30 50 
+Raíz actual: 30
+isBST: true
+isHeapByPriority: true
+isTreap: true
+
+Después de insertar 70 con prioridad 70:
+Recorrido inorden: 30 50 70 
+Recorrido por niveles: 30 50 70 
+Raíz actual: 30
+isBST: true
+isHeapByPriority: true
+isTreap: true
+
+Después de insertar 20 con prioridad 20:
+Recorrido inorden: 20 30 50 70 
+Recorrido por niveles: 20 30 50 70 
+Raíz actual: 20
+isBST: true
+isHeapByPriority: true
+isTreap: true
+
+Después de insertar 40 con prioridad 40:
+Recorrido inorden: 20 30 40 50 70 
+Recorrido por niveles: 20 30 40 50 70 
+Raíz actual: 20
+isBST: true
+isHeapByPriority: true
+isTreap: true
+```
 - dibujo o `asciiArt()` del árbol final.
+```
+asciiArt del arbol final:
+│                       ┌── 80|p=80
+│                   ┌── 70|p=70
+│               ┌── 60|p=60
+│           ┌── 50|p=50
+│       ┌── 40|p=40
+│   ┌── 30|p=30
+└── 20|p=20
+```
 
 ##### Parte B - Instrumentación de `bubbleUp`
 

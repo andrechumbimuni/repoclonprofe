@@ -5,32 +5,30 @@
 
 int main() {
   ods::Treap<int> t(232);
+  std::vector<std::pair<int, int>> insertions = { {50, 50}, {30, 30}, {70, 70}, {20, 20}, {40, 40}, {60, 60}, {80, 80} };
 
   std::cout << "Inserciones con prioridades fijas para ver bubbleUp:\n";
-  t.addWithPriority(8, 80);
-  t.addWithPriority(3, 60);
-  t.addWithPriority(10, 90);
-  t.addWithPriority(1, 50);
-  t.addWithPriority(6, 70);
-  t.addWithPriority(4, 65);
-  t.addWithPriority(7, 68);
-
-  std::cout << t << '\n';
-  std::cout << "inorder: ";
-  for (int x : t.inorderKeys()) {
-    std::cout << x << ' ';
+  //imprime las claves,prioridades, recorrido inorden, recorrido por niveles, raiz actual, resultado de isBST, resultado de isHeapByPriority y resultado de isTreap despues de cada insercion.
+  for (const auto& p : insertions) {
+    t.addWithPriority(p.first, p.second);
+    std::cout << "Después de insertar " << p.first << " con prioridad " << p.second << ":\n";
+    std::cout << "Recorrido inorden: ";
+    std::vector<int> inorder;
+    for (const auto& key : t.inorderKeys()) {
+      std::cout << key << " ";
+      inorder.push_back(key);
+    }
+    std::cout << "\n";
+    std::cout << "Recorrido por niveles: ";
+    for (const auto& key : t.levelOrderKeys()) {
+      std::cout << key << " ";
+    }
+    std::cout << "\n";
+    std::cout << "Raíz actual: " << (t.root() ? t.root()->key : -1) << "\n";
+    std::cout << "isBST: " << (t.isBST() ? "true" : "false") << "\n";
+    std::cout << "isHeapByPriority: " << (t.isHeapByPriority() ? "true" : "false") << "\n";
+    std::cout << "isTreap: " << (t.isTreap() ? "true" : "false") << "\n\n";
   }
-  std::cout << "\n";
-  std::cout << "es treap valido: " << std::boolalpha << t.isTreap() << "\n\n";
+  std::cout << "asciiArt del arbol final:\n" << t << "\n";
 
-  std::cout << "Eliminar 3 y 8 (trickleDown + splice):\n";
-  t.remove(3);
-  t.remove(8);
-  std::cout << t << '\n';
-  std::cout << "inorder final: ";
-  for (int x : t.inorderKeys()) {
-    std::cout << x << ' ';
-  }
-  std::cout << "\n";
-  std::cout << "es treap valido: " << std::boolalpha << t.isTreap() << '\n';
 }

@@ -121,6 +121,13 @@ class PQ_LeftHeap : public PQ<T> {
 
   bool isLeftistHeap() const { return check(root_).ok; }
 
+  //MOD-A6-B7: Método público de validación multivariable
+  bool isValidLeftHeap() const {
+    std::size_t conteo_nodos = 0;
+    bool estructuras_ok = auditNode(root_, conteo_nodos);
+    return estructuras_ok && (conteo_nodos == n_);
+  }
+
  private:
   struct Check {
     bool ok;
@@ -155,6 +162,25 @@ class PQ_LeftHeap : public PQ<T> {
                         (!u->right || !comp_(u->value, u->right->value));
     const bool leftistOk = npl(u->left) >= npl(u->right) && u->npl == npl(u->right) + 1;
     return {l.ok && r.ok && heapOk && leftistOk, u->npl};
+  }
+
+  //MOD-A6-M7: Autoría recursiva profunda de invariantes de Leftist Heap
+  bool auditNode(Node* u, std::size_t& count) const {
+    if(!u) return true;
+
+    count++;
+    // 1. Validación del Invariante de Orden (Max-Heap)
+    if (u->left && comp_(u->value, u->left->value)) return false;
+    if (u->right && comp_(u->value, u->right->value)) return false;
+    
+    // 2. Validación de la Propiedad Izquierdista Estricta
+    if (npl(u->left) < npl(u->right)) return false;
+    
+    // 3. Validación y consistencia de la distancia nula (NPL) almacenada
+    if (u->npl != npl(u->right) + 1) return false;
+    
+    // Cascading recursivo sobre las subramas
+    return auditNode(u->left, count) && auditNode(u->right, count);
   }
 
   static void clear(Node* u) noexcept {

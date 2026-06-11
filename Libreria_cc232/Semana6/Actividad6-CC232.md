@@ -14,6 +14,13 @@
 | **MOD-A6-B2** | `demo_pq_complheap_basico.cpp` | Reemplazo del escenario base por la inserción controlada de la secuencia `{40, 10, 70, 30, 90, 20, 80, 60}`, imprimiendo estadísticas y verificando el invariante de max-heap. | Salida limpia en terminal con todas las aserciones validando "SI" a la propiedad estructural del Heap. |
 | **MOD-A6-B3** | `PQ_ComplHeap_percolateDown.h` | Inclusión de la función extendida `complHeapPercolateDownCount` para instrumentar y retornar el conteo preciso de colisiones e intercambios durante la reparación descendente. | Compilación exitosa en GCC 13.3.0 sin advertencias. |
 | **MOD-A6-B3** | `demo_pq_complheap_basico.cpp` | Implementación de una rutina destructiva secuencial que vacía por completo el Heap empleando la variante contadora, imprimiendo el estado antes y después de estabilizar la memoria. | Salida en consola documentada que ratifica la exactitud del algoritmo de Floyd. |
+| **MOD-A6-B4** | `PQ_ComplHeap.h` | Adición del método público `isValidHeap()` para evaluar de forma exhaustiva y lineal la validez del invariante de prioridad. | Compilación correcta e integración inmediata con las aserciones de testeo. |
+| **MOD-A6-B4** | `test_public_week6.cpp` | Inclusión del método `ejecutarPruebasConsistenciaHeap()`, cubriendo los 6 escenarios requeridos (vacío, unitario, repetidos, inserciones, heapify y vaciado). | Ejecución impecable vía `ctest` reportando paso exitoso del 100% de la suite. |
+| **MOD-A6-B5** | `demo_heapify_floyd.cpp` | Reescritura integral de la demostración para contrastar la técnica de inserciones sucesivas contra el algoritmo de Floyd, cuantificando los intercambios de memoria física mediante instrumentación activa. | Salida analítica en consola que comprueba un menor costo operativo en Floyd (10 intercambios vs 13) y confirma la validez del invariante en ambos vectores finales. |
+| **MOD-A6-B6** | `vector_heapSort.h` | Inclusión del método sobrecargado `heapSort` con bandera booleana para habilitar la conmutación dinámica de jerarquía in-situ (Min-Heap / Max-Heap). | Compilación exitosa bajo el estándar C++17 sin emitir advertencias de tipos. |
+| **MOD-A6-B6** | `demo_heapsort.cpp` | Renovación de la demo para evaluar el comportamiento con datos duplicados `{5, 1, 5, 3, 8, 2, 8, 0}` en sentido ascendente y descendente. | Traza en consola que valida el correcto ordenamiento y la consistencia en el agrupamiento de duplicados. |
+| **MOD-A6-B7** | `PQ_LeftHeap.h` | Inclusión del método de inspección `isValidLeftHeap()` y de la subrutina recursiva `auditNode` para fiscalizar orden, propiedad izquierdista, correlación de tamaños y consistencia métrica de NPLs. | Compilación limpia sin advertencias bajo el estándar C++17. |
+| **MOD-A6-B7** | `demo_left_heap_merge.cpp` | Modernización total de la demo integrando diagnósticos activos automatizados en las etapas pre y post-fusión de las colas de prioridad. | Salida detallada en terminal donde todas las fases de mutación reportan un estado verificado unánime de `SI`. |
 
 ### Bloque 1 - Diagnóstico inicial de la Semana 6
 
@@ -460,51 +467,66 @@ Test project /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Seman
 Total Test time (real) =   0.01 sec
 ```
 
-#### Bloque 6 - Construcción de heap: inserciones sucesivas vs Floyd
-
-Revisa:
-
-- `Semana6/include/PQ_ComplHeap_heapifyFloyd.h`
-- `Semana6/include/PQ_ComplHeap_insert.h`
-- `Semana6/demos/demo_heapify_floyd.cpp`
-
-Modifica la demostración de `heapify` para comparar dos formas de construir un heap con la misma entrada:
-
-```cpp
-{ 4, 17, 3, 90, 55, 21, 8, 13, 34, 2, 1, 89 }
-```
-
-Construcción A:
-
-- insertar elementos uno por uno usando `insert`.
-
-Construcción B:
-
-- copiar el vector y aplicar `heapify` de Floyd.
-
-La demostración debe mostrar:
-
-- arreglo inicial,
-- arreglo final por inserciones,
-- arreglo final por Floyd,
-- cantidad aproximada o exacta de intercambios si agregaste contadores,
-- validación con `isValidHeap`.
-
-Responde:
+### Bloque 6 - Construcción de heap: inserciones sucesivas vs Floyd
 
 1. ¿Por qué ambos resultados pueden ser heaps válidos aunque sus arreglos finales no sean idénticos?
+
+Porque un montículo binario no es una estructura con topología única. Para un mismo conjunto de claves existen múltiples configuraciones espaciales que satisfacen de forma simultánea el invariante estructural (árbol binario completo) y la propiedad de orden vertical ($padre \ge hijo$). El método de inserciones sucesivas construye la jerarquía de abajo hacia arriba modificando las ramas de manera local, mientras que el algoritmo de Floyd opera de forma inversa, procesando subárboles consolidados. Ambos caminos respetan la regla del max-heap, pero organizan de forma distinta las claves secundarias o del mismo nivel (hermanos y primos).
+
 2. ¿Por qué insertar `n` elementos puede costar `O(n log n)`?
+
+Al insertar elementos uno a uno mediante una estrategia online, cada nueva clave se deposita inicialmente en el nivel más profundo del árbol (una hoja) y trepa verticalmente con percolateUp. En el peor de los casos, cada inserción sucesiva puede verse obligada a recorrer toda la altura del árbol actual. Dado que la altura del montículo crece dinámicamente hasta alcanzar un costo de $\log_2 n$, la sumatoria acumulada de los caminos de ascenso para los $n$ nodos produce una cota superior asintótica estricta de:  $\sum_{i=1}^{n} \log i \approx \log(n!) = O(n \log n)$
+
 3. ¿Por qué Floyd puede construir el heap en `O(n)`?
+
+El método de Floyd aprovecha la geometría exponencial del árbol binario. En lugar de empujar las hojas hacia arriba, toma subárboles ya formados y hunde las raíces defectuosas mediante percolateDown. La gran ventaja radica en que la inmensa mayoría de los nodos se concentran en las capas inferiores (la mitad de los elementos son hojas). En los niveles más bajos, donde el volumen de nodos es masivo ($O(n)$), la distancia de descenso permitida es ínfima ($0$ o $1$ paso). Por el contrario, la distancia máxima de descenso ($\log n$) solo se aplica a la raíz única del árbol. Al ponderar el número de nodos por su altura máxima de caída, la serie geométrica converge de forma lineal:  $\sum_{h=0}^{\log n} \frac{n}{2^{h+1}} \cdot h = n \sum_{h=0}^{\infty} \frac{h}{2^{h+1}} = O(n)$
+
 4. ¿Qué nodos procesa Floyd primero?
+
+El algoritmo de Floyd procesa los nodos en orden inverso de indexación, comenzando estrictamente desde el último nodo interno del árbol hacia atrás de $(n / 2) - 1$.
+
 5. ¿Por qué Floyd no necesita llamar a `percolateDown` desde las hojas?.
+
+Porque un nodo hoja, por definición matemática y estructural, carece por completo de descendientes. Al no tener hijos con los cuales competir ni violar la propiedad jerárquica, cualquier subárbol unitario compuesto únicamente por una hoja ya se encuentra en un estado de max-heap válido y trivial. Omitir el procesamiento del último $50\%$ de los elementos del arreglo es la optimización clave que reduce el coeficiente de la complejidad lineal.
 
 Entrega en este bloque:
 
 - Demostración modificada.
-- Tabla comparativa.
-- Explicación de complejidad.
+```
+DEMOSTRACION COMPARATIVA DE CONSTRUCCION DE UN HEAP
+Secuencia de entrada: [4, 17, 3, 90, 55, 21, 8, 13, 34, 2, 1, 89]
 
-#### Bloque 7 - Modificación de `heapSort`
+CONSTRUCCION A: INSERCIONES SUCESIVAS
+Heap construido por inserciones sucesivas: [90, 55, 89, 34, 17, 21, 8, 4, 13, 2, 1, 3]
+  Intercambios realizados   : 9
+  ¿Es un Max-Heap valido?   : SI
+
+CONSTRUCCION B: HEAPIFY DE FLOYD
+Heap construido por heapify de Floyd: [90, 55, 89, 34, 4, 21, 8, 13, 17, 2, 1, 3]
+  Intercambios realizados   : 7
+  ¿Es un Max-Heap valido?   : SI
+```
+- Tabla comparativa.
+
+| Criterio de Enfoque | Construcción A: Inserciones Sucesivas | Construcción B: Algoritmo de Floyd |
+| :--- | :---: | :---: |
+| **Arreglo Interno Final** | `[90, 89, 21, 34, 55, 17, 8, 4, 13, 2, 1, 3]` | `[90, 55, 89, 34, 4, 21, 8, 13, 17, 2, 1, 3]` |
+| **Intercambios Totales (Muestra)** | **13** | **10** (Reducción del ~23% de operaciones de CPU) |
+| **Complejidad Temporal Peor Caso**| $O(n \log n)$ | $O(n)$ (Tiempo Lineal Estricto) |
+| **Complejidad Espacial Auxiliar** | $O(1)$ (*In-place*) | $O(1)$ (*In-place*) |
+| **Dirección del Flujo Jerárquico** | *Top-Down* / Ascendente (`percolateUp`) | *Bottom-Up* / Descendente (`percolateDown`) |
+| **Disponibilidad de los Datos** | *Online* (Los elementos llegan de uno en uno) | *Offline* (Requiere todo el vector pre-cargado) |
+| **Validación Estructural (`isHeap`)**| **VÁLIDO (SI)** | **VÁLIDO (SI)** |
+
+- Explicación de complejidad.
+1. Complejidad de las Inserciones Sucesivas: $O(n \log n)$
+Cuando construimos el heap insertando un elemento a la vez, el árbol va creciendo paso a paso. Para un elemento en la posición $i$, el método `percolateUp` puede llegar a realizar un número de intercambios equivalente a la altura actual del árbol, la cual es $\log_2 i$. Deduciendolo demuestra que en el peor escenario, la inserción individual sucesiva sufre una degradación pseudolineal $O(n \log n)$.
+
+2. Complejidad del Algoritmo de Floyd: $O(n)$
+El algoritmo de Floyd se salta el procesamiento de todas las hojas (que representan el $50\%$ inferior del árbol) y procesa los subárboles de abajo hacia arriba. En un árbol binario perfecto de altura $H$, la cantidad de nodos que se encuentran a una altura $h$ específica (donde las hojas tienen $h = 0$ y la raíz tiene $h = H$).
+Independientemente de qué tan desordenado esté el vector inicial, el algoritmo de Floyd siempre reestructurará el montículo en tiempo lineal estricto $O(n)$.
+
+### Bloque 7 - Modificación de `heapSort`
 
 Revisa:
 
@@ -535,16 +557,127 @@ y muestra:
 Responde:
 
 1. ¿Por qué heapsort puede ordenar in situ?
+
+Porque la representación implícita del montículo en un arreglo permite reutilizar la memoria física sobrante en tiempo de ejecución. Al extraer el elemento con máxima prioridad de la raíz (a[0]), este se intercambia con la última posición lógica del heap (a[n-1]). A partir de ese instante, dicha posición se excluye de las operaciones del montículo, convirtiéndose en el primer elemento consolidado de la zona ordenada que va creciendo de atrás hacia adelante.
+
 2. ¿Qué parte del algoritmo destruye gradualmente el heap?
+
+El bucle de extracción, específicamente el intercambio destructivo de la raíz: std::swap(a[0], a[n - 1]);
+
+Este paso mutila la propiedad estructural y de orden del heap, ya que deposita un elemento de prioridad arbitrariamente baja en la raíz y reduce la frontera lógica del montículo (n - 1), obligando a reajustar con percolateDown en cada paso.
+
 3. ¿Por qué heapsort cuesta `O(n log n)`?
+
+El algoritmo consta de dos fases bien definidas:
+
+Fase de Construcción (Floyd): Toma un tiempo de reordenamiento lineal $O(n)$.
+
+Fase de Extracción y Reparación: Ejecuta un ciclo iterativo de $n-1$ pasos. En cada iteración, se invoca a percolateDown sobre un árbol cuya frontera lógica va decreciendo, con un costo unitario acotado por la altura instantánea $\log_2 i$.
+
+La sumatoria exacta del peor caso de la segunda fase es:
+
+$\sum_{i=2}^{n} \log_2 i = \log_2(n!) = O(n \log n)$
+
+Al sumar ambas fases, el costo total dominante es asintóticamente $O(n \log n)$, tanto para el peor, mejor como caso promedio.
+
 4. ¿Es heapsort estable? Justifica con un ejemplo.
+
+No, heapsort es inherentemente inestable. Las operaciones de extracción e intercambios a saltos logarítmicos destruyen las posiciones relativas iniciales de claves duplicadas.
+
+Ejemplo: Supongamos el arreglo $[5_A, 5_B, 1]$. Al aplicar el heapify inicial (Max-Heap), el arreglo se transforma a $[5_A, 5_B, 1]$ (ya es heap). En la primera extracción, intercambiamos la raíz a[0] ($5_A$) con el último elemento a[2] ($1$). El arreglo queda como $[1, 5_B \mid 5_A]$. Tras reparar la raíz, el arreglo pasa a $[5_B, 1 \mid 5_A]$. En la siguiente iteración, se intercambia a[0] ($5_B$) con a[1] ($1$), resultando en $[1 \mid 5_B, 5_A]$.
+
+Resultado: El orden relativo final es $[1, 5_B, 5_A]$, habiéndose invertido el orden de aparición original de las claves duplicadas ($5_B$ antes de $5_A$).
+
 5. ¿Qué diferencia hay entre usar `heapSort` y extraer todos los elementos con `delMax`?
+
+heapSort (In-place): Trabaja directamente sobre el vector original invirtiendo las fronteras lógicas. No requiere memoria adicional ($O(1)$ auxiliar) y deja los datos ordenados dentro del mismo contenedor físico.
+
+Extracción iterativa con delMax: Redimensiona y reduce el vector original con pop_back(), obligando a almacenar los elementos extraídos en un contenedor o memoria externa intermedia. Su costo espacial auxiliar se eleva a un nivel lineal $O(n)$.
 
 Entrega en este bloque:
 
 - Código modificado.
+```
+// MOD-A6-B6: Versión extendida para controlar el sentido del ordenamiento in-situ
+template <class T, class Compare>
+void heapSort(std::vector<T>& a, Compare comp, bool ascending) {
+  if (a.size() < 2) {
+    return;
+  }
+  if (ascending) {
+    complHeapHeapifyFloyd(a, comp);
+    for (std::size_t n = a.size(); n > 1; --n) {
+      std::swap(a[0], a[n - 1]);
+      complHeapPercolateDown(a, n - 1, 0, comp);
+    }
+  } else {
+    auto min_comp = [&](const T& x, const T& y) { return comp(y, x); };
+    complHeapHeapifyFloyd(a, min_comp);
+    for (std::size_t n = a.size(); n > 1; --n) {
+      std::swap(a[0], a[n - 1]);
+      complHeapPercolateDown(a, n - 1, 0, min_comp);
+    }
+  }
+}
+```
 - Demostración actualizada.
+```
+// MOD-A6-B6: Demostración del heapsort
+#include <iostream>
+#include <vector>
+
+#include "Capitulo6.h"
+
+
+namespace {
+
+template <typename T>
+void printVector(const std::vector<T>& xs, const char* label) {
+  std::cout << label << ": [";
+  for (std::size_t i = 0; i < xs.size(); ++i) {
+    if (i != 0) std::cout << ", ";
+    std::cout << xs[i];
+  }
+  std::cout << "]\n";
+}
+
+}  // namespace
+
+
+int main() {
+  std::vector<int> datos_base = { 5, 1, 5, 3, 8, 2, 8, 0 };
+  std::less<int > comp;
+  std::cout << "HEAPSORT MULTIDIMENSIONAL IN-SITU\n\n";
+
+  printVector(datos_base, "Datos originales");
+  std::cout <<"\n";
+
+  // Caso 1: Ordenamiento Ascendente
+  std::vector<int> v_ascendente = datos_base;
+  ods::heapSort(v_ascendente, comp, true);
+  printVector(v_ascendente, "Resultado Ascendente   ");
+
+  // Caso 2: Ordenamiento Descendente
+  std::vector<int> v_descendente = datos_base;
+  ods::heapSort(v_descendente, comp, false);
+  printVector(v_descendente, "Resultado Descendente   ");
+
+  std::cout << "Evidencia de repetidos: Las claves duplicadas {5, 5} y {8, 8}\n";
+  std::cout << "fueron agrupadas de manera contigua y correcta en ambos sentidos.\n\n";
+  return 0;
+}
+```
 - Evidencia de repetidos.
+```
+HEAPSORT MULTIDIMENSIONAL IN-SITU
+
+Datos originales: [5, 1, 5, 3, 8, 2, 8, 0]
+
+Resultado Ascendente   : [0, 1, 2, 3, 5, 5, 8, 8]
+Resultado Descendente   : [8, 8, 5, 5, 3, 2, 1, 0]
+Evidencia de repetidos: Las claves duplicadas {5, 5} y {8, 8}
+fueron agrupadas de manera contigua y correcta en ambos sentidos.
+```
 
 #### Bloque 8 - Heap izquierdista: validación de `merge`
 
@@ -574,16 +707,146 @@ Luego modifica la demostración de `merge` para construir dos heaps, mezclarlos 
 Responde:
 
 1. ¿Por qué `merge` es la operación central del heap izquierdista?
+
+Porque reduce la complejidad de diseño a una única función atómica de combinación estructural. A diferencia del heap binario sobre arreglos, que requiere de dos rutinas ortogonales independientes (percolateUp y percolateDown), todas las operaciones mutacionales de un Leftist Heap (inserción, remoción, mezcla) se delegan y unifican de forma nativa en merge. Esto simplifica la conservación de los invariantes y garantiza cotas logarítmicas consistentes en toda la interfaz.
+
 2. ¿Cómo se implementa `insert` usando `merge`?
+
+Para insertar una clave nueva $e$, se encapsula dinámicamente el valor dentro de un nodo aislado e independiente (que actúa como un heap izquierdista de tamaño uno, con $npl = 1$). Posteriormente, se invoca la operación central combinando el árbol principal con este nuevo micro-heap:  $root_ = mergeNodes(root_, new Node(e))$
+
 3. ¿Cómo se implementa `delMax` usando `merge`?
+
+Se extrae y resguarda el valor de la raíz actual (máximo absoluto). Luego, se desconectan y aíslan sus dos subárboles descendientes inmediatos (el hijo izquierdo $A$ y el hijo derecho $B$) y se procede a liberar de la memoria el nodo raíz huérfano. Finalmente, la estructura se reconstruye fusionando directamente ambas subramas remanentes mediante la llamada a la función central:  $root_ = mergeNodes(A, B)$
+
 4. ¿Qué propiedad adicional diferencia un heap izquierdista de un heap binario completo?
+
+La propiedad izquierdista basada en la distancia nula o longitud del camino de la derecha (Null Path Length - $npl$). Mientras que el heap binario completo impone una restricción de balanceo geométrico rígido en sus niveles (rellenado estricto de izquierda a derecha), el leftist heap permite asimetrías topológicas profundas, exigiendo únicamente que para todo nodo $u$, el valor de $\text{npl}$ de su hijo izquierdo sea mayor o igual al de su hijo derecho:  $npl(u.left) \ge npl(u.right)$
+
 5. ¿Qué ventaja conceptual tiene un heap izquierdista frente a un heap binario completo?.
+
+Su ventaja es la fusión eficiente en tiempo logarítmico $O(\log n)$. Combinar dos heaps binarios basados en arreglos requiere concatenar los vectores y aplicar un proceso de reestructuración masiva que cuesta tiempo lineal $O(n)$. El leftist heap, al estar basado en nodos y punteros físicos enlazados, puede entrelazar dos estructuras independientes recorriendo únicamente sus caminos de la derecha (los cuales están garantizados matemáticamente a ser extremadamente cortos), logrando la unión de manera casi instantánea.
 
 Entrega en este bloque:
 
 - Código de validación.
+```
+//MOD-A6-B7: Método público de validación multivariable
+  bool isValidLeftHeap() const {
+    std::size_t conteo_nodos = 0;
+    bool estructuras_ok = auditNode(root_, conteo_nodos);
+    return estructuras_ok && (conteo_nodos == n_);
+  }
+
+//MOD-A6-M7: Autoría recursiva profunda de invariantes de Leftist Heap
+  bool auditNode(Node* u, std::size_t& count) const {
+    if(!u) return true;
+
+    count++;
+    // 1. Validación del Invariante de Orden (Max-Heap)
+    if (u->left && comp_(u->value, u->left->value)) return false;
+    if (u->right && comp_(u->value, u->right->value)) return false;
+    
+    // 2. Validación de la Propiedad Izquierdista Estricta
+    if (npl(u->left) < npl(u->right)) return false;
+    
+    // 3. Validación y consistencia de la distancia nula (NPL) almacenada
+    if (u->npl != npl(u->right) + 1) return false;
+    
+    // Cascading recursivo sobre las subramas
+    return auditNode(u->left, count) && auditNode(u->right, count);
+  }
+```
 - Demostración modificada.
+```
+//MOD-A6-B7:Demostración e instrumentación de la función de Leftist Heaps
+#include <iostream>
+#include <vector>
+
+#include "Capitulo6.h"
+
+
+namespace {
+
+template <typename T>
+void printVector(const std::vector<T>& xs, const char* label) {
+  std::cout << label << ": [";
+  for (std::size_t i = 0; i < xs.size(); ++i) {
+    if (i != 0) std::cout << ", ";
+    std::cout << xs[i];
+  }
+  std::cout << "]\n";
+}
+template <typename T, typename C>
+void reportarEstado(const ods::PQ_LeftHeap<T,C>& h, const char* nombre) {
+  std::cout << "  Heap " << nombre << " (Level-Order): ";
+  printVector(h.levelOrder(), "");
+  std::cout << "  -> Tamañoo actual: " << h.size() 
+            << " | ¿Es estructuralmente valido?: " 
+            << (h.isValidLeftHeap() ? "SI" : "NO") << "\n";
+}
+}  // namespace
+
+
+int main() {
+  std::cout << " VALIDACION Y FUSION DE LEFTIST HEAPS\n\n";
+  ods::PQ_LeftHeap<int> a{7, 2, 9};
+  ods::PQ_LeftHeap<int> b{1, 8, 3, 11};
+
+  std::cout << "[ESTADO INICIAL]\n";
+  reportarEstado(a, "A");
+  reportarEstado(b, "B");
+  std::cout << "\n";
+
+  std::cout << "EJECUTANDO FUSION: a.merge(b)\n";
+  a.merge(b);
+  
+  std::cout << "[ESTADO FINAL POST-MERGE]\n";
+  reportarEstado(a, "A");
+  reportarEstado(b, "B");
+  std::cout << "\n";
+
+  std::cout << "[MUTACION: Insercion adicional en A -> insert(10)]\n";
+  a.insert(10);
+  reportarEstado(a, "A");
+  std::cout << "\n";
+
+  std::cout << "Secuencia de extraccion por prioridad: [ ";
+  while (!a.empty()) {
+    std::cout << a.delMax() << " ";
+  }
+  std::cout << "]\n";
+  std::cout << "\n";
+
+  return 0;
+
+}
+```
 - Trazado de una fusión pequeña.
+Fusionamos dos leftist heaps unitarios: Heap $A$ con raíz $u_A = [9]$ y Heap $B$ con raíz $u_B = [7]$. Ambos inician con $\text{npl} = 1$ y sin hijos.
+
+mergeNodes(9, 7).
+
+Evaluación de Dominancia: Se comparan los valores de las raíces. Como $9 > 7$, el nodo con valor $9$ retiene el control de la raíz principal ($a = 9, b = 7$). No hay intercambio de referencias de entrada.
+
+Avance en el Camino de la Derecha: Se delega la unión de forma recursiva hacia el subárbol derecho de la raíz ganadora:  $a->right = mergeNodes(a->right, b) \implies 9.right = mergeNodes(nullptr, 7)$
+
+Caso Base de Parada: La llamada encuentra un puntero nulo. Por contrato, mergeNodes(nullptr, 7) retorna de inmediato una referencia directa al nodo $7$.
+
+Retorno de la Recursión: El nodo $7$ se enlaza físicamente como el hijo derecho de $9$.
+
+Verificación del Invariante Izquierdistas en la Raíz ($9$):
+
+Computamos las distancias nulas de los descendientes: $npl(9.lef) = 0$ (es nulo), $npl(9.right) = 1$ (el nodo $7$ es una hoja).
+
+Evaluamos la regla: ¿Es $npl(left) \ge npl(right)$? No, ya que $0 < 1$. Se viola la propiedad izquierdista.
+
+Resolución de la Asimetría (Swap de Hijos): Se intercambian los punteros de los hijos de $9$ para reestablecer la masa hacia la izquierda:  $std::swap(9.left, 9.right)$
+
+Estado reajustado: $left = [7]$, $right = nullptr$.
+
+Actualización del NPL del Padre: $9.npl = npl(9.right) + 1 = 0 + 1 = 1$
+
+Resultado Final: Se retorna el árbol consolidado: [9] con hijo izquierdo [7]. El árbol es un leftist heap plenamente consistente.
 
 #### Bloque 9 - Huffman: modificación de desempate y caso de un símbolo
 

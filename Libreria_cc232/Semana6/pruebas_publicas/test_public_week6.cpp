@@ -5,6 +5,38 @@
 
 #include "Capitulo5.h"
 #include "Capitulo6.h"
+void ejecutarPruebasConsistenciaHeap() {
+  // 1. Heap vacío
+  ods::PQ_ComplHeap<int> heap_vacio;
+  assert(heap_vacio.isValidHeap());
+
+  // 2. Heap con un elemento
+  ods::PQ_ComplHeap<int> heap_unitario{42};
+  assert(heap_unitario.isValidHeap());
+
+  // 3. Heap con elementos repetidos
+  ods::PQ_ComplHeap<int> heap_repetidos{10, 10, 5, 10, 2, 5};
+  assert(heap_repetidos.isValidHeap());
+
+  // 4. Heap construido por inserciones sucesivas
+  ods::PQ_ComplHeap<int> heap_inserciones;
+  for (int val : {15, 30, 5, 20, 40, 10}) {
+    heap_inserciones.insert(val);
+    assert(heap_inserciones.isValidHeap());
+  }
+
+  // 5. Heap construido masivamente mediante heapify de Floyd
+  std::vector<int> datos_crudos = {80, 20, 90, 40, 10, 70, 30, 60};
+  ods::PQ_ComplHeap<int> heap_floyd(datos_crudos);
+  assert(heap_floyd.isValidHeap());
+
+  // 6. Heap bajo mutación destructiva secuencial (múltiples delMax)
+  while (!heap_floyd.empty()) {
+    heap_floyd.delMax();
+    assert(heap_floyd.isValidHeap());
+  }
+  
+}
 
 int main() {
   ods::PQ_ComplHeap<int> h{4, 10, 7, 1, 3, 9};
@@ -59,4 +91,9 @@ int main() {
   assert(treap.remove(3));
   assert(!treap.contains(3));
   assert(treap.isTreap());
+
+  // MOD-A6-B4: Pruebas adicionales
+  ejecutarPruebasConsistenciaHeap();
+
+  return 0;
 }

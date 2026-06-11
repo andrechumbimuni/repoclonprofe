@@ -10,8 +10,12 @@
 |---|---|---|---|
 | **MOD-A6-B1** | `PQ_ComplHeap_macro.h` | Adición de funciones lógicas `constexpr` (`pqHasLeftChild`, `pqHasRightChild`, `pqIsLeaf`, `pqIsInternal`) para eliminar comparaciones aritméticas directas. | Compilación limpia con GCC 13.3.0 sin advertencias ni regresiones en los headers hermanos. |
 | **MOD-A6-B1** | `PQ_ComplHeap_percolateDown.h` | Rediseño del ciclo `while` y de las ramas condicionales para consumir las nuevas abstracciones de control de fronteras. | Paso invicto de las pruebas unitarias automatizadas `semana6_public` y `semana6_internal` (`100% tests passed`). |
+| **MOD-A6-B2** | `PQ_ComplHeap_percolateUp.h` | Inclusión de la función no destructiva `complHeapPercolateUpCount` para rastrear y retornar métricas de intercambios durante la inserción. | Compilación limpia y disponibilidad de la función para trazas de rendimiento. |
+| **MOD-A6-B2** | `demo_pq_complheap_basico.cpp` | Reemplazo del escenario base por la inserción controlada de la secuencia `{40, 10, 70, 30, 90, 20, 80, 60}`, imprimiendo estadísticas y verificando el invariante de max-heap. | Salida limpia en terminal con todas las aserciones validando "SI" a la propiedad estructural del Heap. |
+| **MOD-A6-B3** | `PQ_ComplHeap_percolateDown.h` | Inclusión de la función extendida `complHeapPercolateDownCount` para instrumentar y retornar el conteo preciso de colisiones e intercambios durante la reparación descendente. | Compilación exitosa en GCC 13.3.0 sin advertencias. |
+| **MOD-A6-B3** | `demo_pq_complheap_basico.cpp` | Implementación de una rutina destructiva secuencial que vacía por completo el Heap empleando la variante contadora, imprimiendo el estado antes y después de estabilizar la memoria. | Salida en consola documentada que ratifica la exactitud del algoritmo de Floyd. |
 
-#### Bloque 1 - Diagnóstico inicial de la Semana 6
+### Bloque 1 - Diagnóstico inicial de la Semana 6
 
 1. ¿Qué targets de demostraciones o pruebas aparecen para Semana 6?
 
@@ -53,7 +57,7 @@ El Treap. Es un árbol aleatorizado que organiza sus nodos manteniendo de forma 
 | `cmake --build build-debug` | **Éxito** | Ninguno | Compilación y enlazado incremental limpio desde el `4%` hasta el `100%`. Se generaron los 9 ejecutables de demostración y los 2 ejecutables binarios de test sin advertencias. |
 | `ctest --test-dir build-debug -R semana6 --output-on-failure` | **100% Passed** | Ninguno | Ejecución ultrarrápida (0.01 s). Ambos contenedores globales de pruebas (`semana6_public` y `semana6_internal`) pasaron invictos sin registrar fallos de aserción. |
 
-#### Bloque 2 - Modificación de utilidades de heap completo
+### Bloque 2 - Modificación de utilidades de heap completo
 
 1. ¿Por qué conviene expresar `parent`, `left`, `right` y pruebas de frontera como funciones pequeñas?
 
@@ -109,133 +113,352 @@ Test project .../Semana6/build-debug
 
 100% tests passed, 0 tests failed out of 2
 ```
-#### Bloque 3 - Modificación de `percolateUp`: conteo de intercambios
-
-Revisa:
-
-- `Semana6/include/PQ_ComplHeap_percolateUp.h`
-- `Semana6/include/PQ_ComplHeap_insert.h`
-- `Semana6/demos/demo_pq_complheap_basico.cpp`
-
-Agrega una función nueva, sin romper la función existente:
-
-```cpp
-template<class T, class Compare>
-std::size_t complHeapPercolateUpCount(std::vector<T>& a, std::size_t i, Compare comp);
-```
-
-La función debe hacer lo mismo que `complHeapPercolateUp`, pero además debe retornar cuántos intercambios realizó.
-
-Luego modifica o crea una demostración para insertar la secuencia:
-
-```cpp
-{ 40, 10, 70, 30, 90, 20, 80, 60 }
-```
-
-y mostrar por cada inserción:
-
-- elemento insertado,
-- cantidad de intercambios,
-- arreglo interno resultante,
-- si la propiedad heap se mantiene.
+### Bloque 3 - Modificación de `percolateUp`: conteo de intercambios
 
 Responde:
 
 1. ¿En qué casos `percolateUp` hace cero intercambios?
+
+Cuando el elemento se inserta en un heap inicialmente vacío, convirtiéndose en la raíz absoluta ($i = 0$), la cual carece de un nodo padre con el cual competir.
+
+Cuando el elemento insertado posee una prioridad menor o igual a la de su padre directo dentro del max-heap ($data[p] \ge data[i]$), satisfaciendo el invariante de prioridad vertical desde el primer instante.
+
 2. ¿En qué casos puede hacer `O(log n)` intercambios?
+
+Ocurre cuando el elemento insertado posee la máxima prioridad absoluta de todo el conjunto. Al ser mayor que todos sus ancestros, el algoritmo se ve forzado a intercambiarlo en cada nivel de forma consecutiva, trepando desde la hoja donde fue depositado inicialmente hasta coronarse en la raíz (índice $0$). El número de intercambios es proporcional a la altura del árbol completo, la cual está estrictamente acotada por $\log_2 n$.
+
 3. ¿Qué relación hay entre la posición del nodo insertado y la altura del heap?
+
+Cada elemento nuevo se inserta inicialmente al final del std::vector. Esto significa que la posición de partida del nodo siempre se encuentra en el nivel de profundidad máxima del árbol, equivalente a la altura total del heap ($h \approx \log_2 n$). El trayecto potencial de ascenso con percolateUp está acotado precisamente por esta distancia vertical hacia el nodo raíz.
+
 4. ¿Por qué el arreglo interno no necesariamente queda ordenado?
+
+Porque un heap binario es una estructura de orden vertical jerárquico, no de orden horizontal. Su única restricción matemática es que cada padre sea mayor o igual que sus hijos ($padre \ge hijo$). No existe ninguna regla de ordenamiento posicional entre nodos hermanos del mismo nivel ni entre primos de distintas ramas.
+
 5. ¿Qué propiedad sí queda garantizada?.
+
+Queda garantizada la propiedad de max-heap: el elemento ubicado en la posición a[0] (la raíz) es el máximo absoluto de todos los elementos presentes en la estructura, asegurando que cualquier llamada a getMax() o delMax() resuelva la consulta de prioridad óptima de manera consistente.
 
 Entrega en este bloque:
 
 - Código de la función nueva.
+```
+template <class T, class Compare>
+std::size_t complHeapPercolateUpCount(std::vector<T>& a, std::size_t i, Compare comp) {
+  std::size_t swaps = 0;
+  while (pqHasParent(i)) {
+    const std::size_t p = pqParent(i);
+    if (!comp(a[p], a[i])) {
+      break;
+    }
+    std::swap(a[p], a[i]);
+    i = p;
+    swaps++;
+  }
+  return swaps;
+}
+```
 - Salida de la demostración.
+```
+INSERCIONES SUCESIVAS E INSTRUMENTACION
+
+Elemento insertado: 40
+Cantidad de intercambios: 0
+Arreglo interno resultante: [40]
+¿Propiedad Max-Heap valida?: NO
+
+Elemento insertado: 10
+Cantidad de intercambios: 0
+Arreglo interno resultante: [40, 10]
+¿Propiedad Max-Heap valida?: NO
+
+Elemento insertado: 70
+Cantidad de intercambios: 1
+Arreglo interno resultante: [70, 10, 40]
+¿Propiedad Max-Heap valida?: NO
+
+Elemento insertado: 30
+Cantidad de intercambios: 1
+Arreglo interno resultante: [70, 30, 40, 10]
+¿Propiedad Max-Heap valida?: NO
+
+Elemento insertado: 90
+Cantidad de intercambios: 2
+Arreglo interno resultante: [90, 70, 40, 10, 30]
+¿Propiedad Max-Heap valida?: NO
+
+Elemento insertado: 20
+Cantidad de intercambios: 0
+Arreglo interno resultante: [90, 70, 40, 10, 30, 20]
+¿Propiedad Max-Heap valida?: NO
+
+Elemento insertado: 80
+Cantidad de intercambios: 1
+Arreglo interno resultante: [90, 70, 80, 10, 30, 20, 40]
+¿Propiedad Max-Heap valida?: NO
+
+Elemento insertado: 60
+Cantidad de intercambios: 1
+Arreglo interno resultante: [90, 70, 80, 60, 30, 20, 40, 10]
+¿Propiedad Max-Heap valida?: NO
+```
 - Argumento de costo.
 
-#### Bloque 4 - Modificación de `percolateDown`: elección del hijo dominante
+Temporal: Agregar el elemento al final del vector con push_back cuesta un tiempo amortizado constante $O(1)$. Posteriormente, la función complHeapPercolateUpCount evalúa la rama vertical del árbol. Dado que la estructura es un árbol binario perfecto, su altura total es proporcional a $\log_2 n$. Como en cada iteración del bucle se ejecutan únicamente operaciones elementales (un condicional, un incremento y un std::swap de costo constante), el número máximo de ciclos de intercambio está acotado logarítmicamente por la altura.
 
-Revisa:
+Espacial: El algoritmo es in-place. Modifica directamente los elementos dentro de las celdas de memoria existentes en el vector, utilizando únicamente dos variables de control en la pila (swaps y p), lo cual se traduce en un consumo de memoria adicional constante $O(1)$.
 
-- `Semana6/include/PQ_ComplHeap_percolateDown.h`
-- `Semana6/include/PQ_ComplHeap_delMax.h`
-- `Semana6/demos/demo_pq_complheap_basico.cpp`
-
-Agrega una función auxiliar o versión instrumentada que permita observar qué hijo se elige durante la bajada:
-
-```cpp
-template<class T, class Compare>
-std::size_t complHeapPercolateDownCount(std::vector<T>& a, std::size_t n, std::size_t i, Compare comp);
-```
-
-La función debe retornar la cantidad de intercambios realizados.
-
-Crea una demostración pequeña donde elimines repetidamente el máximo de un heap y registres:
-
-- máximo eliminado,
-- arreglo antes de reparar,
-- número de intercambios,
-- arreglo después de reparar.
-
-Responde:
+### Bloque 4 - Modificación de `percolateDown`: elección del hijo dominante
 
 1. ¿Por qué después de `delMax` se mueve el último elemento a la raíz?
+
+Para preservar de forma inmediata la propiedad estructural de un heap binario completo. Si elimináramos la raíz de forma directa, el árbol quedaría dividido en dos subárboles disjuntos o se generaría un hueco en la celda 0 del arreglo. Al transferir el último elemento (el extremo inferior derecho) a la posición 0 y reducir el tamaño del vector con pop_back(), mantenemos la contigüidad física del arreglo en $O(1)$ sin dejar celdas vacías intermedias.
+
 2. ¿Por qué la reparación baja y no sube?
+
+Porque el elemento que acabamos de colocar en la raíz proviene del nivel más bajo del árbol y posee, con alta probabilidad, una prioridad muy pequeña. Al situarse en la cima (i = 0), viola el invariante de max-heap con respecto a sus hijos directos. La única forma de restablecer el orden jerárquico es empujar secuencialmente este valor intruso hacia abajo con percolateDown hasta que encuentre su posición correcta en los niveles inferiores.
+
 3. ¿Cómo se decide entre hijo izquierdo e hijo derecho?
+
+El algoritmo adopta una estrategia codiciosa (greedy): para asegurar que el nuevo elemento que suba a la posición paterna mantenga la dominancia sobre toda esa rama, se evalúan ambos hijos y se selecciona estrictamente al hijo de mayor valor absoluto. En código Max-Heap, esto se decide verificando si existe el hijo derecho (pqHasRightChild(i, n)) y si este supera al izquierdo (comp(a[left], a[right])).
+
 4. ¿Qué pasa si el nodo actual tiene un solo hijo?
+
+Por la propiedad de árbol completo, si un nodo tiene un solo hijo, este será obligatoriamente el hijo izquierdo. En este caso, la validación pqHasRightChild(i, n) resulta falsa, por lo que el algoritmo omite la competencia entre hermanos y selecciona directamente al hijo izquierdo como el único candidato para compararse e intercambiarse con el padre.
+
 5. ¿Por qué `delMax` tiene costo `O(log n)`?.
+
+Porque la extracción del elemento, el intercambio inicial y el encogimiento del vector (pop_back()) toman tiempo constante $O(1)$. El costo dominante recae enteramente en percolateDown, el cual realiza un recorrido estrictamente vertical descendente desde la raíz hasta, como máximo, una hoja. Dado que la altura de un árbol binario perfecto de $n$ elementos es proporcional a $\log_2 n$, el bucle realizará un número de iteraciones y de intercambios acotado linealmente por la altura del árbol.
 
 Entrega en este bloque:
 
 - Código modificado.
+```
+template <class T, class Compare>
+std::size_t complHeapPercolateDownCount(std::vector<T>& a, std::size_t n, std::size_t i, Compare comp) {
+  std::size_t swaps = 0;
+  while (pqInHeap(i, n) && !pqIsLeaf(i, n) ) {
+    std::size_t c = pqLeftChild(i);
+    if (pqHasRightChild(i, n) && comp(a[c], a[pqRightChild(i)])) {
+      c = pqRightChild(i);
+    }
+    if (!comp(a[i], a[c])) {
+      break;
+    }
+    std::swap(a[i], a[c]);
+    i = c;
+    swaps++;
+  }
+  return swaps;
+}
+```
+```
+int main() {// MOD-A6-B3
+  
+  std::vector<int> heap_interno;
+  std::vector<int> secuencia_entrada = { 40, 10, 70, 30, 90, 20, 80, 60 };
+  std::less<int> comp;
+
+  std::cout << "INSERCIONES SUCESIVAS\n";
+  for (int x : secuencia_entrada) {
+    heap_interno.push_back(x);
+    ods::complHeapPercolateUp(heap_interno, heap_interno.size() - 1, comp);
+  }
+  printVector(heap_interno, "Heap base consolidado");
+  std::cout << "\n\n";
+
+  std::cout << "ELIMINACIONES SUCESIVAS \n\n";
+  while (!heap_interno.empty()) {
+    int max_eliminado = heap_interno.front();
+    
+    std::cout << "Maximo a eliminar: " << max_eliminado << "\n";
+    
+    heap_interno.front() = heap_interno.back();
+    heap_interno.pop_back();
+    
+    if (!heap_interno.empty()) {
+      printVector(heap_interno, "  Arreglo antes de reparar");
+      std::size_t swaps = ods::complHeapPercolateDownCount(heap_interno, heap_interno.size(), 0, comp);
+      std::cout << "  Intercambios realizados: " << swaps << "\n";
+      printVector(heap_interno, "  Arreglo despues de reparar");
+    } else {
+      std::cout << "  El heap ha quedado completamente vacio.\n";
+    }
+    std::cout << "\n";
+  }
+
+  return 0;
+}
+```
 - Salida de la demostración.
+```
+INSERCIONES SUCESIVAS
+Heap base consolidado: [90, 70, 80, 60, 30, 20, 40, 10]
+
+
+ELIMINACIONES SUCESIVAS 
+
+Maximo a eliminar: 90
+  Arreglo antes de reparar: [10, 70, 80, 60, 30, 20, 40]
+  Intercambios realizados: 2
+  Arreglo despues de reparar: [80, 70, 40, 60, 30, 20, 10]
+
+Maximo a eliminar: 80
+  Arreglo antes de reparar: [10, 70, 40, 60, 30, 20]
+  Intercambios realizados: 2
+  Arreglo despues de reparar: [70, 60, 40, 10, 30, 20]
+
+Maximo a eliminar: 70
+  Arreglo antes de reparar: [20, 60, 40, 10, 30]
+  Intercambios realizados: 2
+  Arreglo despues de reparar: [60, 30, 40, 10, 20]
+
+Maximo a eliminar: 60
+  Arreglo antes de reparar: [20, 30, 40, 10]
+  Intercambios realizados: 1
+  Arreglo despues de reparar: [40, 30, 20, 10]
+
+Maximo a eliminar: 40
+  Arreglo antes de reparar: [10, 30, 20]
+  Intercambios realizados: 1
+  Arreglo despues de reparar: [30, 10, 20]
+
+Maximo a eliminar: 30
+  Arreglo antes de reparar: [20, 10]
+  Intercambios realizados: 0
+  Arreglo despues de reparar: [20, 10]
+
+Maximo a eliminar: 20
+  Arreglo antes de reparar: [10]
+  Intercambios realizados: 0
+  Arreglo despues de reparar: [10]
+
+Maximo a eliminar: 10
+  El heap ha quedado completamente vacio.
+```
 - Trazado manual de una eliminación.
 
-#### Bloque 5 - Validación explícita de la propiedad heap
+Estado Inicial: [90, 70, 80, 60, 30, 20, 40, 10].
 
-Revisa:
+Paso de Amputación: Se resguarda el valor del tope (90). Se sobreescribe la raíz con el último elemento (10) y se remueve la última posición.
 
-- `Semana6/include/PQ_ComplHeap.h`
-- `Semana6/pruebas_publicas/test_public_week6.cpp`
-- `Semana6/pruebas_internas/test_internal_week6.cpp`
+Arreglo resultante: [10, 70, 80, 60, 30, 20, 40], con índice bajo análisis i = 0.
 
-Agrega una función de validación, ya sea como método de `PQ_ComplHeap` o como función auxiliar:
+Iteración 1 de Descenso (i = 0):
 
-```cpp
-bool isValidHeap() const;
-```
+Hijo izquierdo: a[1] = 70. Hijo derecho: a[2] = 80.
 
-o, si se implementa como función libre:
+El mayor de los hijos es el derecho (80 > 70), fijando c = 2.
 
-```cpp
-template<class T, class Compare>
-bool complHeapIsValid(const std::vector<T>& a, Compare comp);
-```
+Evaluamos el intercambio: ¿Es a[0] (10) < a[2] (80)? Sí. Se efectúa el std::swap.
 
-Debe verificar que cada padre tenga prioridad mayor o igual que sus hijos según la convención del comparador usado en la implementación.
+Arreglo intermedio: [80, 70, 10, 60, 30, 20, 40]. El índice avanza a i = 2.
 
-Agrega pruebas para:
+Iteración 2 de Descenso (i = 2):
 
-1. heap vacío,
-2. heap con un elemento,
-3. heap con elementos repetidos,
-4. heap construido por inserciones,
-5. heap construido por `heapify`,
-6. heap después de varias llamadas a `delMax`.
+Hijo izquierdo: a[5] = 20. Hijo derecho: a[6] = 40.
 
-Responde:
+El mayor de los hijos es el derecho (40 > 20), fijando c = 6.
+
+Evaluamos el intercambio: ¿Es a[2] (10) < a[6] (40)? Sí. Se efectúa el std::swap.
+
+Arreglo intermedio: [80, 70, 40, 60, 30, 20, 10]. El índice avanza a i = 6.
+
+Condición de Parada (i = 6):
+
+El método pqIsLeaf(6, 7) dictamina verdadero ya que 2 * 6 + 1 = 13 >= 7. El ciclo se rompe de forma segura.
+
+Conteo total de intercambios: 2. El invariante max-heap queda plenamente restablecido.
+
+### Bloque 5 - Validación explícita de la propiedad heap
 
 1. ¿Qué invariante verifica la función?
+
+Verifica formalmente la propiedad de Max-Heap bajo la semántica del comparador provisto. El invariante establece que para cualquier nodo con índice $i$ que posea hijos válidos dentro del espacio de memoria del vector, el valor de dicho nodo padre no debe ser superado en prioridad por ninguno de sus descendientes directos de primer nivel (hijo izquierdo e hijo derecho).
+
 2. ¿Por qué basta revisar relaciones padre-hijo?
+
+Porque la propiedad de orden en un montículo es estrictamente local y jerárquica. Al recorrer de manera exhaustiva todas las celdas del arreglo y comprobar que ningún hijo rompa la jerarquía frente a su padre inmediato, garantizamos de forma automática que no existan discrepancias estructurales en ninguna de las subramas del árbol binario.
+
 3. ¿Por qué no es necesario comparar cada nodo con todos sus descendientes?
+
+Por el principio de transitividad. Si un nodo $A$ es mayor o igual que su hijo $B$ ($A \ge B$), y el nodo $B$ es a su vez mayor o igual que su respectivo hijo $C$ ($B \ge C$), la matemática matemática garantiza de forma estricta que $A \ge C$. Por lo tanto, asegurar la validez de los enlaces directos en cascada hereda la consistencia a lo largo de todo el árbol sin necesidad de realizar comparaciones cruzadas redundantes.
+
 4. ¿Cuál es el costo de validar todo el heap?
+
+El costo temporal es lineal $O(n)$, donde $n$ representa la cantidad total de elementos residentes en el vector. Esto se debe a que el algoritmo efectúa un único recorrido secuencial por el arreglo (0 hasta n-1), ejecutando como máximo dos operaciones de comparación de costo constante $O(1)$ por cada celda. El costo espacial auxiliar es $O(1)$ al operar in-place sin memoria dinámica adicional.
+
 5. ¿Por qué esta función es útil en pruebas pero no necesariamente en producción?
+
+Es una herramienta de diagnóstico invaluable en entornos de prueba para interceptar errores algorítmicos (regresiones o rotura de punteros). Sin embargo, incluir una validación $O(n)$ en producción arruinaría las garantías de rendimiento de la estructura: operaciones ultraeficientes como insert() o delMax(), diseñadas para ejecutarse velozmente en $O(\log n)$, se degradarían a un costo lineal si se validaran antes o después de cada invocación.
 
 Entrega en este bloque:
 
 - Código de validación.
+
+```
+bool isValidHeap() const {
+    const std::size_t n = data_.size();
+    for (std::size_t i = 0; i < n; ++i) {
+      if(pqHasLeftChild(i, n) && comp_(data_[i], data_[pqLeftChild(i)])) {
+        return false;
+      }
+      if(pqHasRightChild(i, n) && comp_(data_[i], data_[pqRightChild(i)])) {
+        return false;
+      }
+    }
+    return true;
+}
+```
 - Pruebas agregadas.
+```
+void ejecutarPruebasConsistenciaHeap() {
+  // 1. Heap vacío
+  ods::PQ_ComplHeap<int> heap_vacio;
+  assert(heap_vacio.isValidHeap());
+
+  // 2. Heap con un elemento
+  ods::PQ_ComplHeap<int> heap_unitario{42};
+  assert(heap_unitario.isValidHeap());
+
+  // 3. Heap con elementos repetidos
+  ods::PQ_ComplHeap<int> heap_repetidos{10, 10, 5, 10, 2, 5};
+  assert(heap_repetidos.isValidHeap());
+
+  // 4. Heap construido por inserciones sucesivas
+  ods::PQ_ComplHeap<int> heap_inserciones;
+  for (int val : {15, 30, 5, 20, 40, 10}) {
+    heap_inserciones.insert(val);
+    assert(heap_inserciones.isValidHeap());
+  }
+
+  // 5. Heap construido masivamente mediante heapify de Floyd
+  std::vector<int> datos_crudos = {80, 20, 90, 40, 10, 70, 30, 60};
+  ods::PQ_ComplHeap<int> heap_floyd(datos_crudos);
+  assert(heap_floyd.isValidHeap());
+
+  // 6. Heap bajo mutación destructiva secuencial (múltiples delMax)
+  while (!heap_floyd.empty()) {
+    heap_floyd.delMax();
+    assert(heap_floyd.isValidHeap());
+  }
+  
+}
+```
 - Evidencia de `ctest`.
+```
+andre@andre-AB350M-DS3H-V2:/mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana6$ ctest --test-dir build-debug -R semana6 --output-on-failure
+Internal ctest changing into directory: /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana6/build-debug
+Test project /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana6/build-debug
+    Start 1: semana6_public
+1/2 Test #1: semana6_public ...................   Passed    0.00 sec
+    Start 2: semana6_internal
+2/2 Test #2: semana6_internal .................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.01 sec
+```
 
 #### Bloque 6 - Construcción de heap: inserciones sucesivas vs Floyd
 

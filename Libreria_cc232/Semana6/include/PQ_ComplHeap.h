@@ -73,8 +73,21 @@ class PQ_ComplHeap : public PQ<T> {
     }
     return true;
   }
+  // MOD-A6-B4
+  bool isValidHeap() const {
+    const std::size_t n = data_.size();
+    for (std::size_t i = 0; i < n; ++i) {
+      if(pqHasLeftChild(i, n) && comp_(data_[i], data_[pqLeftChild(i)])) {
+        return false;
+      }
+      if(pqHasRightChild(i, n) && comp_(data_[i], data_[pqRightChild(i)])) {
+        return false;
+      }
+    }
+    return true;
+  }
 
- private:
+private:
   std::vector<T> data_;
   Compare comp_{};
 };

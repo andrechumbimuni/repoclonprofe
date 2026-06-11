@@ -10,11 +10,11 @@ namespace ods {
 
 template <class T, class Compare>
 std::size_t complHeapPercolateDown(std::vector<T>& a, std::size_t n, std::size_t i, Compare comp) {
+  // MOD-A6-B1
   while (pqInHeap(i, n) && !pqIsLeaf(i, n) ) {
     std::size_t c = pqLeftChild(i);
-    const std::size_t r = pqRightChild(i);
-    if (pqInHeap(r, n) && comp(a[c], a[r])) {
-      c = r;
+    if (pqHasRightChild(i, n) && comp(a[c], a[pqRightChild(i)])) {
+      c = pqRightChild(i);
     }
     if (!comp(a[i], a[c])) {
       break;

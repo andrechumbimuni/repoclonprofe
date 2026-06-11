@@ -1,179 +1,114 @@
-### Actividad 6 - CC232 
+## Actividad 6 - CC232
 
-- Duración: 3 horas de clase.
-- Modalidad: Trabajo individual.
-- Entrega: Un archivo llamado `Actividad6-CC232.md` y los archivos modificados solicitados.
+### Estudiante
+- Nombre: Chumbimuni Ricci Andre Dylan
+- Código: 20230303J
+- Fecha: 29 de Mayo 2026
 
-#### Objetivo
-
-Consolidar lo trabajado en la Semana 6 a partir de lectura cercana, modificación controlada de código, ejecución de demostraciones, ampliación de pruebas y defensa escrita breve.
-
-La meta principal no es solo ejecutar la librería, sino **intervenir el código** para demostrar comprensión real de:
-
-1. La interfaz abstracta de cola de prioridad: `PQ`.
-2. La implementación con heap binario completo: `PQ_ComplHeap`.
-3. Las operaciones `getMax`, `insert`, `delMax`, `percolateUp`, `percolateDown` y `heapify` de Floyd.
-4. El ordenamiento `heapSort`.
-5. El heap izquierdista: `PQ_LeftHeap` y su operación central `merge`.
-6. La codificación Huffman como aplicación de colas de prioridad.
-7. La comparación con estructuras de la Semana 5: `BinaryHeap`, `BinarySearchTree` y apoyo conceptual de `BinaryTree`.
-8. La relación entre prioridad, búsqueda ordenada y estructuras híbridas como `Treap`.
-
-El énfasis de esta actividad está en **modificar, justificar, probar y defender** cambios pequeños pero técnicamente significativos.
-
-#### Material de trabajo
-
-##### Código de la semana
-
-Revisa como mínimo:
-
-- `Semana6/README.md`
-- `Semana6/lecturas/Notas.md`
-- `Semana6/include/PQ.h`
-- `Semana6/include/PQ_ComplHeap.h`
-- `Semana6/include/PQ_ComplHeap_macro.h`
-- `Semana6/include/PQ_ComplHeap_getMax.h`
-- `Semana6/include/PQ_ComplHeap_insert.h`
-- `Semana6/include/PQ_ComplHeap_delMax.h`
-- `Semana6/include/PQ_ComplHeap_percolateUp.h`
-- `Semana6/include/PQ_ComplHeap_percolateDown.h`
-- `Semana6/include/PQ_ComplHeap_heapifyFloyd.h`
-- `Semana6/include/vector_heapSort.h`
-- `Semana6/include/PQ_LeftHeap.h`
-- `Semana6/include/PQ_LeftHeap_merge.h`
-- `Semana6/include/PQ_LeftHeap_insert.h`
-- `Semana6/include/PQ_LeftHeap_delMax.h`
-- `Semana6/include/Huffman_PQ.h`
-- `Semana6/include/Huffman_PQ_generateTree.h`
-- `Semana6/include/MeldableHeap.h`
-- `Semana6/include/Treap.h`
-- `Semana6/include/Capitulo6.h`
-- `Semana6/include/Capitulo10.h`
-
-##### Código reutilizado de Semana 5
-
-Revisa también:
-
-- `Semana5/include/BinaryTree.h`
-- `Semana5/include/BinaryHeap.h`
-- `Semana5/include/BinarySearchTree.h`
-- `Semana5/include/Capitulo5.h`
-
-##### Demostraciones y pruebas
-
-Revisa y ejecuta:
-
-- `Semana6/demos/demo_pq_complheap_basico.cpp`
-- `Semana6/demos/demo_heapify_floyd.cpp`
-- `Semana6/demos/demo_heapsort.cpp`
-- `Semana6/demos/demo_left_heap_merge.cpp`
-- `Semana6/demos/demo_huffman.cpp`
-- `Semana6/demos/demo_compare_with_semana5.cpp`
-- `Semana6/demos/demo_bst_rotations.cpp`
-- `Semana6/demos/demo_treap_basico.cpp`
-- `Semana6/demos/demo_capitulo6_panorama.cpp`
-- `Semana6/pruebas_publicas/test_public_week6.cpp`
-- `Semana6/pruebas_internas/test_internal_week6.cpp`
-- `Semana6/CMakeLists.txt`
-
-#### Reglas de modificación
-
-1. No reemplaces las estructuras principales por `std::priority_queue`, `std::set`, `std::map` o funciones estándar que oculten el algoritmo central.
-2. Toda modificación debe mantener el estilo de la librería: headers simples, C++17, nombres claros y sin macros innecesarias.
-3. Cada cambio debe compilar.
-4. Cada cambio debe tener al menos una evidencia: demostraciones, prueba pública, prueba interna o salida documentada.
-5. En los archivos modificados, marca tus cambios con comentarios breves de este estilo:
-
-```cpp
-// MOD-A6-B3: validacion de propiedad heap
-```
-
-6. No basta con decir "funciona". Debes explicar qué invariante se preserva, qué caso borde se cubre y qué costo tiene la operación modificada.
+### Resumen de modificaciones
+| Bloque | Archivo modificado | Cambio realizado | Evidencia |
+|---|---|---|---|
+| **MOD-A6-B1** | `PQ_ComplHeap_macro.h` | Adición de funciones lógicas `constexpr` (`pqHasLeftChild`, `pqHasRightChild`, `pqIsLeaf`, `pqIsInternal`) para eliminar comparaciones aritméticas directas. | Compilación limpia con GCC 13.3.0 sin advertencias ni regresiones en los headers hermanos. |
+| **MOD-A6-B1** | `PQ_ComplHeap_percolateDown.h` | Rediseño del ciclo `while` y de las ramas condicionales para consumir las nuevas abstracciones de control de fronteras. | Paso invicto de las pruebas unitarias automatizadas `semana6_public` y `semana6_internal` (`100% tests passed`). |
 
 #### Bloque 1 - Diagnóstico inicial de la Semana 6
 
-Revisa:
-
-- `Semana6/README.md`
-- `Semana6/CMakeLists.txt`
-- `Semana6/include/Capitulo6.h`
-- `Semana6/include/Capitulo10.h`
-
-Ejecuta desde la raíz de la librería o desde el entorno de compilación que uses:
-
-```bash
-cmake -S . -B build
-cmake --build build
-ctest --test-dir build --output-on-failure
-```
-
-Responde:
-
 1. ¿Qué targets de demostraciones o pruebas aparecen para Semana 6?
-las demos, pruebas internas y publicas.
+
+Las demos son sem6_demo_pq_complheap_basico, sem6_demo_heapify_floyd, sem6_demo_heapsort, sem6_demo_left_heap_merge, sem6_demo_huffman, sem6_demo_compare_with_semana5, sem6_demo_bst_rotations, sem6_demo_treap_basico, y sem6_demo_capitulo6_panorama.
+
+Las pruebas son sem6_test_public y sem6_test_internal.
+
 2. ¿Qué archivos se incluyen desde `Capitulo6.h`?
+
 Se incluyen los archivos la semana 6 en la carpeta include de PQ.h, PQ_ComplHeap_macro.h, PQ_ComplHeap.h, PQ_ComplHeap_getMax.h; es un header de la semana6 como una interfaz.
+
 3. ¿Qué diferencia práctica hay entre `Capitulo6.h` y `Capitulo10.h`?
-El capitulo10.h es un alias de compatibilidad del capitulo6.h como si lo estuvieras reutilizando.
+
+El capitulo10.h es un alias de compatibilidad del capitulo6.h para que los programas que busquen el material bajo la numeración clásica del libro de texto de la asignatura funcionen sin romper dependencias.
+
 4. ¿Qué partes de Semana 6 dependen conceptualmente de Semana 5?
-Menciona que la semana 6 usas las estructuras de los arboles de semana5.
+
+Menciona que la semana 6 usas las estructuras de los arboles de semana5 para construir estructuras avanzadas como el Heap Izquierdista (que requiere punteros físicos para su operación merge) y el Treap (que requiere la estructura de un BST y sus métodos de rotación).
+
 5. ¿Qué estructura se usa para prioridad pura?
+
+Se utiliza la interfaz abstracta PQ<T> implementada a través de un montículo binario completo sobre un arreglo implícito (PQ_ComplHeap<T>) o mediante un heap izquierdista enlazado (PQ_LeftHeap<T>).
+
 6. ¿Qué estructura se usa para búsqueda ordenada?
+
+Se utiliza el Árbol de Búsqueda Binaria (BinarySearchTree<T>) heredado de la semana anterior, el cual mantiene las claves ordenadas horizontalmente.
+
 7. ¿Qué estructura mezcla búsqueda ordenada con prioridad?
+
+El Treap. Es un árbol aleatorizado que organiza sus nodos manteniendo de forma simultánea un invariante doble: propiedad de BST para las claves (orden horizontal) y propiedad de Heap para las prioridades asignadas al azar (orden jerárquico vertical).
+
 8. ¿Qué evidencia inicial obtuviste al ejecutar las pruebas sin modificar nada?.
-Los targets estan pasando.
-Entrega en este bloque:
 
-- Una tabla con: comando ejecutado, resultado, error si hubo, interpretación.
+### Tabla de Ejecución de Comandos y Validación
 
-cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug 
-cmake --build build-debug
-ctest --test-dir build-debug -R semana6 --output-on-failure
-
-- Una lista de los archivos que planeas modificar.
+| Comando Ejecutado | Resultado | Error si hubo | Interpretación |
+| :--- | :---: | :---: | :--- |
+| `cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug` | **Éxito** | Ninguno | Se identificó correctamente el compilador **GNU CXX 13.3.0** y se generó el directorio de construcción en la ruta local de la máquina de manera exitosa. |
+| `cmake --build build-debug` | **Éxito** | Ninguno | Compilación y enlazado incremental limpio desde el `4%` hasta el `100%`. Se generaron los 9 ejecutables de demostración y los 2 ejecutables binarios de test sin advertencias. |
+| `ctest --test-dir build-debug -R semana6 --output-on-failure` | **100% Passed** | Ninguno | Ejecución ultrarrápida (0.01 s). Ambos contenedores globales de pruebas (`semana6_public` y `semana6_internal`) pasaron invictos sin registrar fallos de aserción. |
 
 #### Bloque 2 - Modificación de utilidades de heap completo
 
-Revisa:
-
-- `Semana6/include/PQ_ComplHeap_macro.h`
-- `Semana6/include/PQ_ComplHeap_percolateUp.h`
-- `Semana6/include/PQ_ComplHeap_percolateDown.h`
-
-Modifica `PQ_ComplHeap_macro.h` para agregar funciones auxiliares `constexpr` adicionales, sin usar macros:
-
-```cpp
-pqHasLeftChild(i, n)
-pqHasRightChild(i, n)
-pqIsLeaf(i, n)
-pqIsInternal(i, n)
-```
-
-Luego modifica `PQ_ComplHeap_percolateDown.h` para usar esas funciones auxiliares donde corresponda.
-
-Responde:
-
 1. ¿Por qué conviene expresar `parent`, `left`, `right` y pruebas de frontera como funciones pequeñas?
+
 Para que si vea mas ordenado, que la relacion implicita del heap se vuelvan mas legibles, menos errores ya que son funciones pequeñas.
+
 2. ¿Qué ventaja tiene `constexpr` frente a macros?
+
 Se puede definir tipos , respeta ambitos que el macros solo reemplaza texto; tambien permite verificacion semantica y sintactica (como se comporta).
+
 3. ¿Qué caso borde aparece cuando el nodo tiene solo hijo izquierdo?
+
+El caso borde ocurre en un nodo ubicado en la penúltima capa del árbol cuando $n$ es un número par. Al evaluar la bifurcación, la expresión pqHasLeftChild(i, n) resulta verdadera, mientras que pqHasRightChild(i, n) resulta falsa. El algoritmo debe estar preparado para omitir de forma segura la comparación competitiva entre hermanos e identificar al hijo izquierdo directamente como el único candidato disponible para el intercambio.
+
 4. ¿Qué condición identifica una hoja en la representación implícita?
 
+Un nodo se considera hoja si su índice calculado para el hijo izquierdo excede o iguala el tamaño actual del vector. Matemáticamente se define como:
+```
+pqLeftChild(i) >= n
+```
+Si el hijo izquierdo no existe dentro de las fronteras físicas del heap, el hijo derecho tampoco existirá, deduciendo que el nodo no posee descendencia.
+
 5. ¿Qué cambió en `percolateDown` después de usar las funciones auxiliares?
-No cambia su complejidad O(log n )
+
+Cambió exclusivamente su legibilidad estructural e intención semántica. La lógica de control interna ya no expone operaciones aritméticas de comparación directas contra n, sino llamadas limpias a abstracciones lógicas funcionales. El comportamiento dinámico en el Heap de memoria permanece idéntico.
+
 Entrega en este bloque:
 
 - Fragmento del código modificado.
-
+```
 inline constexpr bool pqHasLeftChild(std::size_t i, std::size_t n) noexcept {return pqLeftChild(i) < n;}
 inline constexpr bool pqHasRightChild(std::size_t i, std::size_t n) noexcept {return pqRightChild(i) < n;}
 inline constexpr bool pqIsLeaf(std::size_t i, std::size_t n) noexcept { return !pqHasLeftChild(i, n);}
 inline constexpr std::size_t pqIsInternal(std::size_t i, std::size_t n) noexcept { return pqHasLeftChild(i, n);}
-
+```
 - Explicación de por qué no cambia la complejidad.
-- Evidencia de compilación.
 
+Inlining y Cero Costo de Abstracción: Al estar marcadas como inline constexpr, el compilador de C++ (GCC 13.3.0) sustituye la llamada a la función directamente por la expresión aritmética subyacente durante la fase de optimización. No se genera sobrecosto por llamadas a funciones en la pila (Stack Frames).
+
+Número de Iteraciones: El camino de descenso del ciclo while sigue estando estrictamente acotado por la altura máxima del árbol completo. Dado que la altura de un árbol balanceado de $n$ elementos es $ \log_2 n $, el algoritmo realiza como máximo ese número de pasos de intercambio.
+
+- Evidencia de compilación.
+```
+andre@andre-AB350M-DS3H-V2:~/Libreria_cc232/Semana6$ cmake --build build-debug
+[100%] Built target sem6_test_internal
+
+andre@andre-AB350M-DS3H-V2:~/Libreria_cc232/Semana6$ ctest --test-dir build-debug -R semana6
+Internal ctest changing into directory: .../Semana6/build-debug
+Test project .../Semana6/build-debug
+    Start 1: semana6_public
+1/2 Test #1: semana6_public ...................   Passed    0.00 sec
+    Start 2: semana6_internal
+2/2 Test #2: semana6_internal .................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 2
+```
 #### Bloque 3 - Modificación de `percolateUp`: conteo de intercambios
 
 Revisa:
@@ -844,16 +779,9 @@ Tu respuesta debe incluir obligatoriamente:
 #### Formato sugerido de entrega
 
 ```markdown
-## Actividad 6 - CC232
 
-### Estudiante
-- Nombre:
-- Código:
-- Fecha:
 
-### Resumen de modificaciones
-| Bloque | Archivo modificado | Cambio realizado | Evidencia |
-|---|---|---|---|
+
 
 ### Bloque 1 - Diagnóstico inicial
 [Comandos, resultados y explicación]

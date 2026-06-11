@@ -5,13 +5,14 @@
 
 namespace ods {
 
-constexpr int N_OPTR = 9;
+constexpr int N_OPTR = 10;
 
 enum Operator {
     ADD,
     SUB,
     MUL,
     DIV,
+    MOD,
     POW,
     FAC,
     L_P,
@@ -21,15 +22,16 @@ enum Operator {
 
 // Tabla de precedencias entre operadores
 inline constexpr std::array<std::array<char, N_OPTR>, N_OPTR> pri{{
-    std::array<char, N_OPTR>{'>', '>', '<', '<', '<', '<', '<', '>', '>'},
-    std::array<char, N_OPTR>{'>', '>', '<', '<', '<', '<', '<', '>', '>'},
-    std::array<char, N_OPTR>{'>', '>', '>', '>', '<', '<', '<', '>', '>'},
-    std::array<char, N_OPTR>{'>', '>', '>', '>', '<', '<', '<', '>', '>'},
-    std::array<char, N_OPTR>{'>', '>', '>', '>', '>', '<', '<', '>', '>'},
-    std::array<char, N_OPTR>{'>', '>', '>', '>', '>', '>', ' ', '>', '>'},
-    std::array<char, N_OPTR>{'<', '<', '<', '<', '<', '<', '<', '=', ' '},
-    std::array<char, N_OPTR>{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-    std::array<char, N_OPTR>{'<', '<', '<', '<', '<', '<', '<', ' ', '='}
+    std::array<char, N_OPTR>{'>', '>', '<', '<', '<', '<', '<', '<', '>', '>'},
+    std::array<char, N_OPTR>{'>', '>', '<', '<', '<', '<', '<', '<', '>', '>'},
+    std::array<char, N_OPTR>{'>', '>', '>', '>', '>', '<', '<', '<', '>', '>'},
+    std::array<char, N_OPTR>{'>', '>', '>', '>', '>', '<', '<', '<', '>', '>'},
+    std::array<char, N_OPTR>{'>', '>', '>', '>', '>', '<', '<', '<', '>', '>'},
+    std::array<char, N_OPTR>{'>', '>', '>', '>', '>', '>', '<', '<', '>', '>'},
+    std::array<char, N_OPTR>{'>', '>', '>', '>', '>', '>', '>', ' ', '>', '>'},
+    std::array<char, N_OPTR>{'<', '<', '<', '<', '<', '<', '<', '<', '=', ' '},
+    std::array<char, N_OPTR>{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    std::array<char, N_OPTR>{'<', '<', '<', '<', '<', '<', '<', '<', ' ', '='}
 }};
 
 // Convierte un símbolo en su tipo de operador
@@ -39,6 +41,7 @@ inline Operator optr2rank(char op) {
         case '-': return SUB;
         case '*': return MUL;
         case '/': return DIV;
+        case '%': return MOD;
         case '^': return POW;
         case '!': return FAC;
         case '(': return L_P;

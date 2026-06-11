@@ -31,7 +31,10 @@ cc232_add_sem4_target(sem4_demo_nqueens "demos/demo_nqueens.cpp")
 cc232_add_sem4_target(sem4_demo_maze "demos/demo_maze.cpp")
 cc232_add_sem4_target(sem4_demo_bank "demos/demo_bank.cpp")
 cc232_add_sem4_target(sem4_demo_capitulo4_panorama "demos/demo_capitulo4_panorama.cpp")
-
+cc232_add_sem4_target(sem4_demo_experimento1 "demos/demo_experimento1.cpp")
+cc232_add_sem4_target(sem4_demo_experimento2 "demos/demo_experimento2.cpp")
+cc232_add_sem4_target(sem4_demo_experimento3 "demos/demo_experimento3.cpp")
+cc232_add_sem4_target(sem4_demo_experimento4 "demos/demo_experimento4.cpp")
 cc232_add_sem4_target(sem4_test_public "pruebas_publicas/test_public_week4.cpp")
 cc232_add_sem4_target(sem4_test_internal "pruebas_internas/test_internal_week4.cpp")
 

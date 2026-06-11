@@ -13,89 +13,56 @@ La meta es distinguir con claridad cómo `Stack` y `Queue` dejan de ser solo est
 
 Además, se busca comparar explícitamente enfoques recursivos e iterativos, justificar qué información guarda cada estructura auxiliar, defender por qué una pila explícita puede reemplazar recursión implícita, y analizar cómo pequeñas decisiones de diseño cambian el comportamiento observable en N-Reinas, laberintos y simulación bancaria.
 
-#### Material de trabajo
 
-##### Código de la semana
-
-- `Semana4/README.md`
-- `Semana4/CMakeLists.txt`
-- `Semana4/include/Stack.h`
-- `Semana4/include/Queue.h`
-- `Semana4/include/BaseConversion.h`
-- `Semana4/include/Parentheses.h`
-- `Semana4/include/OperatorPriority.h`
-- `Semana4/include/ExpressionEvaluator.h`
-- `Semana4/include/Queen.h`
-- `Semana4/include/NQueens.h`
-- `Semana4/include/Maze.h`
-- `Semana4/include/BankSimulation.h`
-- `Semana4/include/Capitulo4.h`
-- `Semana4/demos/demo_stack_queue.cpp`
-- `Semana4/demos/demo_base_conversion.cpp`
-- `Semana4/demos/demo_paren_rpn.cpp`
-- `Semana4/demos/demo_nqueens.cpp`
-- `Semana4/demos/demo_maze.cpp`
-- `Semana4/demos/demo_bank.cpp`
-- `Semana4/demos/demo_capitulo4_panorama.cpp`
-- `Semana4/pruebas_publicas/test_public_week4.cpp`
-- `Semana4/pruebas_internas/test_internal_week4.cpp`
-- `Semana4/Ejercicios4-CC232.md`
-
-#### Lecturas obligatorias
-
-- Capítulo 4 de Deng: pilas, colas y aplicaciones.
-- README de la Semana 4.
-
-#### Bloque 0 - Instalación y preparación
-
-1. Deja lista tu carpeta de trabajo.
-2. Verifica que puedes abrir `Semana4`, las lecturas y el archivo de entrega.
-3. Crea el archivo `Actividad4-CC232.md`.
-4. Anota tu nombre completo.
-5. Compila y ejecuta al menos una demostración y una prueba pública de Semana 4.
 
 #### Bloque 1 - Núcleo conceptual de la semana
 
-Revisa:
-
-- `Semana4/README.md`
-- `Semana4/include/Stack.h`
-- `Semana4/include/Queue.h`
-- `Semana4/include/BaseConversion.h`
-- `Semana4/include/Parentheses.h`
-- `Semana4/include/ExpressionEvaluator.h`
-- `Semana4/include/NQueens.h`
-- `Semana4/include/Maze.h`
-- `Semana4/include/BankSimulation.h`
-- Capítulo 4 de Deng.
-
-Responde:
-
 1. Explica con tus palabras la diferencia entre acceso `LIFO` y acceso `FIFO`.
+
 LIFO como indica el nombre es el ultimo en entrar es el primero en salir y FIFO es el primero en entrar y primero en salir.
+
 2. Explica por qué `Stack` resuelve naturalmente problemas donde importa "lo último pendiente".
+
 Una Pila Stack es LIFO. Al hacerlo, la información más reciente que guardas se convierte inmediatamente en la primera que vas a procesar
+
 3. Explica por qué `Queue` modela naturalmente procesos de espera y atención.
+
 Una Cola Queue funciona bajo el modelo FIFO, que es la representación exacta de la "justicia cronológica": el que llega primero, es atendido primero.
+
 4. Explica qué significa reemplazar recursión implícita por una estructura explícita.
+
 Una función recursiva es una función que se llama a sí misma, el programa utiliza la Pila de Llamadas (Call Stack) del sistema para recordar en qué línea se quedó cada función y qué valores tenía.la recursion implicita es cuando tu no lo gestionas si no el SO.
 
 5. Explica qué información mínima debe guardarse para que una pila permita reconstruir una solución parcial.
+
 El estado actual y las alternativas de caminos pendientes, si un camino falla prueba la siguiente alternativa.
+
 6. Compara la conversión de base recursiva e iterativa: ¿qué comparten y qué cambia en el control del proceso?
+
 Comparten que ambos dividen al numero entre la base y guardan los residuos y los leen en orden inverso.
 En la recursiva, el SO controla el LIFO usando la pila de llamadas. En la iterativa,tú controlas el proceso creando explícitamente una estructura de datos Stack.
+
 7. Explica por qué la verificación iterativa de paréntesis necesita almacenar aperturas pendientes.
+
 Porque cuando almacena un parentisis de entrada no se sabe cuando aparecera el parentesis de salida, por lo que necesitas recordar el parentisis de entrada.
+
 8. Explica por qué el evaluador de expresiones necesita dos pilas y no una sola.
+
 Porque una expresión  es para los números (operandos) y el otro para los símbolos (operadores). Necesitas separarlos para poder aplicar reglas como multiplicar antes de sumar. Una pila guarda los valores acumulados y la otra guarda los operadores en espera de que les llegue su turno de ejecutarse.
+
 9. Explica por qué N-Reinas y laberinto son ejemplos naturales de backtracking.
+
 Porque son problemas de ensayo y error. No existe una fórmula directa para saber dónde poner la reina o qué camino tomar.
+
 10. Explica por qué la simulación bancaria no se modela bien con pila, pero sí con colas.
+
 Porque un banco real funciona bajo el principio de "justicia". Si usaras una Pila (LIFO), la última persona en entrar es la primera en ser atendida, y la persona que llegó temprano seria la ultima, cosa que en una cola seria al revez.
+
 11. Explica qué relación hay entre estructura auxiliar, estado parcial y correctitud.
+
 Estructura auxiliar: Es la memoria (Pila, Cola), el estado parcial es "dónde estoy ahora" en medio del cálculo y la correctitud es que el algoritmo dé la respuesta correcta.
 La relación es si eliges la estructura auxiliar adecuada, esta guardará los estados parciales en el orden correcto (LIFO o FIFO). Al procesarlos en el orden dictado por la naturaleza del problema, garantizas la correctitud del resultado final.
+
 12. Explica qué diferencia conceptual hay entre "resolver un problema" y "simular un proceso".
 
 Resolver un problema se enfoca en encontrar un resultado final único u óptimo. No importa cómo llegues ahí, lo importante es la respuesta final.
@@ -103,182 +70,388 @@ Simular un proceso se enfoca en imitar el comportamiento de un sistema paso a pa
 
 #### Bloque 2 - Demostración y trazado guiado
 
-Revisa:
+| Archivo | Salida u observable importante | Estructura o técnica central | Qué concepto permite defender |
+| :--- | :--- | :--- | :--- |
+| **`demo_stack_queue.cpp`** | `Tope = 9` / `Pop = 9`<br>`Frente = 10` / `Dequeue = 10` | Pila (`ods::Stack`) y Cola (`ods::Queue`) lineales. | La diferencia fundamental entre la filosofía **LIFO** (último en entrar, primero en salir) y **FIFO** (primero en entrar, primero en salir). |
+| **`demo_base_conversion.cpp`** | Ambas funciones devuelven la misma cadena `12345 en base 8 = 30071`. | Recursión implícita vs. `Stack` explícito. | La **equivalencia de control**: cualquier proceso recursivo puede simularse iterativamente usando una pila propia para evitar el *Stack Overflow*. |
+| **`demo_paren_rpn.cpp`** | `Parentesis balanceados = true`, la cadena en RPN y el `Valor de la expresion = 2012`. | Pilas duales (operadores/operandos) y algoritmo Shunting-yard. | Cómo las pilas eliminan la ambigüedad y los paréntesis de una operación, convirtiéndola en una estructura lineal fácil de evaluar por una máquina. |
+| **`demo_nqueens.cpp`** | `N=4,  soluciones = 2, verificaciones = 84` y las matrices con las posiciones({1 3 0 2},{2 0 3 1}). | **Backtracking** (Ensayo y error sistemático). | La capacidad de explorar un árbol de decisiones completo, **guardando estados parciales** y retrocediendo cuando se viola una regla de aislamiento. |
+| **`demo_maze.cpp`** | `Medida del camino = 5` y la lista secuencial de coordenadas `(1,1) (1,2) (1,3) (2,3) (3,3)`. | Búsqueda de caminos mediante Pilas/Colas sobre matrices. | El uso de estructuras auxiliares para reconstruir una **solución geométrica paso a paso** sin perder el rastro del camino correcto. |
+| **`demo_bank.cpp`** | `Llegadas=7 `, `atendidos=0` y las listas `[t=0: [87][][], t=1: [86][12][] ...` . | Simulación por tiempo discreto usando múltiples colas FIFO. | La **justicia cronológica** en el modelado de procesos reales. Demuestra cómo las colas gestionan la congestión en sistemas de espera. |
+| **`demo_capitulo4_panorama.cpp`** | Mensaje de éxito inicial `Semana 4 cargada correctamente` y la impresión de todas las salidas integradas en un solo bloque. | Integración modular de TDA (Pilas y Colas) y algoritmos avanzados. | La **versatilidad** de las estructuras lineales: herramientas simples (pilas/colas) sirven como base para resolver problemas complejos y diversos. |
 
-- `Semana4/demos/demo_stack_queue.cpp`
-- `Semana4/demos/demo_base_conversion.cpp`
-- `Semana4/demos/demo_paren_rpn.cpp`
-- `Semana4/demos/demo_nqueens.cpp`
-- `Semana4/demos/demo_maze.cpp`
-- `Semana4/demos/demo_bank.cpp`
-- `Semana4/demos/demo_capitulo4_panorama.cpp`
 
-Construye una tabla con cuatro columnas:
-
-- Archivo
-- Salida u observable importante
-- Estructura o técnica central
-- Qué concepto permite defender
-
-Luego responde:
 
 1. En `demo_stack_queue.cpp`, ¿qué parte de la salida deja más clara la diferencia entre tope y frente?
-Como stack es un pila(LIFO) donde el tope es el elemento 9(cima) sera el primero en salir; y en la cola queue, el primer elemento(frente) es 10 que va a ser el primero en salir (FIFO) 
+
+Como stack es un pila(LIFO) donde el tope es el elemento 9(cima) sera el primero en salir; y en la cola queue, el primer elemento(frente) es 10 que va a ser el primero en salir (FIFO) .
+
 2. En `demo_base_conversion.cpp`, ¿qué observable permite afirmar que las versiones recursiva e iterativa producen la misma representación?
+
+El observable es el resultado textual idéntico en la consola. Ambas funciones reciben el mismo número (12345) y la misma base (8), y devuelven exactamente el mismo string.
+
 3. En `demo_paren_rpn.cpp`, ¿qué relación observas entre paréntesis balanceados, RPN y valor final?
+
+La relación es un flujo de validación y transformación:
+
+Primero se verifica que los paréntesis estén balanceados (true) para garantizar que la expresión sea válida.
+Luego, las pilas separan los operadores de los operandos, reordenándolos en RPN, lo que destruye la necesidad de usar paréntesis.
+Finalmente, esa cadena lineal limpia en RPN es la que permite procesar y calcular de manera directa y sin ambigüedades el valor final.
+
 4. En `demo_nqueens.cpp`, ¿qué significan `solutions` y `checks`, y por qué no miden lo mismo?
+
+solutions: Es la cantidad de tableros finales válidos encontrados donde las 4 reinas están a salvo.
+
+checks: Es el número total de veces que el algoritmo tuvo que validar si una reina atacaba a otra en cualquier celda.
+No miden lo mismo porque checks mide el esfuerzo total del algoritmo, incluyendo todos los caminos falsos e intentos fallidos que el Backtracking tuvo que explorar y desechar (poda) antes de encontrar las soluciones reales.
+
 5. En `demo_maze.cpp`, ¿qué muestra la secuencia de coordenadas sobre el camino encontrado?
+
+Muestra una ruta continua y adyacente paso a paso, desde el punto de inicio (1,1) hasta el punto de destino (3,3). Al ver que las coordenadas cambian de uno en uno (por ejemplo, de 1,1 a 1,2), se demuestra que la estructura guardó el rastro físico del laberinto sin dar saltos mágicos o atravesar paredes (#).
+
 6. En `demo_bank.cpp`, ¿qué representa cada lista impresa en cada instante `t`?
+
+Representa la fotografía exacta de las filas del banco en ese segundo o minuto específico. Cada [] es una ventanilla de atención, y los números dentro de los corchetes muestran cuántos clientes están haciendo cola en ese preciso instante de tiempo t. Permite ver visualmente cómo la cola crece cuando llegan clientes o se vacía cuando son atendidos.
+
 7. En `demo_capitulo4_panorama.cpp`, ¿qué salida resume mejor la idea de que una misma semana reúne estructuras y aplicaciones?
+
+Lo resume el bloque final de impresiones en consola, donde se ejecutan consecutivamente algoritmos de áreas totalmente distintas: evaluación matemática (RPN), juegos/inteligencia artificial (N-Reinas), robótica/navegación (Laberinto) y operaciones de negocios (Banco). Ver todas esas salidas juntas demuestra que las estructuras fundamentales de Pilas y Colas son el motor de aplicaciones muy diversas.
 
 #### Bloque 3 - Pruebas públicas, pruebas internas y correctitud
 
-Revisa:
-
-- `Semana4/pruebas_publicas/test_public_week4.cpp`
-- `Semana4/pruebas_internas/test_internal_week4.cpp`
-
-Responde:
-
 1. ¿Qué operaciones mínimas valida la prueba pública para `Stack`?
+
+Valida el ciclo de vida básico de la estructura en orden LIFO:
+
+empty(): Verifica que inicie vacía y termine vacía tras los procesos.
+
+push(): Inserta elementos consecutivamente (5 y luego 9).
+
+top(): Comprueba cuál es la cima actual sin removerla (debe ser 9).
+
+pop(): Extrae y devuelve los elementos en orden inverso al que entraron (primero el 9, luego el 5).
+
 2. ¿Qué operaciones mínimas valida la prueba pública para `Queue`?
+
+Valida el comportamiento de una fila en orden FIFO:
+
+empty(): Monitorea el estado de vacío inicial y final.
+
+enqueue(): Inserta elementos en fila (1, 2 y luego 3).
+
+front(): Inspecciona el primer elemento en espera sin sacarlo (debe ser 1).
+
+dequeue(): Extrae los elementos respetando estrictamente el orden de llegada (1, luego 2 y al final 3).
+
 3. ¿Qué valida la prueba pública sobre conversión de base?
+
+Comprueba que un número entero genérico (12345) sea transformado correctamente a base octal ("30071"), y asegura que tanto la estrategia recursiva como la iterativa produzcan exactamente el mismo resultado string.
+
 4. ¿Qué valida la prueba pública sobre paréntesis balanceados?
+
+Valida tres escenarios de agrupación comunes:
+
+Un caso simple con paréntesis uniformes perfectamente emparejados (true).
+
+Un caso complejo que mezcla múltiples símbolos ((), [], {}) ordenados correctamente (true).
+
+Un error de cruce de cierres incorrecto (([)]), que debe ser detectado como inválido (false).
+
 5. ¿Qué valida la prueba pública sobre evaluación de expresiones y RPN?
+
+Valida una expresión aritmética masiva que combina múltiples reglas: operaciones aritméticas básicas, prioridades con paréntesis, factoriales (!) y potencias (^). Asegura que el algoritmo reordene correctamente los tokens en la cadena RPN y que la evaluación final con números flotantes sea exacta (2012.0).
+
 6. ¿Qué valida la prueba pública sobre `NQueens`?
+
+Valida el funcionamiento del Backtracking sobre el tablero estándar de N = 4. Verifica que el algoritmo sea capaz de encontrar exactamente las 2 soluciones únicas que existen matemáticamente para este tamaño de cuadrícula sin omitir ninguna.
+
 7. ¿Qué valida la prueba pública sobre `Maze`?
+
+Valida la resolución de un laberinto con una ruta accesible. Comprueba que el algoritmo devuelva una lista de coordenadas que no esté vacía, y asegura las condiciones de frontera básicas: que el punto de partida sea obligatoriamente (1,1) y la meta alcanzada sea (3,3).
+
 8. ¿Qué valida la prueba pública sobre `bestWindow` en la simulación bancaria?
+
+Valida la lógica de decisión inteligente para la asignación de clientes. El test simula un banco con tres ventanillas: una con dos personas, otra con una persona, y una tercera completamente vacía. Verifica que el código retorne el índice 2, demostrando que el sistema elige correctamente la ventanilla con la menor carga de espera.
+
 9. ¿Qué casos adicionales cubre la prueba interna y no aparecen de forma explícita en la pública?
+
+Valores nulos y límites en bases: Evalúa la conversión del número 0 (que suele romper bucles mal diseñados) y el uso de bases con caracteres alfanuméricos como la Hexadecimal (255 -> "FF").
+
+Gestión de Excepciones: Intenta forzar una conversión con una base inválida (base 1) para certificar que el código lance correctamente un error std::invalid_argument.
+
+Strings atípicos en paréntesis: Valida cadenas que no tienen ningún paréntesis ("sin parentesis" que debe dar true) y cadenas que inician con un cierre huérfano (")()(" que debe dar false).
+
+Operadores unarios: Evalúa cómo se comporta el calculador ante un signo de menos negativo al inicio de la expresión ("-3+5").
+
+El laberinto imposible: Prueba un mapa donde la meta está completamente bloqueada por paredes (#), validando que el algoritmo lo detecte devolviendo un camino vacío (empty()) de forma segura en lugar de caer en un bucle infinito.
+
+El tablero mínimo: Prueba NQueens con N = 1, que es el caso base absoluto del problema.
+
 10. ¿Por qué pasar pruebas no reemplaza una explicación de invariantes, estado y complejidad?
+
+Porque las pruebas unitarias solo demuestran que el programa funciona para un conjunto limitado y cerrado de ejemplos.
+
+Un algoritmo pésimo con complejidad de tiempo horrible (como un Laberinto que explore de forma ineficiente tardando horas) pasará el test público si el mapa es minúsculo.
+
+La sustentación teórica demuestra que el código es robusto ante cualquier situación y que su consumo de recursos es óptimo.
+
 11. Da un ejemplo de un error conceptual que podría sobrevivir si solo se ejecutaran los casos mínimos.
+
+Si se asume que el símbolo de resta - siempre separa a dos números (un operador binario como A - B), la prueba pública pasará perfectamente porque dice -(5!-67...) donde el menos actúa de forma similar tras resolver el paréntesis. Sin embargo, si le ingresas el caso de la prueba interna ("-3+5"), un código con ese error conceptual fallará rotundamente o crasheará, porque el menos ahí es un operador unario (modifica solo al 3) y no tiene un operando izquierdo con el cual trabajar.
 
 #### Bloque 4 - Comparación recursivo vs iterativo
 
-Revisa:
-
-- `Semana4/include/BaseConversion.h`
-- `Semana4/include/Parentheses.h`
-- `Semana4/demos/demo_base_conversion.cpp`
-- `Semana4/demos/demo_paren_rpn.cpp`
-
-Responde:
-
 1. En conversión de base, ¿qué papel juegan el cociente, el residuo y la pila?
+
+El Residuo (n % base): Representa el valor del dígito actual en la nueva base. Las divisiones sucesivas van extrayendo estos dígitos desde las unidades hacia arriba.
+
+El Cociente (n / base): Es la parte reducida del número que queda por procesar. Se utiliza como el nuevo valor de n para la siguiente iteración o llamada recursiva hasta llegar a 0.
+
+La Pila (Stack<char>): Recibe los residuos en el orden en que se calculan (al revés). Como la pila opera bajo el principio LIFO, al retirar todos los elementos al final con popAll, los dígitos salen invertidos, devolviendo el número en el orden correcto de lectura.
+
 2. ¿Por qué los residuos se apilan antes de formar la cadena final?
+
+Porque el algoritmo matemático de división sucesiva extrae los dígitos "de atrás hacia adelante" (empezando por las unidades). Si concatenáramos los residuos directamente en un string conforme van saliendo, el número final quedaría completamente al revés. La pila se usa como una herramienta de inversión lógica: lo primero que entra es lo último que sale, ordenando la cadena de manera correcta de izquierda a derecha.
+
 3. ¿Qué cambia entre dejar que el call stack haga el trabajo y manejar una pila explícita?
+
+En la versión iterativa, el estado de las variables y el bucle while ocurren dentro de un único marco de ejecución. Es altamente eficiente en memoria.
+
+En la versión recursiva, cada paso genera una nueva llamada a convertRecursive. El Sistema Operativo tiene que usar el Call Stack (pila de llamadas) del sistema para recordar en qué línea se quedó cada función y qué valores tenían n y base. Si el número fuera colosalmente grande, delegar el control al Call Stack podría arriesgar un desbordamiento de pila (Stack Overflow).
+
 4. En `parenRecursive`, ¿qué idea intenta capturar `divideParentheses`?
+
+Intenta capturar el concepto de aislamiento de un bloque jerárquico. Dado un paréntesis de apertura en la posición lo, esta función busca su pareja exacta de cierre mi. Para lograrlo, utiliza un contador (crc) que aumenta con cada ( y disminuye con cada ). Esto permite "saltarse" limpiamente cualquier sub-bloque que esté anidado adentro. Una vez encontrado el límite, el problema se divide en dos: validar lo que está adentro del bloque y validar lo que continúa después de él.
+
 5. ¿Qué limitación conceptual tiene la versión recursiva mostrada frente a la iterativa cuando aparecen `[]` y `{}`?
+
+La versión recursiva compartida está completamente acoplada a un solo tipo de símbolo (). Su función trimParentheses ignora físicamente las llaves y los corchetes, tratándolos como si fueran texto ordinario. Modificar esta lógica para que valide de forma recursiva estructuras mixtas o cruzadas como {[(])} requeriría un árbol de decisiones extremadamente complejo y costoso de programar. La versión iterativa, en cambio, maneja múltiples tipos de forma nativa simplemente comparando el tope de la pila en un switch-case.
+
 6. En `parenIterative`, ¿por qué un cierre incorrecto puede detectarse apenas aparece?
+
+Debido a la naturaleza LIFO. Si el programa lee un ] y al inspeccionar la pila nota que está vacía (un cierre huérfano) o que el elemento en la cima es un (, la regla de oro se rompe inmediatamente. El algoritmo no necesita perder tiempo leyendo el resto de la cadena; detecta el error al instante y retorna false.
+
 7. Compara ambas parejas de funciones: ¿en cuál caso la versión iterativa te parece más natural y en cuál la recursiva resulta más expresiva?
+
+Conversión de base: La versión iterativa es la más natural. El proceso matemático se reduce a un bucle directo y plano que divide un número consecutivamente. Añadir recursión aquí no aporta claridad y consume más recursos.
+
+Verificación de paréntesis: La versión iterativa es, por mucho, la más limpia y expresiva para escenarios del mundo real. Aunque la recursividad es una manera muy elegante de esquematizar la teoría de lenguajes y bloques jerárquicos, en la práctica del código se vuelve rígida, ineficiente y difícil de adaptar a múltiples tipos de llaves.
 
 ##### Experimento 1
 
-Ejecuta pruebas propias con al menos cinco números y cuatro bases distintas para `toBaseRecursive` y `toBaseIterative`.
-
-Registra en una tabla:
-
-- Número
-- Base
-- Salida recursiva
-- Salida iterativa
-- ¿Coinciden?
-- Comentario
-
+Creado en la carpeta demos llamado demo_experimento1.cpp:
+Imprimiendo las 5 primeras filas:
+```
+| Número    | Base | Salida Recursiva  | Salida Iterativa      | ¿Coinciden? | Comentario |
+|          0 |     2 |                    0 |                    0 |        Sí | Caso base límite: El cero es invariante en cualquier base. |
+|          0 |     8 |                    0 |                    0 |        Sí | Caso base límite: El cero es invariante en cualquier base. |
+|          0 |    10 |                    0 |                    0 |        Sí | Caso base límite: El cero es invariante en cualquier base. |
+|          0 |    16 |                    0 |                    0 |        Sí | Caso base límite: El cero es invariante en cualquier base. |
+|         45 |     2 |               101101 |               101101 |        Sí | Base binaria: Evalúa la máxima longitud de bits en la pila. |
+```
 ##### Experimento 2
 
-Construye una batería de al menos ocho expresiones para paréntesis, incluyendo:
-
-- una vacía,
-- una sin paréntesis,
-- una correctamente anidada,
-- una con desbalance,
-- una con cruce incorrecto,
-- una con varios tipos de delimitadores,
-- una larga,
-- una inventada por ti.
-
-Para cada caso indica:
-
-- resultado recursivo,
-- resultado iterativo,
-- si ambos coinciden,
-- qué explica el caso.
-
+Creado en la carpeta demos llamado demo_experimento2.cpp:
+Imprimiendo las 3 primeras filas:
+```
+| Categoría       | Expresión | Resultado Recursivo | Resultado Iterativo | ¿Coinciden? | Explicación del Caso |
+| Vacía   |         | TRUE (Válido)        | TRUE (Válido)        | Sí                  | Caso base absoluto. Ambos algoritmos lo procesan como exitoso inmediatamente. |
+| Sin paréntesis   | Expresion plana con texto 123        | TRUE (Válido)        | TRUE (Válido)        | Sí                  | No contiene delimitadores. La iterativa termina con pila vacía y la recursiva reduce sus índices a cero. |
+| Correctamente anidada   | ((a + b) * (c - d))        | TRUE (Válido)        | TRUE (Válido)        | Sí                  | Estructura pura de paréntesis circulares con anidamiento válido. Ambos métodos funcionan perfecto. |
+```
 #### Bloque 5 - Evaluación de expresiones y prioridad de operadores
 
-Revisa:
-
-- `Semana4/include/OperatorPriority.h`
-- `Semana4/include/ExpressionEvaluator.h`
-- `Semana4/demos/demo_paren_rpn.cpp`
-- `Semana4/pruebas_publicas/test_public_week4.cpp`
-- `Semana4/pruebas_internas/test_internal_week4.cpp`
-
-Responde:
-
 1. Explica qué información guarda `EvaluationResult`.
+
+Es una estructura de datos (struct) diseñada para empaquetar y devolver de manera compacta los dos productos finales del procesamiento de la expresión:
+
+double value: El valor numérico final calculado tras resolver todas las operaciones aritméticas.
+
+std::string rpn: La representación de la expresión en Notación Polaca Inversa, donde los operandos anteceden a sus operadores y se eliminan por completo los paréntesis.
+
 2. Explica por qué primero se eliminan espacios.
+
+Para simplificar la fase de tokenización y análisis sintáctico. Al limpiar caracteres invisibles como  , \t o \n mediante removeSpaces, el algoritmo garantiza que el puntero de lectura (i) avance de manera continua y predecible de un carácter significativo al siguiente. Además, evita tener que implementar comprobaciones redundantes de espacios en funciones clave como la lectura de números o la detección del operador unario.
+
 3. Explica cómo se detecta el signo menos unario.
+
+La función isUnaryMinus implementa una máquina de estados contextual. Para que un caracter - sea interpretado como el signo negativo de un número y no como una operación de resta, debe cumplir tres condiciones concurrentes:
+
+Tener un dígito o un punto inmediatamente a su derecha (i + 1).
+
+Estar al principio absoluto de la expresión (i == 0).O, si está en el medio, estar precedido inmediatamente por otro operador o paréntesis de apertura (por ejemplo, el - en 5 * (-3) o + - 4). 
+
+Si lo antecediera un número o un factorial, se trataría de una resta ordinaria.
+
 4. Explica por qué el factorial se trata como operador unario y qué restricción impone el código.
+
+Es un operador unario porque semánticamente se aplica sobre un único operando situado inmediatamente a su izquierda ($n!$).El código impone dos restricciones estrictas sobre él:
+
+Numérica: El operando debe ser matemáticamente un número entero (std::fabs(b - rounded) < 1e-9). Si es un flotante puro (como 5.5!), el código lanza un runtime_error.
+
+De Dominio: El entero no puede ser negativo (n < 0), arrojando una excepción en factorialInt ya que el factorial estándar no está definido en ese espectro.
+
 5. Explica cómo la RPN se va construyendo durante la evaluación y no al final.
+
+Se construye mediante un enfoque on-the-fly aprovechando la misma lógica de decisión del algoritmo:
+
+Cuando el lector identifica un número, este se concatena inmediatamente a la cadena rpn.
+
+Cuando el analizador determina que un operador del tope tiene mayor precedencia que el símbolo actual (caso '>'), el operador es retirado de la pila e incorporado a la cadena rpn justo antes de ser ejecutado.
+
+Esto evita tener que hacer un doble recorrido; ambos procesos van de la mano.
+
 6. Explica qué significa la relación entre operador del tope y símbolo actual.
+
+Representa la acción sintáctica dictada por la matriz de precedencia pri en OperatorPriority.h:
+
+'<' (Precedencia Menor): El operador del tope tiene menos jerarquía que el entrante. El símbolo actual se apila en operators para esperar su momento.
+
+'>' (Precedencia Mayor): El operador en el tope es más prioritario que el entrante. Se desapila, se manda a la RPN y se evalúa sobre los operandos acumulados.
+
+'=' (Prioridad Equivalente): Ocurre únicamente entre un paréntesis izquierdo  y uno derecho , o entre el inicio y el fin de la expresión (\0). Significa que el bloque se ha cerrado con éxito y el operador se descarta.
+
 7. Explica por qué una expresión mal formada debe terminar en error y no en un valor arbitrario.
+
+Porque un software de cálculo debe garantizar la integridad de los datos. Si una expresión como 5 + * 3 o (4 + 2 devolviera un valor por defecto (como 0.0), el sistema ocultaría fallos de lógica del usuario o errores de transmisión de datos. Lanzar un runtime_error detiene la ejecución inmediatamente y notifica de manera transparente que la entrada es inválida, impidiendo que cálculos erróneos se propaguen.
+
 8. ¿Qué ventaja conceptual tiene obtener a la vez el valor y la RPN?
+
+Proporciona un mecanismo nativo de auditoría y verificación. 
+La RPN actúa como la "caja negra" o el mapa de ejecución que muestra exactamente cómo interpretó la máquina las prioridades asociadas por el usuario. Al depurar o evaluar, si el value no coincide con lo esperado, inspeccionar la rpn te permite discernir de inmediato si el error fue un fallo de cálculo numérico o una mala interpretación de la jerarquía de los operadores.
 
 ##### Experimento 3
 
-Propón y ejecuta al menos seis expresiones nuevas:
+Creado en la carpeta demos llamado demo_experimento3.cpp:
 
-- dos válidas sin paréntesis,
-- dos válidas con anidamiento,
-- una con menos unario,
-- una inválida.
+Imprimiendo las filas:
+```
+Categoría: Válida sin paréntesis (1)
+Expresión: 3+4*2^3
+RPN Obtenida:  3 4 2 3 ^ * +
+Valor Obtenido: 35
 
-Para cada una registra:
+Categoría: Válida sin paréntesis (2)
+Expresión: 5!/4-2
+RPN Obtenida:  5 ! 4 / 2 -
+Valor Obtenido: 28
 
-- expresión,
-- RPN esperada,
-- RPN obtenida,
-- valor esperado u error esperado,
-- valor obtenido o error observado,
-- explicación breve.
+Categoría: Válida con anidamiento (1)
+Expresión: (2+3)^(4-2)
+RPN Obtenida:  2 3 + 4 2 - ^
+Valor Obtenido: 25
 
+Categoría: Válida con anidamiento (2)
+Expresión: 2*(3!+(4-1)!)
+RPN Obtenida:  2 3 ! 4 1 - ! + *
+Valor Obtenido: 24
+
+Categoría: Con menos unario
+Expresión: -5+3!*-2
+RPN Obtenida:  -5 3 ! -2 * +
+Valor Obtenido: -17
+
+Categoría: Expresión Inválida
+Expresión: 5+*3
+Error Observado: std::runtime_error (faltan operandos para el operador binario)
+```
 ##### Extensión opcional
 
-Extiende el evaluador con un operador adicional elegido por ti.
+Símbolo agregado: % (Operador Módulo).
 
-La defensa debe incluir obligatoriamente:
+Aridad: Binario (requiere dos operandos, ej. $A \% B$).
 
-- qué símbolo agregaste,
-- su aridad,
-- su prioridad,
-- qué casos válidos probaste,
-- qué caso inválido probaste,
-- qué parte del código tuviste que modificar.
+Prioridad: Tiene la misma jerarquía que la multiplicación y la división. Esto significa que es superior a la suma y la resta, pero inferior a la potencia y al factorial. De izquierda a derecha, se evalúa conforme aparece (asociatividad a la izquierda).
+
+Casos válidos probados:10 % 3 $\rightarrow$ 
+Debe dar 1.0 (RPN: 10 3 %).5 + 11 % 4 * 2 $\rightarrow$ 
+Primero el módulo ($11 \% 4 = 3$), luego multiplicación ($3 \times 2 = 6$) y suma ($5 + 6 = 11$). 
+Debe dar 11.0.
+
+Caso inválido probado:5 % 0 $\rightarrow$ Debe lanzar un error en tiempo de ejecución (runtime_error) por intentar calcular un residuo con un divisor igual a cero.5.5 % 2 $\rightarrow$ 
+Debe lanzar un error dado que el módulo conceptualmente requiere operandos enteros.
+
+2. Modificaciones Obligatorias en el Código
+
+Modificación A: En OperatorPriority.h
+
+Expandir el Enum: Añadir el identificador MOD antes de los paréntesis.
+
+Crecer la Matriz: Modificar N_OPTR de 9 a 10 e insertar una nueva fila y columna en la tabla pri que copie exactamente el comportamiento de las filas/columnas de MUL (*) y DIV (/).
+
+Mapear el Carácter: En optr2rank, añadir el case '%': return MOD;.
+
+Modificación B: En ExpressionEvaluator.h
+
+Registrar como Operador: En isOperatorChar, añadir case '%': para que el tokenizador lo reconozca y no intente leerlo como parte de un número.
+
+Implementar la Operación: En la función sobrecargada calcu para operaciones binarias, añadir el cálculo matemático:
 
 #### Bloque 6 - Backtracking explícito: N-Reinas y laberinto
 
-Revisa:
-
-- `Semana4/include/Queen.h`
-- `Semana4/include/NQueens.h`
-- `Semana4/include/Maze.h`
-- `Semana4/demos/demo_nqueens.cpp`
-- `Semana4/demos/demo_maze.cpp`
-- `Semana4/pruebas_publicas/test_public_week4.cpp`
-- `Semana4/pruebas_internas/test_internal_week4.cpp`
-
-Responde:
-
 1. En `Queen`, ¿qué significa que dos reinas entren en conflicto?
+
+Significa que ambas reinas se encuentran en una posición del tablero donde se pueden amenazar mutuamente según las reglas del ajedrez. El operador sobrecargado == lo verifica de forma puramente matemática mediante cuatro condiciones:
+
+x == other.x: Comparten la misma fila.
+
+y == other.y: Comparten la misma columna.
+
+x + y == other.x + other.y: Comparten la diagonal secundaria (pendiente positiva).
+
+x - y == other.x - other.y: Comparten la diagonal principal (pendiente negativa).
+
 2. En `NQueens`, ¿qué representa exactamente la pila `solution`?
+
+La pila representa el estado parcial de un tablero válido en un momento determinado de la búsqueda. Cada elemento de la pila es un objeto Queen cuyas coordenadas $(x, y)$ indican la fila y columna donde ha sido colocada de forma segura. El tamaño de la pila (solution.size()) indica de manera directa cuántas filas consecutivas (desde la $0$ hasta la $x-1$) han sido resueltas con éxito hasta el momento.
+
 3. ¿Qué significa avanzar en columna dentro de una fila y cuándo toca retroceder?
+
+Avanzar en columna (++q.y): Significa desplazar lateralmente a la reina actual para probar si la siguiente celda de la misma fila está libre de amenazas. Esto ocurre de forma secuencial dentro del bucle while mientras se sigan detectando conflictos con las reinas ya fijadas.
+
+Cuándo toca retroceder (Backtrack): Toca retroceder cuando el puntero de columna llega al borde del tablero (q.y >= n) sin haber encontrado ninguna casilla segura en esa fila. El algoritmo reconoce que el camino actual es un callejón sin salida, retira la última reina colocada de la pila (solution.pop()) para regresar a la fila anterior y desplaza a esa reina previa a la siguiente columna (++q.y) para explorar alternativas.
+
 4. ¿Por qué `checks` es una métrica útil para analizar la búsqueda?
+
+Porque permite auditar y cuantificar la complejidad temporal práctica del algoritmo. En lugar de basarse únicamente en el tiempo de reloj del procesador (que cambia según el hardware), la variable checks cuenta el número exacto de comparaciones individuales realizadas entre pares de reinas. Es una métrica excelente para observar el comportamiento exponencial del algoritmo frente a distintos valores de $N$ y comprobar cómo el Backtracking poda ramas enteras del árbol de decisiones.
+
 5. ¿Qué cambia cuando `collectPlacements` vale `false`?
+
+Cambia radicalmente la eficiencia en el uso de la memoria dinámica. Cuando es false, el algoritmo simplemente cuenta cuántas configuraciones válidas existen (++result.solutions) pero no almacena las coordenadas de los tableros en el contenedor result.placements. Esto evita la asignación repetida de vectores e impide que la memoria RAM se sature cuando se buscan soluciones para valores de $N$ muy grandes ($N \ge 12$), donde el número de soluciones crece de forma masiva.
+
 6. En `Maze`, ¿qué representa el estado `AVAILABLE`, `ROUTE`, `BACKTRACKED` y `WALL`?
+
+Representan el ciclo de vida y la clasificación topológica de cada celda del laberinto:
+
+WALL: Una pared infranqueable; el algoritmo nunca la puede pisar.
+
+AVAILABLE: Una celda de pasadizo libre que aún no ha sido explorada ni evaluada por la ruta.
+
+ROUTE: Una celda que forma parte activa del camino actual guardado en la pila hacia la meta.
+
+BACKTRACKED: Una celda que ya fue visitada pero que demostró ser un callejón sin salida. Se marca así para que el algoritmo no vuelva a perder tiempo entrando en ella.
+
 7. ¿Qué información codifican `incoming` y `outgoing`?
+
+Codifican la historia direccional y el flujo del movimiento en los puntos cardinales (Este, Sur, Oeste, Norte):
+
+outgoing: Almacena hacia qué punto cardinal se está intentando avanzar desde la celda actual. Funciona como una memoria local para recordar qué direcciones ya se probaron y cuál toca evaluar a continuación.
+
+incoming: Registra desde qué dirección se ingresó a la celda actual. Es de vital importancia para establecer el vínculo físico de procedencia con el nodo padre al avanzar con la función advance.
+
 8. ¿Por qué el algoritmo del laberinto marca y desmarca estado en lugar de solo "moverse"?
+
+Porque opera bajo el principio de búsqueda con memoria. Al marcar una celda como ROUTE, el camino se autoprotege de morderse la cola. Al marcarla como BACKTRACKED, el algoritmo deja un rastro o "migaja de pan" permanente que clausura esa sección del mapa, asegurando que el proceso siempre progrese hacia áreas inexploradas o termine de forma segura si no hay solución.
+
 9. Compara N-Reinas y laberinto: ¿qué comparten como problemas de búsqueda y qué cambia en la representación del estado?
+
+Lo que comparten: Ambos problemas son modelados como árboles de decisión explorados de manera iterativa mediante Búsqueda en Profundidad (DFS) asistida por una pila explicita (Stack). Los dos aplican la filosofía del Backtracking: avanzan de forma optimista explorando un camino y, en el instante en que violan una restricción matemática o física desatan un retorno controlado para reconfigurar la última decisión tomada.
+
+Lo que cambia en la representación del estado:
+
+En N-Reinas, el estado es abstracto y global. No existe un mapa físico precargado. Cada paso genera dinámicamente restricciones espaciales en todo el tablero futuro. El estado se recupera íntegramente leyendo el contenido de la pila.
+
+En el Laberinto, el estado es concreto, local y topológico. Existe una cuadrícula física preexistente (Maze). Las restricciones están dadas de forma estática por las paredes (WALL) y de forma dinámica por la celda adyacente inmediata. Aquí la pila solo almacena los punteros del camino de celdas activas, pero el estado de visitado o clausurado queda guardado directamente dentro de cada celda de la matriz (cells_).
 
 ##### Experimento 4
 

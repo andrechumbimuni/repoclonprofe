@@ -36,6 +36,7 @@ inline bool isOperatorChar(char ch) {
         case '-':
         case '*':
         case '/':
+        case '%':
         case '^':
         case '!':
         case '(':
@@ -62,7 +63,7 @@ inline bool isUnaryMinus(const std::string& expr, std::size_t i) {
         return true;
     }
     const char prev = expr[i - 1];
-    return prev == '(' || prev == '+' || prev == '-' || prev == '*' || prev == '/' || prev == '^';
+    return prev == '(' || prev == '+' || prev == '-' || prev == '*' || prev == '/' || prev == '%' || prev == '^';
 }
 
 // Calcula factorial entero
@@ -88,8 +89,18 @@ inline double calcu(double a, char op, double b) {
                 throw std::runtime_error("division entre cero");
             }
             return a / b;
+        case '%': {
+            if (b == 0.0) {
+                throw std::runtime_error("modulo entre cero");
+            }
+            if (std::floor(a) != a || std::floor(b) != b) {
+                throw std::runtime_error("el operador modulo requiere operandos enteros");
+            }
+            return static_cast<double>(static_cast<long long>(a) % static_cast<long long>(b));
+        }
         case '^': return std::pow(a, b);
         default: throw std::runtime_error("operador binario no soportado");
+        
     }
 }
 

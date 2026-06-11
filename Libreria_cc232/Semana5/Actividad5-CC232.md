@@ -4,7 +4,7 @@
 
 - Nombre: Chumbimuni Ricci Andre Dylan
 
-#### Bloque 1 - Núcleo conceptual de la semana
+### Bloque 1 - Núcleo conceptual de la semana
 
 1. Explica con tus palabras qué diferencia hay entre un árbol binario enlazado y un árbol binario almacenado implícitamente en un arreglo.
 
@@ -54,16 +54,7 @@ Porque sigue el patrón Izquierda $\rightarrow$ Raíz $\rightarrow$ Derecha. Por
 
 Porque el heap no es una estructura totalmente ordenada; solo garantiza prioridad local entre padres e hijos. No existe ninguna relación de orden fija entre hermanos (izquierdo y derecho) ni entre ramas distintas, obligando a extraer la raíz repetidamente (destruyendo el heap) para conocer el orden real.
 
-#### Bloque 2 - Navegación, altura, profundidad y tamaño
-
-Revisa:
-
-- `Semana5/include/BinNode.h`
-- `Semana5/include/BinTree.h`
-- `Semana5/include/BinaryTree.h`
-- `Semana5/demos/demo_binary_tree.cpp`
-
-Responde:
+### Bloque 2 - Navegación, altura, profundidad y tamaño
 
 1. En `BinNode`, explica qué significan `hasLeft()`, `hasRight()`, `isRoot()`, `isLeaf()`, `isLeftChild()` e `isRightChild()`.
 
@@ -134,36 +125,19 @@ Por definición, depth(u) es la longitud del camino desde la raíz hasta u, y he
 
 La igualdad $depth(u) + height(u) = height(T)$ se cumple si y solo si el nodo u pertenece al camino más largo que define la altura máxima de $T$.
 
-#### Bloque 3 - Recorridos y trazado guiado
+### Bloque 3 - Recorridos y trazado guiado
 
-Revisa:
-
-- `Semana5/include/BinNode.h`
-- `Semana5/include/BinTree.h`
-- `Semana5/demos/demo_binary_tree.cpp`
-- `Semana5/demos/demo_capitulo5_panorama.cpp`
-
-Construye una tabla con cinco columnas:
-
-- Recorrido
-- Versión revisada
-- Estructura auxiliar usada
-- Secuencia producida en el árbol de prueba
-- Argumento de correctitud y costo
-
-Incluye en la tabla:
-
-- preorden recursivo,
-- preorden iterativo,
-- inorden recursivo,
-- inorden iterativo `#1`,
-- inorden iterativo `#2`,
-- inorden iterativo `#3`,
-- postorden recursivo,
-- postorden iterativo,
-- recorrido por niveles.
-
-Luego responde:
+| Recorrido | Versión Revisada | Estructura Auxiliar | Secuencia Producida (Árbol de Prueba) | Argumento de Correctitud y Costo |
+| :--- | :--- | :---: | :--- | :--- |
+| **Preorden** | `travPre` (Recursivo) | Pila de llamadas | `7 3 1 5 4 6 10 8 12` | **Correctitud:** Visita la raíz y delega los hijos. Costo temporal $O(n)$ y espacial $O(h)$ por la pila del sistema. |
+| **Preorden** | `travPreIterative2` | `std::stack` | `7 3 1 5 4 6 10 8 12` | **Correctitud:** Procesa la raíz y apila primero el hijo derecho para asegurar extraer el izquierdo antes. Costo: $O(n)$ tiempo, $O(h)$ espacio. |
+| **Inorden** | `travInRecursive` | Pila de llamadas | `1 3 4 5 6 7 8 10 12` | **Correctitud:** Explora al extremo izquierdo, procesa la raíz y pasa a la derecha. Genera secuencia ordenada si es BST. Costo: $O(n)$ tiempo, $O(h)$ espacio. |
+| **Inorden** | `travInIterative1` | `std::stack` | `1 3 4 5 6 7 8 10 12` | **Correctitud:** Emula la recursión guardando los ancestros izquierdos en una pila explícita antes de procesarlos. Costo: $O(n)$ tiempo, $O(h)$ espacio. |
+| **Inorden** | `travInIterative2` | Ninguna (Punteros) | `1 3 4 5 6 7 8 10 12` | **Correctitud:** Decide la ruta comparando los punteros `prev` y `curr` sin estructuras auxiliares. Costo: $O(n)$ tiempo, $O(1)$ espacio auxiliar (Óptimo). |
+| **Inorden** | `travInIterative3` | Ninguna (Punteros) | `1 3 4 5 6 7 8 10 12` | **Correctitud:** Empieza en el nodo `leftmost()` y salta secuencialmente usando `succ()`. Costo: $O(n)$ tiempo total (cada enlace se cruza máximo 2 veces), $O(1)$ espacio. |
+| **Postorden** | `travPost` (Recursivo) | Pila de llamadas | `1 4 6 5 3 8 12 10 7` | **Correctitud:** Procesa primero ambos hijos por completo antes de realizar el `visit()` sobre la raíz. Costo: $O(n)$ tiempo, $O(h)$ espacio. |
+| **Postorden** | `travPostIterative` | Dos `std::stack` | `1 4 6 5 3 8 12 10 7` | **Correctitud:** La primera pila invierte un preorden modificado (Raíz, Derecha, Izquierda) pasándolo a la segunda pila para su salida. Costo: $O(n)$ tiempo y $O(n)$ espacio. |
+| **Por Niveles** | `travLevel` | `std::queue` | `7 3 10 1 5 8 12 4 6` | **Correctitud:** Estrategia BFS. Procesa celdas horizontalmente metiendo los hijos directos en una cola FIFO. Costo: $O(n)$ tiempo, $O(w)$ espacio ($w = \text{ancho máximo}$). |
 
 1. ¿Qué significa visitar un nodo en preorden?
 
@@ -174,73 +148,163 @@ El nodo que esta siendo visitado en preorden cuando se esta ejecutando el visit(
 Esto visita primero al hijo por la izquierda luego la raiz  para luego la derecha.
 
 3. ¿Qué significa visitar un nodo en postorden?
+
+Significa procesar de forma completa e íntegra todos los descendientes del nodo antes de efectuar la acción sobre el nodo mismo. El orden estricto es: Subárbol Izquierdo $\rightarrow$ Subárbol Derecho $\rightarrow$ Raíz. Es ideal para tareas destructivas (como liberar la memoria del árbol) porque no puedes borrar un padre sin haber borrado sus hijos primero.
+
 4. ¿Qué significa visitar un árbol por niveles?
 
-Viajar por niveles: travlevel 
+Significa recorrer la estructura horizontalmente de manera secuencial (estrategia BFS), procesando primero todos los nodos de profundidad $d$ antes de pasar a cualquiera de profundidad $d+1$, avanzando siempre de izquierda a derecha en cada nivel.
 
 5. ¿Por qué los recorridos recursivos tienen tiempo `O(n)`?
 
+Porque la definición estructural garantiza que cada nodo del árbol es alcanzado exactamente una única vez por cada llamada o bifurcación del método. No existen ciclos internos repetitivos ni evaluaciones redundantes sobre nodos previamente procesados.
+
 6. ¿Por qué las versiones iterativas también tienen tiempo `O(n)`?
+
+Porque aunque utilicen estructuras de control lineales (stack o queue), cada nodo individual del árbol se inserta y se remueve de dichas colecciones exactamente una sola vez. En los algoritmos basados puramente en punteros (Iterative2 e Iterative3), los enlaces entre nodos vecinos se cruzan un número constante de veces (máximo 2 o 3 pasadas por arista), manteniendo la linealidad.
+
 7. ¿Cuál es la memoria auxiliar de un recorrido recursivo en un árbol balanceado?
+
+La memoria auxiliar es logarítmica: $O(\log n)$. Al estar el árbol perfectamente equilibrado, la altura del árbol ($h$) está acotada por $\log_2(n)$, lo que implica que la pila de llamadas del procesador nunca acumulará más de $\log(n)$ marcos de función activos en simultáneo.
+
 8. ¿Cuál es la memoria auxiliar de un recorrido recursivo en un árbol degenerado?
+
+La memoria auxiliar es lineal: $O(n)$. En un árbol degenerado (que tiene forma de lista enlazada o "zig-zag"), la altura es igual al número total de nodos ($h = n$). La recursión se ve obligada a apilar todas las funciones en memoria al mismo tiempo, lo que arriesga al sistema operativo a sufrir un colapso por Stack Overflow.
+
 9. ¿Qué diferencia hay entre usar una pila explícita y usar la pila de llamadas?
 
-Nosotros la controlamos (explicita) y en la pila de llamadas el computador usa sus propias formas de llamar pero puede causar overflow
+Pila explícita (std::stack): Se gestiona de forma directa dentro de la memoria dinámica (Heap de datos) de nuestra aplicación. Nosotros controlamos su ciclo de vida y tamaño sin peligro inmediato de colapso crítico del sistema.
+
+Pila de llamadas: Es administrada de forma implícita por el hardware y el compilador en un espacio de memoria restringido y pequeño. Un error de diseño o una profundidad excesiva en los datos gatilla un fallo catastrófico de segmentación (Stack Overflow).
 
 10. ¿Por qué la cola del recorrido por niveles puede crecer mucho más en un árbol completo que en un árbol degenerado?.
 
-#### Bloque 4 - Demostración: evidencia observable
+Porque en un árbol degenerado el ancho máximo en cualquier nivel es siempre $1$. Por el contrario, en un árbol completo, el último nivel concentra de forma exponencial a la mitad de todos los elementos de la estructura ($\approx n/2$). Al avanzar horizontalmente, la cola debe retener de golpe a todos los nodos de ese nivel masivo antes de poder despacharlos, provocando que la memoria consumida por la cola explote de manera lineal con respecto al tamaño global del árbol.
 
-Revisa y ejecuta:
+### Bloque 4 - Demostración: evidencia observable
 
-- `Semana5/demos/demo_binary_tree.cpp`
-- `Semana5/demos/demo_bst.cpp`
-- `Semana5/demos/demo_heap.cpp`
-- `Semana5/demos/demo_capitulo5_panorama.cpp`
-
-Construye una tabla con cuatro columnas:
-
-- Archivo
-- Salida u observable importante
-- Idea estructural
-- Argumento de costo, espacio o diseño
-
-Luego responde:
+| Archivo | Salida u Observable Importante | Idea Estructural | Argumento de Costo, Espacio o Diseño |
+| :--- | :--- | :--- | :--- |
+| `demo_binary_tree.cpp` | Listas de secuencias idénticas para los inórdenes (`1 3 4 5 6 7 8 10 12`). `Sucesor de 5: 6`. | Árbol binario enlazado clásico donde cada nodo conoce a sus hijos y a su padre (`parent`). | El costo temporal de los recorridos es lineal $O(n)$. Las versiones iterativas `#2` y `#3` logran costo espacial óptimo $O(1)$ eliminando la pila. |
+| `demo_bst.cpp` | `lowerBound(9): 10`. Impresión del árbol balanceado desde un vector ordenado. `isBST: si`. | Árbol de búsqueda binaria que mantiene la propiedad de orden simétrico (izquierda $<$ raíz $\le$ derecha). | Las búsquedas toman tiempo logarítmico $O(\log n)$ si el árbol está balanceado. El método `buildBalancedFromSorted` lo garantiza en $O(n)$. |
+| `demo_heap.cpp` | El primer elemento del arreglo tras `heapify` o `add(0)` es siempre el mínimo absoluto (`0`). | Árbol binario completo empaquetado de forma implícita y contigua dentro de un `std::vector`. | El acceso al mínimo es constante $O(1)$. `heapify()` reestructura todo el vector de forma óptima en tiempo lineal $O(n)$ en vez de $O(n \log n)$. |
+| `demo_capitulo5_panorama.cpp`| Coexistencia de `BinaryHeap`, `BinarySearchTree` e iteración estilo contenedores STL (`for (int x : bst)`). | Integración de las estructuras no lineales en el espacio de nombres de la librería (`ods`). | Muestra que el diseño orientado a objetos encapsula la complejidad interna, exponiendo interfaces uniformes, reutilizables y seguras para el usuario. |
 
 1. En `demo_binary_tree.cpp`, ¿qué salida permite verificar que los recorridos visitan los nodos en el orden esperado?
+
+La comparación directa de las secuencias impresas en la consola. Que los métodos recursivos e iterativos (como Inorden recursivo, e Iterativos #1, #2 y #3) impriman exactamente los mismos elementos y en el mismo orden (1 3 4 5 6 7 8 10 12) valida empíricamente que la lógica de ruteo es correcta.
+
 2. ¿Qué parte de la demo permite defender que `succ()` y `pred()` respetan el orden inorden?
+
+Las impresiones de los vecinos del nodo 5 (Sucesor de 5: 6 y Predecesor de 5: 4), junto con la secuencia de Iteracion por sucesor. Al verificar la cadena ordenada del inorden, se observa que el 4 está inmediatamente antes y el 6 inmediatamente después del 5, demostrando que los saltos por punteros respetan la secuencia lineal matemática.
+
 3. ¿Qué evidencia produce la representación ASCII del árbol?
+
+Produce evidencia topológica y visual de la estructura real guardada en memoria. Permite verificar de forma directa qué nodo quedó asignado como hijo izquierdo o derecho (a través de las ramas ┌── y └──) y validar visualmente si el árbol se encuentra balanceado o si tiene ramas degeneradas.
+
 4. En `demo_bst.cpp`, ¿qué observable permite defender que el inorden del BST queda ordenado?
+
+La línea BST inorden: 1 3 4 5 6 7 8 10 12. Al insertar los elementos de forma desordenada en el bucle (7, 3, 10, 1...) y obtener una salida perfectamente ordenada de menor a mayor en el inorden, se constata que la estructura reorganizó internamente los nodos bajo la propiedad de búsqueda binaria.
+
 5. ¿Qué operaciones de búsqueda se distinguen mejor en la demo del BST: `find`, `findEQ`, `lowerBound` o `upperBound`?
+
+Se distinguen mejor lowerBound y upperBound al buscar valores inexistentes o límites. Por ejemplo, al ejecutar lowerBound(9) el árbol no encuentra el 9 pero retorna el 10 (el menor elemento que es $\ge 9$), mientras que upperBound(8) retorna el 10 (el primer elemento estrictamente $> 8$), marcando la sutil diferencia matemática entre ambos.
+
 6. En `demo_heap.cpp`, ¿qué salida permite defender que el mínimo queda en la raíz?
+
+La salida de la función heap.remove() y las impresiones del vector base. Al invocar remove() el sistema extrae un 0 (el menor de todos), y en la línea de Heapify, la primera posición del vector (data()[0]) contiene de forma consistente al valor más pequeño del conjunto actual.
+
 7. ¿Qué evidencia permite distinguir entre insertar con `add()` y construir con `heapify()`?
+
+La disposición interna del vector resultante. Si insertas elementos uno por uno con add(), el árbol sufre reajustes locales sucesivos (bubbleUp) costando $O(n \log n)$ en total. heapify() toma el vector desordenado completo y aplica trickleDown desde la mitad hacia atrás, lo cual se evidencia en la consola porque reorganiza los datos en una sola pasada masiva y eficiente de costo lineal $O(n)$.
+
 8. En `demo_capitulo5_panorama.cpp`, ¿qué comparación resume mejor la semana: árbol enlazado, BST o heap?.
+
+El Árbol Enlazado provee la infraestructura física pura y libre (punteros y conectividad).
+
+El BST restringe esa infraestructura imponiendo un orden horizontal estricto (ideal para buscar cualquier elemento).
+
+El Heap sacrifica los punteros por un arreglo implícito y restringe el orden de forma vertical (prioridad arriba-abajo), ideal para despachar solo el elemento mínimo de forma óptima.
 
 #### Bloque 5 - Pruebas públicas, pruebas internas e invariantes
 
-Revisa:
-
-- `Semana5/pruebas_publicas/test_public_week5.cpp`
-- `Semana5/pruebas_internas/test_internal_week5.cpp`
-
-Responde:
-
 1. ¿Qué operaciones del BST valida la prueba pública?
+
+Valida el ciclo de operaciones esenciales de un árbol de búsqueda binaria: inserción ordenada mediante add(), rechazo de claves duplicadas, búsquedas especializadas (findEQ(), find(), lowerBound(), upperBound()), extracción de extremos (minNode(), maxNode()), eliminación de nodos intermedios (remove()), validación de consistencia estructural (isBST()), soporte para iteración estándar STL y construcción optimizada con balanceo desde vectores ordenados (buildBalancedFromSorted()).
+
 2. ¿Qué casos validan que el BST no acepta duplicados?
+
+Lo valida explícitamente la línea expect(!bst.add(5), "BST no debe aceptar duplicados");. Al intentar insertar un segundo 5 en un árbol que ya posee esa clave, el método add() intercepta la colisión y retorna false, confirmando que el árbol mantiene estrictamente un conjunto de elementos únicos.
+
 3. ¿Qué se verifica al comparar el inorden recursivo con las versiones iterativas?
+
+Se verifica la equivalencia funcional absoluta y la consistencia del ordenamiento simétrico. Al forzar que el inorden recursivo y los tres métodos iterativos (Iterative1, Iterative2, Iterative3) devuelvan exactamente el mismo vector ordenado ({1, 3, 4, 5, 6, 7, 8, 10, 12}), se demuestra que la optimización de código y la sustitución de la pila de llamadas del sistema por bucles o punteros no alteran el resultado matemático esperado.
+
 4. ¿Qué se espera de `findEQ(8)` en la prueba pública?
+
+Se espera que localice de forma exacta el nodo que contiene la clave 8 y devuelva un puntero válido hacia él (findEQ(8) != nullptr), permitiendo comprobar que la información recuperada coincide con el valor de búsqueda (->data == 8).
+
 5. ¿Qué se espera de `lowerBound(9)` y `upperBound(8)`?
+
+De lowerBound(9) se espera que devuelva el nodo con valor 10, ya que el 9 no existe y 10 es el menor elemento que es mayor o igual ($\ge 9$).De upperBound(8) se espera que devuelva el nodo con valor 10, pues busca el primer elemento estrictamente mayor ($> 8$), ignorando la existencia exacta del 8.
+
 6. ¿Qué propiedad se valida con `isBST()`?
+
+Valida de forma exhaustiva el orden simétrico global del árbol. Inspecciona recursivamente que para cada nodo del árbol se cumpla el invariante de que todas las claves en su subárbol izquierdo sean menores y todas las de su subárbol derecho sean mayores.
+
 7. ¿Qué se valida después de eliminar un nodo con `remove()`?
+
+Que la función devuelva éxito (true).
+
+Que la propiedad de orden no se haya roto (el inorden resulta en {1, 4, 5, 6, 7, 8, 10, 12}).
+
+Que una búsqueda posterior confirme la ausencia del elemento (!bst.contains(3)).
+
 8. ¿Qué valida `checkParentLinks()` después de borrar, separar o adjuntar subárboles?
+
+Valida la integridad bidireccional del grafo. Asegura que después de cualquier reestructuración destructiva o de movimiento de memoria, cada enlace hijo-padre concuerde perfectamente. Es decir, que si el nodo $A$ apunta al nodo $B$ como su hijo, el nodo $B$ apunte obligatoriamente al nodo $A$ como su parent.
+
 9. ¿Qué operaciones del heap valida la prueba pública?
+
+Valida la construcción masiva y lineal en lote (heapify), el invariante de prioridad superior (isHeap() e isHeapArray()) y el proceso de extracción ordenada mediante reajuste descendente (remove()).
+
 10. ¿Qué demuestra extraer repetidamente de un min-heap hasta vaciarlo?
+
+Demuestra el principio operativo del ordenamiento por montículos (Heapsort). Al vaciar el heap y almacenar cada elemento extraído con remove(), se comprueba empíricamente que los elementos emergen en una secuencia perfectamente ordenada de menor a mayor ({1, 2, 3, 5, 7, 8, 10}), confirmando que la raíz siempre retuvo al mínimo absoluto del conjunto.
+
 11. ¿Qué operaciones de `BinTree` se validan con `attachAsRC`, `secede` y `removeSubtree`?
+
+attachAsRC: Conecta un árbol externo como hijo derecho, absorbiendo su tamaño y vaciando el contenedor original.
+
+secede: Separa un subárbol entero transformándolo en un nuevo objeto independiente y recalculando las alturas de la rama afectada.
+
+removeSubtree: Borra físicamente un subárbol completo de la memoria y ajusta el tamaño global del árbol anfitrión.
+
 12. ¿Qué agregan las pruebas internas respecto a rotaciones, `bubbleUp`, `trickleDown`, profundidad, altura, sucesor y predecesor?
+
+Agregan la validación de los mecanismos internos de bajo nivel que las pruebas públicas solo miden indirectamente:
+
+Evalúan la correctitud matemática de rotateLeft y rotateRight para alterar la topología sin romper el orden del BST.
+
+Verifican de forma aislada el comportamiento de bubbleUp y trickleDown al insertar o remover elementos en el heap.
+
+Inspeccionan la precisión de las funciones de cálculo métrico métricas (depth ascendente, height estructural y subtreeSize).
+
+Garantizan el correcto ruteo por punteros de succ() y pred() en sus extremos e inversiones de flujo.
+
 13. ¿Qué sí demuestra pasar las pruebas públicas?
+
+Demuestra que la interfaz externa de tu librería es funcionalmente correcta bajo los escenarios estándar de evaluación. Confirma que los algoritmos resuelven los casos de prueba previstos, que respetan los contratos de las firmas de funciones y que no presentan fugas de memoria o fallos catastróficos evidentes en condiciones normales de ejecución.
+
 14. ¿Qué no demuestra pasar las pruebas públicas?
+
+No demuestra la eficiencia asintótica real ni la resiliencia ante casos patológicos o maliciosos. Pasar las pruebas no asegura que tu código se ejecute en tiempo logarítmico $O(\log n)$ (podría estar ejecutándose en $O(n)$ si el árbol se desbalancea), ni garantiza la ausencia de desbordamientos de pila (Stack Overflow) ante datos masivos degenerados, ni que el código esté libre de condiciones de carrera o comportamientos indefinidos bajo otras configuraciones de compilación.
+
 15. ¿Por qué una defensa correcta debe mencionar invariantes y complejidad además de resultados observables?.
 
+Los invariantes (como el orden simétrico en un BST o la prioridad en un heap) prueban que el código es lógicamente correcto en cualquier estado intermedio y ante cualquier volumen de datos.
+
+La complejidad asintótica ($O(n)$, $O(\log n)$) defiende que el software fue construido bajo criterios de ingeniería de rendimiento, garantizando que el sistema será escalable, predecible y óptimo en entornos de producción reales.
 
 #### Bloque 6 - Lectura cercana: `BinNode`, `BinTree` y `BinaryTree`
 

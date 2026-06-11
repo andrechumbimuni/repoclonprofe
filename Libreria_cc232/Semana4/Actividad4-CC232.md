@@ -1,21 +1,10 @@
-### Actividad 4 - Semana 4
+## Actividad 4-CC232
 
-- Duración: 3 horas de clase.
-- Modalidad: Trabajo individual.
-- Tiempo de instalación: 15 minutos al inicio.
-- Entrega: Un archivo llamado `Actividad4-CC232.md`.
-
-#### Objetivo
-
-Consolidar lo trabajado en la Semana 4 a partir de código, demos, pruebas, experimentos y una defensa escrita breve.
-
-La meta es distinguir con claridad cómo `Stack` y `Queue` dejan de ser solo estructuras lineales y pasan a funcionar como herramientas algorítmicas para resolver problemas de conversión de base, verificación de paréntesis, evaluación de expresiones, búsqueda con retroceso y simulación.
-
-Además, se busca comparar explícitamente enfoques recursivos e iterativos, justificar qué información guarda cada estructura auxiliar, defender por qué una pila explícita puede reemplazar recursión implícita, y analizar cómo pequeñas decisiones de diseño cambian el comportamiento observable en N-Reinas, laberintos y simulación bancaria.
+### Estudiante
+- Chumbimuni Ricci Andre Dylan
 
 
-
-#### Bloque 1 - Núcleo conceptual de la semana
+### Bloque 1 - Núcleo conceptual de la semana
 
 1. Explica con tus palabras la diferencia entre acceso `LIFO` y acceso `FIFO`.
 
@@ -68,7 +57,7 @@ La relación es si eliges la estructura auxiliar adecuada, esta guardará los es
 Resolver un problema se enfoca en encontrar un resultado final único u óptimo. No importa cómo llegues ahí, lo importante es la respuesta final.
 Simular un proceso se enfoca en imitar el comportamiento de un sistema paso a paso. Aquí no hay una "respuesta final" ganadora; el objetivo es estudiar cómo cambian los estados intermedios a través del tiempo.
 
-#### Bloque 2 - Demostración y trazado guiado
+### Bloque 2 - Demostración y trazado guiado
 
 | Archivo | Salida u observable importante | Estructura o técnica central | Qué concepto permite defender |
 | :--- | :--- | :--- | :--- |
@@ -117,7 +106,7 @@ Representa la fotografía exacta de las filas del banco en ese segundo o minuto 
 
 Lo resume el bloque final de impresiones en consola, donde se ejecutan consecutivamente algoritmos de áreas totalmente distintas: evaluación matemática (RPN), juegos/inteligencia artificial (N-Reinas), robótica/navegación (Laberinto) y operaciones de negocios (Banco). Ver todas esas salidas juntas demuestra que las estructuras fundamentales de Pilas y Colas son el motor de aplicaciones muy diversas.
 
-#### Bloque 3 - Pruebas públicas, pruebas internas y correctitud
+### Bloque 3 - Pruebas públicas, pruebas internas y correctitud
 
 1. ¿Qué operaciones mínimas valida la prueba pública para `Stack`?
 
@@ -199,7 +188,7 @@ La sustentación teórica demuestra que el código es robusto ante cualquier sit
 
 Si se asume que el símbolo de resta - siempre separa a dos números (un operador binario como A - B), la prueba pública pasará perfectamente porque dice -(5!-67...) donde el menos actúa de forma similar tras resolver el paréntesis. Sin embargo, si le ingresas el caso de la prueba interna ("-3+5"), un código con ese error conceptual fallará rotundamente o crasheará, porque el menos ahí es un operador unario (modifica solo al 3) y no tiene un operando izquierdo con el cual trabajar.
 
-#### Bloque 4 - Comparación recursivo vs iterativo
+### Bloque 4 - Comparación recursivo vs iterativo
 
 1. En conversión de base, ¿qué papel juegan el cociente, el residuo y la pila?
 
@@ -237,7 +226,7 @@ Conversión de base: La versión iterativa es la más natural. El proceso matem�
 
 Verificación de paréntesis: La versión iterativa es, por mucho, la más limpia y expresiva para escenarios del mundo real. Aunque la recursividad es una manera muy elegante de esquematizar la teoría de lenguajes y bloques jerárquicos, en la práctica del código se vuelve rígida, ineficiente y difícil de adaptar a múltiples tipos de llaves.
 
-##### Experimento 1
+#### Experimento 1
 
 Creado en la carpeta demos llamado demo_experimento1.cpp:
 Imprimiendo las 5 primeras filas:
@@ -249,7 +238,7 @@ Imprimiendo las 5 primeras filas:
 |          0 |    16 |                    0 |                    0 |        Sí | Caso base límite: El cero es invariante en cualquier base. |
 |         45 |     2 |               101101 |               101101 |        Sí | Base binaria: Evalúa la máxima longitud de bits en la pila. |
 ```
-##### Experimento 2
+#### Experimento 2
 
 Creado en la carpeta demos llamado demo_experimento2.cpp:
 Imprimiendo las 3 primeras filas:
@@ -259,7 +248,7 @@ Imprimiendo las 3 primeras filas:
 | Sin paréntesis   | Expresion plana con texto 123        | TRUE (Válido)        | TRUE (Válido)        | Sí                  | No contiene delimitadores. La iterativa termina con pila vacía y la recursiva reduce sus índices a cero. |
 | Correctamente anidada   | ((a + b) * (c - d))        | TRUE (Válido)        | TRUE (Válido)        | Sí                  | Estructura pura de paréntesis circulares con anidamiento válido. Ambos métodos funcionan perfecto. |
 ```
-#### Bloque 5 - Evaluación de expresiones y prioridad de operadores
+### Bloque 5 - Evaluación de expresiones y prioridad de operadores
 
 1. Explica qué información guarda `EvaluationResult`.
 
@@ -320,8 +309,7 @@ Porque un software de cálculo debe garantizar la integridad de los datos. Si un
 Proporciona un mecanismo nativo de auditoría y verificación. 
 La RPN actúa como la "caja negra" o el mapa de ejecución que muestra exactamente cómo interpretó la máquina las prioridades asociadas por el usuario. Al depurar o evaluar, si el value no coincide con lo esperado, inspeccionar la rpn te permite discernir de inmediato si el error fue un fallo de cálculo numérico o una mala interpretación de la jerarquía de los operadores.
 
-##### Experimento 3
-
+#### Experimento 3
 Creado en la carpeta demos llamado demo_experimento3.cpp:
 
 Imprimiendo las filas:
@@ -355,7 +343,7 @@ Categoría: Expresión Inválida
 Expresión: 5+*3
 Error Observado: std::runtime_error (faltan operandos para el operador binario)
 ```
-##### Extensión opcional
+#### Extensión opcional
 
 Símbolo agregado: % (Operador Módulo).
 
@@ -387,7 +375,7 @@ Registrar como Operador: En isOperatorChar, añadir case '%': para que el tokeni
 
 Implementar la Operación: En la función sobrecargada calcu para operaciones binarias, añadir el cálculo matemático:
 
-#### Bloque 6 - Backtracking explícito: N-Reinas y laberinto
+### Bloque 6 - Backtracking explícito: N-Reinas y laberinto
 
 1. En `Queen`, ¿qué significa que dos reinas entren en conflicto?
 
@@ -453,128 +441,176 @@ En N-Reinas, el estado es abstracto y global. No existe un mapa físico precarga
 
 En el Laberinto, el estado es concreto, local y topológico. Existe una cuadrícula física preexistente (Maze). Las restricciones están dadas de forma estática por las paredes (WALL) y de forma dinámica por la celda adyacente inmediata. Aquí la pila solo almacena los punteros del camino de celdas activas, pero el estado de visitado o clausurado queda guardado directamente dentro de cada celda de la matriz (cells_).
 
-##### Experimento 4
+#### Experimento 4
 
-Ejecuta `placeQueens(n)` para al menos cuatro valores de `n`.
+Cambiando demo_nqueens.cpp para que imprima N, soluciones, verificaciones, la distribucion de coordenadas de columnas por fila.
 
-Registra en una tabla:
+| `n` | Número de Soluciones | Número de `checks` | ¿Crece rápido o lento? | Comentario |
+| :---: | :---: | :---: | :--- | :--- |
+| **4** | 2 | 84 | Lento | Caso mínimo con solución. El árbol de búsqueda es sumamente pequeño y se resuelve de inmediato. |
+| **5** | 10 | 405 | Moderado | El número de verificaciones se quintuplica, reflejando cómo cada nueva fila añade ramificaciones al árbol. |
+| **6** | 4 | 2,016 | Rápido | Curiosamente hay menos soluciones que en $N=5$, pero el costo de exploración interna se dispara considerablemente. |
+| **8** | 92 | 46,752 | **Exponencial** | El clásico tablero de ajedrez estándar. La cantidad de `checks` explota masivamente, evidenciando el costo del problema. |
 
-- `n`
-- número de soluciones
-- número de `checks`
-- ¿crece rápido o lento?
-- comentario
-
-Luego responde:
 
 1. ¿Qué patrón observas en el crecimiento de `checks`?
+
+El crecimiento de la métrica checks sigue un patrón combinatorio/exponencial ($O(N!)$ en el peor de los casos). Al incrementar $N$ linealmente, el espacio de estados no crece sumando casillas, sino multiplicando las posibilidades de cada fila nueva por todas las anteriores. Por ejemplo, al pasar de $N=6$ a $N=8$ (un incremento de solo dos unidades), el número de verificaciones saltó de menos de $2,016$ a casi $46,752$.
+
 2. ¿Por qué contar verificaciones no es lo mismo que contar soluciones?
+
+Contar soluciones es simplemente llevar el registro de los "éxitos absolutos", es decir, cuántas veces la pila se llenó por completo (solution.size() == n) con reinas que no se atacan.
+
+Contar verificaciones (checks) mide el esfuerzo de exploración total, incluyendo todos los intentos fallidos, callejones sin salida y retrocesos.
+
 3. ¿Dónde aparece la "poda" en este código, aunque no haya una estructura formal con ese nombre?
 
-##### Experimento 5
+La poda ocurre de manera implícita en la condición del bucle while que busca una columna válida:
 
-Diseña al menos tres laberintos propios:
+```
+while (q.y < n && conflictsWithAny(solution, q, result.checks)) {
+    ++q.y;
+}
+```
+Si la reina candidata q en la fila actual genera conflicto con cualquiera de las reinas ya colocadas en la pila (solution), el algoritmo descarta esa casilla inmediatamente incrementando q.y. Al hacer esto, el algoritmo evita pasar a la siguiente fila (++q.x). Conceptualmente, lo que está haciendo es amputar (podar).
 
-- uno con camino claro,
-- uno sin salida,
-- uno donde el algoritmo deba retroceder varias veces.
+#### Experimento 5
 
-Para cada laberinto registra:
+Cambiando demo_maze.cpp para los tres casos:
+```
+Inicio: (1, 1) -> Destino: (3, 1)
+Medida del camino = 11 celdas
+Mapa de Evidencia ('*'=camino, 'B'=Retroceso):
+#######
+#*****#
+#####*#
+#*****#
+#######
 
-- grilla usada,
-- coordenadas de inicio y destino,
-- longitud del camino o ausencia de camino,
-- evidencia de retroceso,
-- interpretación.
+LABERINTO 2: SIN SALIDA 
+Inicio: (1,1) -> Destino: (1,5)
+Longitud del camino: 0 (Ausencia de camino)
+Mapa de Evidencia ('*'=Camino, 'B'=Retroceso):
+#######
+#BBB#.#
+###B#.#
+#BBB#.#
+#######
 
-#### Bloque 7 - Simulación bancaria y experimentación con colas
-
-Revisa:
-
-- `Semana4/include/Queue.h`
-- `Semana4/include/BankSimulation.h`
-- `Semana4/demos/demo_bank.cpp`
-- `Semana4/pruebas_publicas/test_public_week4.cpp`
-- `Semana4/pruebas_internas/test_internal_week4.cpp`
-
-Responde:
+LABERINTO 3: MÚLTIPLES RETROCESOS
+Inicio: (1,1) -> Destino: (5,4)
+Longitud del camino: 8 celdas
+Mapa de Evidencia ('*'=Camino, 'B'=Retroceso):
+########
+#*BBBBB#
+#*####B#
+#*#..#B#
+#*##.#B#
+#****#B#
+########
+```
+### Bloque 7 - Simulación bancaria y experimentación con colas
 
 1. ¿Qué representa cada `Queue<Customer>` dentro del vector `windows`?
+
+Representa la fila física de clientes esperando ser atendidos delante de una ventanilla específica. Cada ventanilla tiene asignada su propia cola independiente de tipo FIFO (First-In, First-Out). El primer cliente en la cola es el que está siendo atendido activamente en ese instante por el cajero, mientras que los que están detrás esperan su turno conforme el tiempo restante de atención (time) del cliente al frente se reduce a cero.
+
 2. ¿Qué criterio usa `bestWindow` y qué decisión toma cuando hay empate?
+
+Criterio: Evalúa de manera codiciosa (greedy) la longitud actual de todas las filas y elige aquella que tenga la menor cantidad de clientes en espera (windows[i].size()).
+
+En caso de empate: El algoritmo favorece a la ventanilla con el índice numérico más bajo. Esto se debe al operador de comparación estricta < (if (windows[i].size() < minSize)). Si encuentra otra ventana con exactamente el mismo tamaño mínimo que el ya registrado, la condición resulta falsa y no actualiza la variable opt.
+
 3. ¿Qué significa que la simulación use una semilla (`seed`)?
+
+Significa que el experimento es estocástico pero $100\%$ determinista y replicable. Al inicializar el motor de números pseudoaleatorios con un valor fijo (std::mt19937 rng(seed)), la secuencia de eventos (cuándo llega un cliente y cuánto tiempo de atención requiere) será exactamente la misma cada vez que ejecutes el programa. Esto es crucial en ingeniería de software para depurar código, comparar cambios en el algoritmo bajo idénticas condiciones de estrés y realizar auditorías científicas de rendimiento.
+
 4. ¿Qué relación debe cumplirse entre `totalArrivals` y `totalServed`, y por qué?
+
+Debe cumplirse de manera estricta que:$$\text{totalArrivals} \ge \text{totalServed}$$
+
+Porque el banco no puede atender a más clientes de los que físicamente han ingresado al sistema. La diferencia entre ambos valores ($\text{totalArrivals} - \text{totalServed}$) representa con precisión el número de clientes remanentes que se quedaron atrapados haciendo fila en las ventanillas en el instante en que la simulación se detuvo (now == servTime).
+
 5. ¿Qué representa la línea de tiempo (`timeline`) en el resultado?
+
+Representa una bitácora de auditoría histórica paso a paso. Es un vector que almacena una captura fotográfica (BankSimulationStep) del estado completo del banco en cada segundo o unidad de tiempo transcurrida. Almacena cronológicamente el instante actual y una matriz con el tiempo restante de atención de todos y cada uno de los clientes distribuidos en sus respectivas filas, permitiendo reconstruir o graficar el comportamiento del sistema a posteriori.
+
 6. ¿Por qué esta aplicación necesita colas y no pilas?
+
+Porque el modelo de negocio bancario exige una política de justicia distributiva básica (Equidad). Una cola garantiza la semántica FIFO, asegurando que el cliente que llegó primero sea el primero en ser atendido.
+
 7. ¿Qué simplificación del mundo real introduce este simulador?
+
+Tiempos discretos: Todo ocurre en ticks fijos de tiempo; no hay retrasos de transición ni demoras entre que un cliente se retira y el siguiente avanza.
+
+Fidelidad absoluta: Los clientes eligen una fila al entrar y se quedan estáticos en ella. En el mundo real, las personas cambian de fila si ven que otra avanza más rápido (jockeying) o abandonan el banco si la fila es demasiado larga (balking).
+
+Frecuencia homogénea: La probabilidad de llegada es constante a lo largo del tiempo, ignorando la existencia de "horas pico".
+
 8. ¿Qué cambiaría si la política ya no fuera "cola más corta" sino otra?
 
-##### Experimento 6
+Cambiaría drásticamente la distribución de la carga y la eficiencia del banco:
 
-Ejecuta la simulación variando al menos tres parámetros:
+Si fuera una Cola Única para múltiples ventanillas (Modelo Serpiente): El banco sería mucho más eficiente. Ninguna ventanilla se quedaría vacía si hay gente esperando, eliminando el problema de quedarse atrapado detrás de un cliente con un trámite larguísimo.
 
-- número de ventanillas,
-- duración total,
-- semilla.
+Si fuera Aleatoria o Round-Robin: Las filas se desbalancearían masivamente. Podrías tener una ventanilla colapsada con 10 personas mientras la de al lado está completamente vacía.
 
-Construye una tabla con:
+#### Experimento 6
 
-- `nWin`
-- `servTime`
-- `seed`
-- `totalArrivals`
-- `totalServed`
-- tamaño final de cada cola
-- observación
+Cambiando demo_bank.cpp para las variaciones pedidas:
+| `nWin` | `servTime` | `seed` | `totalArrivals` | `totalServed` | `tamaño final` | `Observación` |
+| :---: | :---: | :---: | :--- | :--- | :---: | :--- |
+| 1 | 30 | 12345 | 16 | 0 | [16]` | Pocas ventanas (1). Colapso inminente por acumulación. |
+| 3 | 30 | 12345 | 24 | 1 | [8, 8, 7]` | Mismo tiempo/semilla, pero más ventanas. Fluidez notable. |
+| 3 | 100 | 12345 | 80 | 3 | [26, 26, 25]` | Mayor duración. Permite ver el comportamiento a largo plazo. |
+| 3 | 30 | 99999 | 24 | 1 | [8, 8, 7]` | Mismas ventanas/tiempo que el Caso 2, pero diferente semilla. |
+| 3 | 30 | 12345 | 24 | 1 | [8, 8, 7]` | Réplica exacta del Caso 2 para demostrar determinismo. |
+| 5 | 30 | 55555 | 24 | 1 | [5, 5, 5, 4, 4]` | Muchas ventanas. Alta probabilidad de colas vacías. |
 
-Luego responde:
 
 1. ¿Qué parámetro parece influir más en la congestión observable?
+
+El número de ventanillas (nWin). Cuando nWin = 1, la tasa de salida de clientes está severamente limitada. Al incrementar las ventanillas, el procesamiento pasa a ser en paralelo, lo que reduce la longitud de las filas, aun cuando la cantidad de personas que ingresan al banco (totalArrivals) se mantenga similar.
+
 2. ¿Qué cambia cuando repites exactamente la misma semilla?
+
+No cambia absolutamente nada. Esto demuestra que el generador std::mt19937 es puramente matemático y predecible dada una base inicial.
+
 3. ¿Qué cambia cuando mantienes `nWin` y `servTime`, pero alteras la semilla?
+
+Cambia el escenario estocástico específico. Al alterar la semilla (comparando la fila 2 con la fila 4), se modifica el orden y los valores de los números que el generador arroja. Esto se traduce en que los clientes llegan en momentos distintos del tiempo y con requisitos de atención (time) completamente diferentes, alterando las métricas de rendimiento finales del banco.
+
 4. ¿Qué evidencia usarías para defender que la cola más corta es una política razonable, aunque no necesariamente óptima?
 
-#### Bloque 8 - Cierre comparativo y preparación de sustentación
+La evidencia se encuentra en la homogeneidad de los tamaños finales de las colas en los escenarios con múltiples ventanillas (ej. [6, 6, 5] o [18, 17, 17]).
 
-Responde esta pregunta final:
+Esta política es razonable porque el algoritmo distribuye la carga equitativamente, logrando que ninguna ventanilla quede ociosa mientras otra esté saturada. Sin embargo, no es óptima porque solo mira el número de personas y no el tiempo que tardarán. Si una cola tiene un solo cliente al que le faltan 90 unidades de tiempo, y otra cola tiene dos clientes a los que les falta 1 unidad a cada uno, el algoritmo enviará al nuevo usuario a la fila del cliente de 90 unidades, haciéndolo esperar más tiempo.
+
+### Bloque 8 - Cierre comparativo y preparación de sustentación
 
 **¿Qué cambia cuando pasamos de "usar pilas y colas como ADTs básicos" a "usarlas como mecanismos de control para resolver problemas"?**
 
-La respuesta debe incluir obligatoriamente:
+El paso de concebir las pilas y colas como simples estructuras de datos contenedoras (ADTs básicos que guardan y extraen elementos) a utilizarlas como motores de control de flujo altera por completo la arquitectura del software, transformando las políticas de ordenamiento en estrategias lógicas para gobernar el tiempo, el espacio y la toma de decisiones en un algoritmo.
 
-- una afirmación sobre `LIFO` y `FIFO`,
-- una afirmación sobre recursión implícita frente a estructura explícita,
-- una afirmación sobre evaluación de expresiones,
-- una afirmación sobre backtracking,
-- una afirmación sobre simulación,
-- una afirmación sobre correctitud experimental,
-- una comparación entre conversión de base, paréntesis, N-Reinas, laberinto y banco.
+Sobre LIFO y FIFO: LIFO se transforma en el núcleo del rastreo jerárquico y de profundidad, mientras que FIFO se erige como el árbitro de la equidad operativa y la simulación cronológica paralela.
 
-#### Formato sugerido de entrega
+Sobre recursión implícita frente a estructura explícita: El uso de una pila explícita en lugar de la recursión delegada al sistema operativo traslada el control del estado del programa desde la pila de llamadas (Call Stack) del hardware hacia el espacio de usuario, eliminando el riesgo de un desbordamiento de pila y permitiendo pausar, auditar o inspeccionar las variables de control en cualquier instante del ciclo de ejecución.
 
-```md
-## Actividad 4-CC232
+Sobre evaluación de expresiones: En el análisis y resolución de expresiones algebraicas, la pila deja de ser un mero depósito de datos para actuar como un operador sintáctico en tiempo real, donde la política de precedencias de una matriz decide dinámicamente si un operador es retenido en memoria o si es despachado de inmediato hacia la Notación Polaca Inversa (RPN).
 
-### Estudiante
-- Nombre completo
+Sobre backtracking: En las estrategias de backtracking, la pila se convierte en un mapa de decisiones reversibles y dinámicas, actuando como el diario de viaje del algoritmo.
 
-#### Bloque 1 (respuestas)
-#### Bloque 2 (tabla y respuestas)
-#### Bloque 3 (respuestas)
-#### Bloque 4 (respuestas y experimentos 1-2)
-#### Bloque 5 (respuestas y experimento 3)
-#### Bloque 6 (respuestas y experimentos 4-5)
-#### Bloque 7 (respuestas y experimento 6)
-#### Bloque 8 (respuesta final)
+Sobre simulación: Al implementar simulaciones de sistemas, la cola se transforma en la representación del tiempo de espera y la congestión de un entorno estocástico, modelando cómo interactúan flujos independientes de entidades discretas frente a recursos limitados y permitiendo analizar cuantitativamente la eficiencia de políticas operativas sin necesidad de alterar el mundo real.
 
-#### Autoevaluación breve
-- Qué puedo defender con seguridad:
-- Qué todavía confundo:
-- Qué experimento me dio mejor evidencia:
-- Qué evidencia usaría en una sustentación:
-```
+Sobre correctitud experimental: El uso de estas estructuras como mecanismos de control permite que la correctitud de un algoritmo no se asuma de forma teórica, sino que se demuestre a través de la auditoría de su rastro en memoria.
 
-#### Criterio general de trabajo
 
-Se espera lectura real de los archivos, respuestas breves pero justificadas, y conexión explícita entre código, correctitud, estado, estructuras auxiliares, recursión, backtracking, simulación y evidencia experimental.
+### Autoevaluación breve
 
-No basta con ejecutar el programa: debes poder explicar por qué funciona, qué información mantiene cada estructura, qué decisión toma el algoritmo en cada paso y qué evidencia experimental respalda tu defensa.
+- Qué puedo defender con seguridad: La diferencia radical entre LIFO (pila) y FIFO (cola) como motores de control. Puedo demostrar cómo la pila gobierna el retroceso controlado (backtracking) en búsquedas y la jerarquía sintáctica en expresiones, mientras que la cola gestiona el paralelismo, el tiempo y la equidad distributiva en sistemas de servicios.
+
+- Qué todavía confundo: La optimización del estado global frente al local. Específicamente, cómo mapear las restricciones dinámicas en el espacio de estados (como el cálculo de diagonales en N-Reinas) en comparación con las restricciones físicas e inmóviles de una matriz estática (las paredes en el Laberinto).
+
+- Qué experimento me dio mejor evidencia: El de Validación de Paréntesis (Cruce Incorrecto). Demostró experimentalmente un falso positivo (un bug de diseño) en el algoritmo recursivo al evaluar expresiones como ([)]. Evidenció que mientras la recursión fallaba por ignorar caracteres, la estructura explícita de la pila iterativa defendía con éxito la integridad sintáctica.
+
+- Qué evidencia usaría en una sustentación: Las métricas de checks en N-Reinas y el mapa de celdas BACKTRACKED en el Laberinto. Con los checks demuestras matemáticamente cómo el algoritmo realiza la "poda" de ramas muertas sin explorarlas por completo, y con las celdas B del laberinto pruebas visualmente el rastro físico del backtracking en memoria.

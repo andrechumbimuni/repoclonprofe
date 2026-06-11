@@ -1,59 +1,10 @@
-### Actividad 5 - CC232
+## Actividad 5 - CC232
 
-- Duración: 3 horas de clase.
-- Modalidad: Trabajo individual.
-- Entrega: Un archivo llamado `Actividad5-CC232.md`.
+### Estudiante
 
-#### Objetivo
-
-Consolidar lo trabajado en la Semana 5 a partir de lectura de código, ejecución de demos, revisión de pruebas, trazado manual y defensa escrita breve.
-
-La meta es distinguir con claridad tres niveles de trabajo con árboles:
-
-1. La infraestructura enlazada base: `BinNode` y `BinTree`.
-2. La navegación y los recorridos de un árbol binario: `BinaryTree`, sucesor, predecesor, profundidad, altura, tamaño de subárbol e iteración inorden.
-3. Las estructuras especializadas de la semana: `BinarySearchTree` y `BinaryHeap`.
-
-Además, se busca conectar la implementación de la semana con las ideas de Morin y Deng: árboles binarios enlazados, mantenimiento de alturas, recorridos recursivos e iterativos, sucesor inorden, recorrido por niveles, representación implícita de heaps, búsqueda en BST, eliminación, `splice`, rotaciones y validación de invariantes.
-
-#### Material de trabajo
-
-##### Código de la semana
-
-- `Semana5/README.md`
-- `Semana5/include/BinNode.h`
-- `Semana5/include/BinTree.h`
-- `Semana5/include/BinaryTree.h`
-- `Semana5/include/BinarySearchTree.h`
-- `Semana5/include/BinaryHeap.h`
-- `Semana5/include/Capitulo5.h`
-- `Semana5/demos/demo_binary_tree.cpp`
-- `Semana5/demos/demo_bst.cpp`
-- `Semana5/demos/demo_heap.cpp`
-- `Semana5/demos/demo_capitulo5_panorama.cpp`
-- `Semana5/pruebas_publicas/test_public_week5.cpp`
-- `Semana5/pruebas_internas/test_internal_week5.cpp`
-- `Semana5/lecturas/Notas.md`
-- `Semana5/Ejercicios5-CC232.md`
-
-##### Lecturas obligatorias
-
-- Lectura de Deng asociadas a `BinNode`, `BinTree`, mantenimiento de alturas, recorridos, sucesor inorden y recorrido por niveles dado en el repositorio.
-- Secciones de Morin asociadas a `BinaryTree`, `BinaryHeap` y `BinarySearchTree` dado en el repositorio.
+- Nombre: Chumbimuni Ricci Andre Dylan
 
 #### Bloque 1 - Núcleo conceptual de la semana
-
-Revisa:
-
-- `Semana5/README.md`
-- `Semana5/lecturas/Notas.md`
-- `Semana5/include/BinNode.h`
-- `Semana5/include/BinTree.h`
-- `Semana5/include/BinaryTree.h`
-- `Semana5/include/BinarySearchTree.h`
-- `Semana5/include/BinaryHeap.h`
-
-Responde:
 
 1. Explica con tus palabras qué diferencia hay entre un árbol binario enlazado y un árbol binario almacenado implícitamente en un arreglo.
 
@@ -65,25 +16,43 @@ Guarda los datos del nodo al que apunta, el nodo parent, left , right y la altur
 
 3. Explica por qué el puntero `parent` permite implementar operaciones como `succ()`, `pred()` y actualización ascendente de alturas.
 
-Parent permite subir al la raiz
+El puntero parent rompe la limitación unidireccional del árbol proporcionando una vía de regreso hacia arriba.
+
+Para succ() (Sucesor inorden): Si el nodo actual no tiene un subárbol derecho, su sucesor matemático se encuentra arriba. El puntero parent permite ascender por la rama hasta encontrar el primer ancestro del cual somos un descendiente izquierdo.
+
+Para pred() (Predecesor inorden): Funciona bajo la misma lógica inversa; si no hay subárbol izquierdo, parent permite subir por el árbol para buscar el ancestro inmediato anterior en orden numérico.
+
+Para la actualización ascendente de alturas (updateHeightAbove): Cada vez que insertas o eliminas un nodo, la altura de sus ancestros puede cambiar. El puntero parent permite disparar un bucle while que viaja en reversa hacia la raíz, recalculando y corrigiendo las alturas nivel por nivel de forma quirúrgica, afectando únicamente a la rama modificada sin tener que recalcular todo el árbol.
 
 4. Explica qué responsabilidad tiene `BinTree` frente a `BinNode`.
+
+BinNode maneja la estructura local del nodo (punteros y datos). BinTree asume el control global de la estructura: administra la raíz, el tamaño total (size_), la memoria (destrucción de nodos) y la consistencia de las alturas al insertar o remover subárboles.
+
 5. Explica qué agrega `BinaryTree` sobre la infraestructura base de `BinTree`.
 
-Agrega las funciones de navegacion, tamaño del arbol, el primer nodo , el ultimo.
+Agrega la capacidad de navegación avanzada e iteración: provee iteradores estándar (begin, end), cálculo de profundidades (depth), dibujo en consola (asciiArt) y recorridos ordenados por sucesores o predecesores usando los punteros del nodo.
 
 6. Explica qué propiedad adicional convierte un árbol binario en un `BinarySearchTree`.
 
-Cuando todo valor de la derecho es menor que el derecho (isBST)
+La propiedad de orden simétrico: para cada nodo, todos los valores de su subárbol izquierdo deben ser estrictamente menores que él, y todos los de su subárbol derecho deben ser mayores o iguales.
 
 7. Explica qué propiedad adicional convierte un arreglo en un `BinaryHeap` mínimo.
+
+La propiedad del heap mínimo: el valor de cualquier nodo debe ser menor o igual que el de sus hijos (left y right), manteniendo el árbol perfectamente completo y compacto en memoria (sin huecos en el arreglo).
+
 8. Compara la propiedad de orden de un BST con la propiedad de prioridad de un heap.
+
+BST (Orden Izquierda-Derecha): Divide horizontalmente. Permite búsquedas rápidas de cualquier elemento ($O(\log n)$) porque mantiene un ordenamiento total.
+
+Heap (Orden Arriba-Abajo): Divide verticalmente por niveles. Solo garantiza que el mínimo está en la raíz, optimizando el acceso exclusivo al elemento prioritario ($O(1)$).
+
 9. Explica por qué un recorrido inorden de un BST produce una secuencia ordenada.
 
-Porque primero visita menores , el mismo bst y los mayores.
+Porque sigue el patrón Izquierda $\rightarrow$ Raíz $\rightarrow$ Derecha. Por la propiedad del BST, este orden procesa de forma matemática primero los elementos menores, luego el nodo actual y al final los elementos mayores.
 
 10. Explica por qué un heap no permite, por sí solo, recorrer los elementos en orden sin destruir o copiar la estructura.
 
+Porque el heap no es una estructura totalmente ordenada; solo garantiza prioridad local entre padres e hijos. No existe ninguna relación de orden fija entre hermanos (izquierdo y derecho) ni entre ramas distintas, obligando a extraer la raíz repetidamente (destruyendo el heap) para conocer el orden real.
 
 #### Bloque 2 - Navegación, altura, profundidad y tamaño
 
@@ -106,23 +75,64 @@ Si el nodo tiene hijo derecho, baja al subarbol  derecho(s=right) y busca el mas
 
 3. Explica el caso en que `succ()` sube por los ancestros hasta encontrar el primer giro hacia la izquierda.
 
-Si el nodo no tiene hijo derecho , sube por los ancestros mientras seas hijo derecho 
+Ocurre cuando el nodo no tiene hijo derecho. El algoritmo sube usando parent mientras el nodo actual sea el hijo derecho de su padre (ya que esa rama ya fue procesada). Se detiene al llegar al primer ancestro del cual somos descendientes por la izquierda; ese padre es el sucesor.
 
 4. Explica simétricamente cómo debe funcionar `pred()`.
+
+Si tiene hijo izquierdo: Baja un paso a la izquierda (s = left) y busca el nodo más a la derecha de ese subárbol (s = s->right).
+
+Si no tiene hijo izquierdo: Sube por los ancestros usando parent mientras sea hijo izquierdo. El primer padre del cual sea hijo derecho será su predecesor.
+
 5. Dibuja un árbol de al menos 7 nodos y marca el sucesor y predecesor inorden de tres nodos distintos.
+```
+Arbol:
+│       ┌── 12
+│   ┌── 10
+│   │   └── 8
+└── 7
+    │       ┌── 6
+    │   ┌── 5
+    │   │   └── 4
+    └── 3
+        └── 1
+```
+Para el Nodo 5 (Caso con dos hijos):
+
+Predecesor (4): Es el nodo más a la derecha de su subárbol izquierdo.
+
+Sucesor (6): Es el nodo más a la izquierda de su subárbol derecho.
+
+Para el Nodo 1 (Caso Nodo Hoja Extremo):
+
+Predecesor (No tiene / nullptr): Al ser el Primer nodo inorden, no existe ningún elemento menor que él.
+
+Sucesor (3): Al no tener hijo derecho, sube por su parent directo.
+
+Para el Nodo 8 (Caso Hoja Intermedia):
+
+Predecesor (7): No tiene hijo izquierdo, sube por los ancestros. Como 8 es hijo izquierdo de 10, sigue subiendo. Al llegar a 10, este es hijo derecho de 7, por lo que el giro a la derecha determina que 7 es su predecesor.
+
+Sucesor (10): Al no tener hijo derecho, sube hacia su parent. Como 8 es el hijo izquierdo de 10, el giro se completa en un solo paso hacia arriba.
+
 6. Explica qué calcula `depth(u)` y por qué puede implementarse subiendo por `parent`.
 
-
+Calcula la profundidad del nodo (la distancia desde la raíz hasta u). Se implementa subiendo por parent porque existe un único camino directo y lineal desde cualquier nodo hacia la raíz, bastando un bucle que cuente los pasos hacia arriba hasta que parent == nullptr.
 
 7. Explica qué calcula `height(u)` y por qué suele implementarse bajando recursivamente por los hijos.
+
+Calcula la altura del nodo (la distancia desde u hasta la hoja más profunda de su subárbol). Requiere bajar recursivamente porque un nodo puede tener múltiples ramificaciones hacia abajo y se debe explorar cada camino para encontrar el máximo entre la altura izquierda y derecha: $1 + max$(altura_izq, altura_der).
+
 8. Explica qué calcula `subtreeSize(u)`.
+
+Calcula el tamaño del subárbol que nace en u (es decir, la cantidad total de nodos que dependen de él, incluyéndose a sí mismo). Se obtiene sumando el tamaño del subárbol izquierdo, el del derecho, más $1$ por el nodo actual.
+
 9. Demuestra que para todo nodo `u` se cumple `depth(u) + height(u) <= height(T)`.
 
-
+Por definición, depth(u) es la longitud del camino desde la raíz hasta u, y height(u) es el camino más largo desde u hasta una hoja. La suma de ambos representa la longitud de un camino completo de raíz a hoja que pasa obligatoriamente por u. Como height(T) es, por definición, el camino absoluto más largo posible de todo el árbol de raíz a hoja, cualquier otro camino que pase por un nodo u cualquiera será menor o igual a este máximo global.
 
 10. Indica la condición necesaria y suficiente para que se alcance la igualdad anterior.
 
-Si u perteneciera al nodo donde esta el subarreglo mas largo osea la distancia maxima de T.
+La igualdad $depth(u) + height(u) = height(T)$ se cumple si y solo si el nodo u pertenece al camino más largo que define la altura máxima de $T$.
 
 #### Bloque 3 - Recorridos y trazado guiado
 
@@ -343,11 +353,7 @@ La respuesta debe incluir obligatoriamente:
 #### Formato sugerido de entrega
 
 ```markdown
-## Actividad 5 - CC232
 
-### Estudiante
-
-- Nombre:
 
 ### Bloque 1 - Núcleo conceptual
 

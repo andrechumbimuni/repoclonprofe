@@ -28,6 +28,10 @@
 | **MOD-A6-B9-PC** | `Treap.h` | Inclusión de los métodos de control métrico `trickleDownCount` y `removeCount` para cuantificar las rotaciones durante los desbalances controlados de borrado. | Compilación limpia bajo el estándar de lenguaje C++17 sin regresiones. |
 | **MOD-A6-B9-PC** | `demo_treap_basico.cpp` | Modificación del punto de entrada para aplicar remociones instrumentadas sucesivas sobre el lote de llaves `{50, 20, 70}`. | Registros en terminal que confirman la ejecución de 2 rotaciones para `20`, 1 rotación para `70` y un estado de consistencia estructural verificado continuo. |
 | **MOD-A6-B9-PD** | `demo_treap_basico.cpp` | Inclusión del set de pruebas analíticas de rangos (`findEQ`, `lowerBound`, `upperBound`) sobre estados mutados del Treap. | Salida en consola limpia que ratifica la consistencia semántica exacta frente a un BST tradicional. |
+| **MOD-A6-B9-PE** | `test_public_week6.cpp` | Implementación integral de las 13 pruebas de control estructural y de invariantes mixtos (BST + Heap). | Cobertura unánime aprobada (`Passed`) en CTest bajo el estándar de compilación C++17. |
+| **MOD-A6-B10** | `demo_compare_with_semana5.cpp` | Reescritura del flujo para inyectar y contrastar de manera simultánea los componentes de la Semana 5 (`BinaryHeap`, `BST`) con las implementaciones avanzadas de la Semana 6 (`PQ_ComplHeap`, `Treap`). | Ejecución limpia que genera registros precisos de las salidas estructurales y los invariantes. |
+| **MOD-A6-B11** | `test_public_week6.cpp` | Reescritura e inyección integral de la suite de pruebas unitarias instrumentadas, cubriendo de forma secuencial y automatizada los **15 requerimientos de invariantes**. | Ejecución unánime aprobada (`Passed`) a través de la consola de `CTest` con reporte de trazas limpio en 0.03 segundos. |
+
 ### Bloque 1 - Diagnóstico inicial de la Semana 6
 
 1. ¿Qué targets de demostraciones o pruebas aparecen para Semana 6?
@@ -1574,7 +1578,7 @@ Prueba 12 (Consistencia Mixta): Monitorea continuamente la variable de control s
 
 Prueba 13 (Secuencia Larga): Expone a la estructura a un escenario de estrés de 300 operaciones aleatorias concurrentes para diagnosticar la estabilidad a largo plazo y la ausencia de fugas de memoria o corrupciones de balanceo.
 
-#### Bloque 11 - Comparación con Semana 5: `BinaryHeap`, `BinarySearchTree` y `Treap`
+### Bloque 11 - Comparación con Semana 5: `BinaryHeap`, `BinarySearchTree` y `Treap`
 
 Revisa:
 
@@ -1604,129 +1608,162 @@ La demostración debe mostrar una tabla con columnas:
 Responde:
 
 1. ¿Qué diferencia hay entre un heap de prioridad y un árbol de búsqueda?
+
+Un montículo o heap mantiene una jerarquía de orden puramente vertical (relación padre-hijo, donde el padre es siempre mayor o menor que sus descendientes), lo que permite localizar el elemento óptimo en la raíz de forma inmediata $O(1)$. Un árbol de búsqueda binaria (BST) mantiene una relación de orden horizontal estricta (todo el subárbol izquierdo es menor que la raíz, y todo el derecho es mayor), lo que optimiza búsquedas exactas y por rangos.
+
 2. ¿Por qué un BST permite recorrido ordenado y un heap no?
+
+Porque el invariante posicional del BST garantiza un orden simétrico. Al realizar un recorrido inorden, las claves se visitan secuencialmente de izquierda a derecha de forma ordenada. El heap no impone restricciones de orden entre hermanos ni entre subramas separadas (el hijo izquierdo puede ser mayor o menor que el derecho), lo que destruye cualquier posibilidad de obtener secuencias ordenadas de manera directa mediante recorridos tradicionales.
+
 3. ¿Qué agrega `PQ_ComplHeap` frente a un `BinaryHeap` educativo?
+
+PQ_ComplHeap implementa una interfaz genérica parametrizada basada en polimorfismo dinámico (PQ<T>), lo que permite el intercambio transparente de colas de prioridad en tiempo de ejecución. Además, está desacoplado mediante políticas de ordenación personalizables (Compare), admite la construcción óptima en tiempo lineal $O(n)$ usando el algoritmo de inicialización de Floyd (heapify), y soporta inyecciones contiguas eficientes en memoria mediante la API estándar de std::vector.
+
 4. ¿Qué combina un `Treap`?
+
+Combina las fortalezas de un Árbol de Búsqueda Binaria (BST) sobre sus claves (keys) para mantener la capacidad de búsqueda rápida y de rangos, junto con las propiedades de un Min-Heap sobre prioridades numéricas autogeneradas de forma aleatoria para garantizar la estabilidad del balanceo topológico de forma probabilística.
+
 5. ¿Qué estructura usarías para extraer máximos repetidamente?
+
+Utilizaría PQ_ComplHeap (configurado con un Max-Heap). Ofrece acceso inmediato al elemento máximo en $O(1)$ y una reestructuración de extracción garantizada en tiempo logarítmico estricto $O(\log n)$, operando sobre un arreglo contiguo con un costo espacial nulo en punteros.
+
 6. ¿Qué estructura usarías para responder `lowerBound` o `upperBound`?
+
+Utilizaría un Treap (o en su defecto un BinarySearchTree si el orden de los datos no fuera de carácter malicioso). Ambas estructuras mantienen la propiedad horizontal necesaria para acotar rangos secuenciales y descartar mitades completas de claves en tiempo logarítmico.
+
 7. ¿Qué estructura usarías si quieres búsqueda ordenada con balanceo probabilístico?.
+
+Utilizaría un Treap. Su naturaleza asegura que la altura del árbol converja estadísticamente a un óptimo esperado de $O(\log n)$ ante cualquier secuencia de inserciones sin la sobrecarga computacional de rotaciones continuas que imponen los árboles AVL o Red-Black rígidos.
 
 Entrega en este bloque:
 
 - Demostración modificada.
+```
+// MOD-A6-B10: Análisis Comparativo Multi-Estructura (S5 vs S6)
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iomanip>
+#include "Capitulo5.h"
+#include "Capitulo6.h"
+
+int main() {
+  const std::vector<int> xs{8, 3, 10, 1, 6, 14, 4, 7, 13};
+  ods::BinaryHeap<int> binaryHeap;
+  ods::PQ_ComplHeap<int> pqComplHeap;
+  ods::BinarySearchTree<int> bst;
+  ods::Treap<int> treap(42);
+
+  // Inserción concurrente
+  for (int x : xs) {
+    binaryHeap.add(x);
+    pqComplHeap.insert(x);
+    bst.add(x);
+    treap.addWithPriority(x, static_cast<std::uint64_t>(x * 10));
+  }
+
+  std::cout << "REPORTE DE EVIDENCIAS EN CONSOLA\n";
+  std::cout << "\n\n";
+
+  // 1. Evidencia BinaryHeap
+  std::cout << "  BinaryHeap (Min-Heap S5):\n";
+  std::cout << "  Elemento en el tope (Mínimo): " << binaryHeap.top() << "\n\n";
+
+  // 2. Evidencia PQ_ComplHeap
+  std::cout << "  PQ_ComplHeap (Max-Heap S6):\n";
+  std::cout << "  Elemento máximo (getMax())  : " << pqComplHeap.getMax() << "\n";
+  std::cout << "  ¿Es un Max-Heap válido?     : " << (pqComplHeap.isValidHeap() ? "SI" : "NO") << "\n\n";
+
+  // 3. Evidencia BinarySearchTree
+  std::cout << "  BinarySearchTree (S5):\n";
+  std::cout << "  Recorrido Inorden ordenado  : ";
+  for (int x : bst.inorder()) { std::cout << x << " "; }
+  std::cout << "\n\n";
+
+  // 4. Evidencia Treap
+  std::cout << "  Treap Balanceado (S6):\n";
+  std::cout << "  Recorrido Inorden de claves : ";
+  for (int x : treap.inorderKeys()) { std::cout << x << " "; }
+  std::cout << "\n";
+  auto* lb = treap.lowerBound(5);
+  std::cout << "  lowerBound(5) sobre claves  : " << (lb ? std::to_string(lb->key) : "null") << "\n";
+  std::cout << "  ¿Es un Treap mixto válido?  : " << (treap.isTreap() ? "SI" : "NO") << "\n";
+  std::cout << "\n";
+
+  return 0;
+}
+```
+
 - Tabla de comparación.
+
+Estructura | Operación Principal | Propiedad Mantenida | Operación Eficiente | Operación que NO Conviene | Evidencia Producida por la Demostración |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`BinaryHeap`** *(Semana 5)* | Extracción del elemento mínimo. | **Min-Heap Vertical:** El nodo padre es menor o igual que sus hijos. | `top()` en $O(1)$, `add()` y `remove()` en $O(\log n)$. | Buscar una clave exacta o listar los elementos en orden ($O(n \log n)$). | `top() = 1`, confirmando que el valor menor absoluto reside en la raíz. |
+| **`PQ_ComplHeap`** *(Semana 6)* | Extracción del elemento máximo. | **Max-Heap Vertical:** El nodo padre es mayor o igual que sus hijos. | `getMax()` en $O(1)$, `insert()` y `delMax()` en $O(\log n)$. | Consultar rangos u obtener cotas de vecindad como `lowerBound` ($O(n)$). | `getMax() = 14` e `isValidHeap() = SI` bajo una carga de datos aleatorios. |
+| **`BinarySearchTree`** *(Semana 5)* | Búsqueda y ordenamiento de claves. | **Orden Horizontal BST:** Subárbol izquierdo < raíz < subárbol derecho. | Recorrido `inorder()` en $O(n)$, búsquedas en $O(\log n)$ promedio. | Insertar claves que ya vienen ordenadas (degradación a peor caso $O(n)$). | `inorder() = 1 3 4 6 7 8 10 13 14` en perfecta secuencia monótona. |
+| **`Treap`** *(Semana 6)* | Búsqueda ordenada con balanceo. | **Mixta:** BST horizontal en claves + Min-Heap vertical en prioridades. | Búsquedas, rangos y mutaciones en tiempo esperado $O(\log n)$. | Extracciones puras de mínimos sin requerir un diccionario ($O(\log n)$ con punteros). | Claves ordenadas en inorden, `lowerBound(5) = 6` e `isTreap() = SI`. |
+
 - Respuesta breve de selección de estructura.
+Para extraer máximos o mínimos repetidamente, para responder consultas de rangos (lowerBound / upperBound) y para búsquedas dinámicas con un balanceo simple y probabilístico.
 
 #### Bloque 12 - Pruebas obligatorias después de modificar código
 
-Debes agregar o extender pruebas en:
-
-- `Semana6/pruebas_publicas/test_public_week6.cpp`
-- `Semana6/pruebas_internas/test_internal_week6.cpp`
-
-Incluye al menos las siguientes pruebas:
-
-1. `PQ_ComplHeap` conserva la propiedad heap después de cada inserción.
-2. `PQ_ComplHeap` conserva la propiedad heap después de cada eliminación.
-3. `getMax` no cambia el tamaño.
-4. `delMax` sí cambia el tamaño.
-5. `heapifyFloyd` produce un heap válido.
-6. `heapSort` ordena con repetidos.
-7. `PQ_LeftHeap` conserva su propiedad después de `merge`.
-8. `PQ_LeftHeap` conserva su propiedad después de `insert`.
-9. `PQ_LeftHeap` conserva su propiedad después de `delMax`.
-10. Huffman produce códigos para todos los símbolos con frecuencia positiva.
-11. Huffman produce códigos libres de prefijos.
-12. Huffman maneja correctamente el caso de un solo símbolo.
-13. `Treap` conserva propiedad BST después de insertar.
-14. `Treap` conserva propiedad de heap por prioridad después de insertar.
-15. `Treap` conserva ambas propiedades después de eliminar.
-
-Entrega en este bloque:
-
 - Lista de pruebas agregadas.
+```
+REQ 1 & 2: Invariantes estables en PQ_ComplHeap.
+REQ 3 & 4: Control de efectos secundarios en tamaño.
+REQ 5: Constructor Floyd (heapify) validado.
+REQ 6: HeapSort con elementos repetidos correcto.
+REQ 7, 8 & 9: Invariantes estables en PQ_LeftHeap.
+REQ 10 & 11: Códigos de Huffman unívocos y válidos.
+REQ 12: Caso crítico de un solo símbolo manejado con éxito.
+REQ 13 & 14: Inserciones duales perfectas en Treap.
+REQ 15: Eliminaciones complejas en Treap mantienen invariantes.
+```
 - Resultado completo de `ctest --output-on-failure`.
+```
+andre@andre-AB350M-DS3H-V2:/mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana6$ ctest --test-dir build-debug -R semana6 --output-on-failure
+Internal ctest changing into directory: /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana6/build-debug
+Test project /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana6/build-debug
+    Start 1: semana6_public
+1/2 Test #1: semana6_public ...................   Passed    0.01 sec
+    Start 2: semana6_internal
+2/2 Test #2: semana6_internal .................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.03 sec
+```
 - Explicación de qué bug atraparía cada prueba.
+
+REQ 1 & 2 (PQ_ComplHeap invariantes): Atrapa desajustes aritméticos elementales en los índices dinámicos de los hijos (2i + 1 y 2i + 2) durante las etapas críticas de ascenso y descenso.
+
+REQ 3 & 4 (Efectos en Tamaño): Previene fugas conceptuales de extracción de datos, controlando que los métodos de solo lectura (getMax) no quiten elementos accidentalmente y que delMax limpie el final del vector.
+
+REQ 5 (Floyd): Detecta si la cota de iteración de Floyd se detuvo antes de la mitad del arreglo, dejando nodos hoja actuando como padres sin estar ordenados de forma descendente.
+
+REQ 6 (Repetidos): Expone inestabilidades algorítmicas si los comparadores fallan ante claves idénticas, previniendo loops infinitos en la extracción de máximos duplicados.
+
+REQ 7, 8 & 9 (PQ_LeftHeap): Evita la corrupción estructural del s-value o NPL (Null Path Length). Si se olvida actualizar la distancia al camino nulo de un nodo tras el merge, la propiedad izquierdista colapsa de inmediato.
+
+REQ 10, 11 & 12 (Huffman): Asegura la completitud del diccionario de frecuencias y la decodificabilidad unívoca (que ningún código binario sea prefijo de otro). El check del símbolo único evita accesos a punteros nulos (nullptr) cuando no hay un segundo nodo con el cual emparejar el árbol.
+
+REQ 13, 14 & 15 (Treap): El seguro definitivo de las operaciones híbridas. Valida que las rotaciones a la izquierda y derecha reubiquen de forma exacta las prioridades del Min-Heap vertical sin desordenar jamás la secuencia simétrica horizontal inorden de las claves.
 
 #### Bloque 13 - Defensa escrita de modificaciones
 
-Responde en no más de 900 palabras:
-
 ¿Qué aprendiste al modificar código de prioridad, heaps, Huffman y Treap que no se aprende solo leyendo o ejecutando demostraciones?
 
-Tu respuesta debe incluir obligatoriamente:
+Modificar directamente las entrañas de estas estructuras me permitió cruzar la frontera entre la teoría elegante y la cruda realidad de la gestión de memoria y punteros, una experiencia que la lectura pasiva jamás lograría transmitir.
 
-- Una afirmación sobre la interfaz `PQ`.
-- Una afirmación sobre la representación implícita del heap binario completo.
-- Una afirmación sobre `percolateUp`.
-- Una afirmación sobre `percolateDown`.
-- Una afirmación sobre `heapify` de Floyd.
-- Una afirmación sobre `heapSort`.
-- Una afirmación sobre `merge` en heap izquierdista.
-- Una afirmación sobre Huffman.
-- Una afirmación sobre `Treap`, rotaciones, prioridades y búsqueda ordenada.
-- Una afirmación sobre comparación con `BinaryHeap` y `BinarySearchTree`.
-- Una afirmación sobre pruebas, invariantes y casos borde.
+Al trabajar en este nivel, comprendí que la interfaz PQ actúa como un contrato polimórfico indispensable que abstrae el comportamiento de una cola de prioridad, demostrando cómo el diseño de software limpio permite intercambiar implementaciones internas (ya sean arreglos o estructuras enlazadas) sin alterar un solo bit del código del cliente. Al meterme en los detalles de PQ_ComplHeap, asimilé de forma práctica que la representación implícita del heap binario completo sobre un vector contiguo elimina por completo el costo de almacenamiento de punteros, pero a cambio exige una precisión matemática absoluta en la aritmética de índices para no corromper las relaciones jerárquicas.
 
+Durante las mutaciones, descubrí el verdadero peso operativo de los algoritmos de rebalanceo. Implementar percolateUp me enseñó que la flotación de un elemento es un proceso local y eficiente de costo logarítmico, pero sumamente propenso a fallar en los límites superiores si la condición de parada no gestiona correctamente la llegada al índice de la raíz. Por otro lado, la lógica de percolateDown reveló ser sustancialmente más compleja de codificar debido a que cada paso descendente exige evaluar múltiples bifurcaciones (la existencia de dos hijos y la rigurosa selección del hermano óptimo) para no violar la propiedad del montículo.
 
-#### Formato sugerido de entrega
+El impacto de la optimización matemática cobró sentido al validar el heapify de Floyd; comprobar mediante trazas que procesar el arreglo desde el último nodo no-hoja hacia atrás reduce el costo de construcción a un tiempo lineal $O(n)$ fue un hallazgo fascinante que contrasta con el enfoque ingenuo de inserciones repetidas. Al conectar esto con heapSort, aprendí que este algoritmo de ordenamiento saca provecho de dicha estructura para garantizar un tiempo de ejecución óptimo de $O(n \log n)$ en el peor caso, manteniendo una estabilidad operativa impecable incluso al lidiar con claves duplicadas.
 
-```markdown
+Al pasar a estructuras enlazadas avanzadas, el panorama cambió por completo. La codificación del merge en el heap izquierdista me obligó a entender cómo una única operación fundamental puede resolver de forma elegante la inserción y la eliminación en tiempo logarítmico, siempre y cuando se actualice rigurosamente el valor de distancia al camino nulo (s-value) y se intercambien los subárboles de manera oportuna para mantener el sesgo hacia la izquierda. Con Huffman, el aprendizaje práctico radicó en ver cómo la combinación repetida de estos nodos mínimos produce árboles de codificación óptimos y libres de prefijos, asimilando el manejo crítico de alfabetos de un solo símbolo para evitar desreferenciaciones nulas.
 
+La cúspide de este laboratorio fue el Treap, donde experimenté cómo las rotaciones quirúrgicas coordinan armoniosamente dos mundos opuestos: el orden horizontal de las prioridades del Min-Heap y la búsqueda ordenada del BST. Modificar sus métodos de descenso me demostró que el balanceo probabilístico es sumamente robusto ante datos maliciosos, superando la rigidez de los árboles AVL. Esto se consolidó en la comparación con BinaryHeap y BinarySearchTree, donde evidencié que el Treap es una estructura híbrida excelente que unifica la inspección por rangos (lowerBound) del BST y el control vertical del Heap, sacrificando únicamente la eficiencia en caché de los arreglos.
 
-
-
-### Bloque 1 - Diagnóstico inicial
-[Comandos, resultados y explicación]
-
-### Bloque 2 - Utilidades de heap completo
-[Código, explicación y evidencia]
-
-### Bloque 3 - Conteo en percolateUp
-[Código, salida y análisis]
-
-### Bloque 4 - Conteo en percolateDown
-[Código, salida y análisis]
-
-### Bloque 5 - Validación de propiedad heap
-[Código, pruebas y explicación]
-
-### Bloque 6 - Inserciones sucesivas vs Floyd
-[Demostración, tabla y complejidad]
-
-### Bloque 7 - heapSort
-[Código, pruebas y discusión de estabilidad]
-
-### Bloque 8 - Heap izquierdista
-[Código, validación y trazado]
-
-### Bloque 9 - Huffman
-[Código, tabla de códigos y prefijo libre]
-
-### Bloque 10 - Treap
-[Rotaciones, inserción, eliminación, búsquedas y pruebas]
-
-### Bloque 11 - Comparación con Semana 5
-[Tabla y selección de estructura]
-
-### Bloque 12 - Pruebas
-[Lista de pruebas, salida de ctest y explicación]
-
-### Bloque 13 - Defensa escrita
-[Respuesta final]
-```
-
-#### Criterio general de evaluación
-
-Se espera evidencia de trabajo directo sobre el código. La actividad será evaluada principalmente por:
-
-1. Claridad de las modificaciones.
-2. Conservación de la interfaz pública cuando corresponda.
-3. Uso correcto de invariantes.
-4. Pruebas con casos borde.
-5. Comparación razonada entre estructuras.
-6. Explicación de costos.
-7. Capacidad de sustentar oralmente los cambios.
-8. Calidad de los ejercicios adicionales de codificación: modularidad, pruebas, casos borde y respeto de invariantes.
-
-Pasar las pruebas no es suficiente. Debes poder explicar por qué tus cambios preservan la propiedad de heap, la propiedad izquierdista, la validez del árbol de Huffman, la propiedad BST del `Treap` y la diferencia entre estructuras para prioridad y estructuras para búsqueda ordenada.
+Finalmente, escribir la suite de validación me dejó una lección: las pruebas, invariantes y casos borde no son meros agregados de control de calidad; son el único mecanismo capaz de capturar errores invisibles en el código, como punteros parent mal direccionados tras una rotación o contadores de size() desfasados. En conclusión, meter las manos en el código me enseñó que la belleza de las estructuras de datos no reside solo en su análisis asintótico, sino en la rigurosa consistencia de sus punteros ante cada mutación.

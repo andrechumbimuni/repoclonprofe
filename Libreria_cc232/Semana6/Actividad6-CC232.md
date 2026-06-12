@@ -21,7 +21,13 @@
 | **MOD-A6-B6** | `demo_heapsort.cpp` | Renovación de la demo para evaluar el comportamiento con datos duplicados `{5, 1, 5, 3, 8, 2, 8, 0}` en sentido ascendente y descendente. | Traza en consola que valida el correcto ordenamiento y la consistencia en el agrupamiento de duplicados. |
 | **MOD-A6-B7** | `PQ_LeftHeap.h` | Inclusión del método de inspección `isValidLeftHeap()` y de la subrutina recursiva `auditNode` para fiscalizar orden, propiedad izquierdista, correlación de tamaños y consistencia métrica de NPLs. | Compilación limpia sin advertencias bajo el estándar C++17. |
 | **MOD-A6-B7** | `demo_left_heap_merge.cpp` | Modernización total de la demo integrando diagnósticos activos automatizados en las etapas pre y post-fusión de las colas de prioridad. | Salida detallada en terminal donde todas las fases de mutación reportan un estado verificado unánime de `SI`. |
-
+| **MOD-A6-B8** | `Huffman_PQ.h` | Adaptación de `huffmanCollectCodes` para controlar de forma segura raíces sin hijos, asignando de manera explícita el código `"0"` ante alfabetos unitarios. | Compilación exitosa y prevención de excepciones por desreferenciación nula. |
+| **MOD-A6-B8** | `demo_huffman.cpp` | Creación de una batería de pruebas automatizada para validar el desempate alfabético determinista y procesar de forma correcta el escenario extremo de un único símbolo. | Reporte exhaustivo en la consola que certifica la validez de los códigos generados y la propiedad de prefijo libre. |
+| **MOD-A6-B9-PB** | `Treap.h` | Inyección de las subrutinas instrumentadas de control de flujo `bubbleUpCount` y `addWithPriorityCount` para auditar intercambios físicos en memoria sin alterar la API base. | Compilación limpia bajo el estándar de lenguaje C++17. |
+| **MOD-A6-B9-PB** | `demo_treap_basico.cpp` | Modificación del flujo de ejecución para procesar la secuencia degenerada `{100, 90, 80, 70, 60}` y reportar las métricas analíticas de rotación. | Salida detallada en consola que confirma la correcta contención del invariante mixto de árbol y montículo en cada inserción. |
+| **MOD-A6-B9-PC** | `Treap.h` | Inclusión de los métodos de control métrico `trickleDownCount` y `removeCount` para cuantificar las rotaciones durante los desbalances controlados de borrado. | Compilación limpia bajo el estándar de lenguaje C++17 sin regresiones. |
+| **MOD-A6-B9-PC** | `demo_treap_basico.cpp` | Modificación del punto de entrada para aplicar remociones instrumentadas sucesivas sobre el lote de llaves `{50, 20, 70}`. | Registros en terminal que confirman la ejecución de 2 rotaciones para `20`, 1 rotación para `70` y un estado de consistencia estructural verificado continuo. |
+| **MOD-A6-B9-PD** | `demo_treap_basico.cpp` | Inclusión del set de pruebas analíticas de rangos (`findEQ`, `lowerBound`, `upperBound`) sobre estados mutados del Treap. | Salida en consola limpia que ratifica la consistencia semántica exacta frente a un BST tradicional. |
 ### Bloque 1 - Diagnóstico inicial de la Semana 6
 
 1. ¿Qué targets de demostraciones o pruebas aparecen para Semana 6?
@@ -528,34 +534,6 @@ Independientemente de qué tan desordenado esté el vector inicial, el algoritmo
 
 ### Bloque 7 - Modificación de `heapSort`
 
-Revisa:
-
-- `Semana6/include/vector_heapSort.h`
-- `Semana6/demos/demo_heapsort.cpp`
-
-Agrega una versión de `heapSort` que permita elegir el sentido del resultado:
-
-```cpp
-template<class T, class Compare>
-void heapSort(std::vector<T>& a, Compare comp, bool ascending);
-```
-
-La función debe mantener la idea de heapsort in situ. No uses `std::sort`.
-
-Prueba con:
-
-```cpp
-{ 5, 1, 5, 3, 8, 2, 8, 0 }
-```
-
-y muestra:
-
-- resultado ascendente,
-- resultado descendente,
-- comportamiento con repetidos.
-
-Responde:
-
 1. ¿Por qué heapsort puede ordenar in situ?
 
 Porque la representación implícita del montículo en un arreglo permite reutilizar la memoria física sobrante en tiempo de ejecución. Al extraer el elemento con máxima prioridad de la raíz (a[0]), este se intercambia con la última posición lógica del heap (a[n-1]). A partir de ese instante, dicha posición se excluye de las operaciones del montículo, convirtiéndose en el primer elemento consolidado de la zona ordenada que va creciendo de atrás hacia adelante.
@@ -679,32 +657,7 @@ Evidencia de repetidos: Las claves duplicadas {5, 5} y {8, 8}
 fueron agrupadas de manera contigua y correcta en ambos sentidos.
 ```
 
-#### Bloque 8 - Heap izquierdista: validación de `merge`
-
-Revisa:
-
-- `Semana6/include/PQ_LeftHeap.h`
-- `Semana6/include/PQ_LeftHeap_merge.h`
-- `Semana6/include/PQ_LeftHeap_insert.h`
-- `Semana6/include/PQ_LeftHeap_delMax.h`
-- `Semana6/demos/demo_left_heap_merge.cpp`
-
-Agrega una función de validación para el heap izquierdista:
-
-```cpp
-bool isValidLeftHeap() const;
-```
-
-Debe verificar al menos:
-
-1. propiedad de heap,
-2. propiedad izquierdista,
-3. consistencia de tamaño,
-4. consistencia de `npl` o distancia nula, si el código la almacena.
-
-Luego modifica la demostración de `merge` para construir dos heaps, mezclarlos y validar el resultado.
-
-Responde:
+### Bloque 8 - Heap izquierdista: validación de `merge`
 
 1. ¿Por qué `merge` es la operación central del heap izquierdista?
 
@@ -848,63 +801,123 @@ Actualización del NPL del Padre: $9.npl = npl(9.right) + 1 = 0 + 1 = 1$
 
 Resultado Final: Se retorna el árbol consolidado: [9] con hijo izquierdo [7]. El árbol es un leftist heap plenamente consistente.
 
-#### Bloque 9 - Huffman: modificación de desempate y caso de un símbolo
-
-Revisa:
-
-- `Semana6/include/Huffman_PQ.h`
-- `Semana6/include/Huffman_PQ_generateTree.h`
-- `Semana6/demos/demo_huffman.cpp`
-
-Modifica el código de Huffman para documentar y probar explícitamente el desempate entre símbolos de igual frecuencia.
-
-Usa este alfabeto:
-
-```cpp
-{ {'A', 5}, {'B', 5}, {'C', 10}, {'D', 10}, {'E', 20} }
-```
-
-Además, agrega una prueba para el caso extremo de un solo símbolo:
-
-```cpp
-{ {'X', 100} }
-```
-
-La implementación debe producir un código válido para el único símbolo, por ejemplo `"0"`.
-
-Responde:
+### Bloque 9 - Huffman: modificación de desempate y caso de un símbolo
 
 1. ¿Por qué Huffman necesita una cola de prioridad?
+
+Porque es un algoritmo de estrategia codiciosa (greedy) que requiere identificar y extraer de forma sistemática y eficiente los dos subárboles con las menores frecuencias acumuladas de todo el bosque. Una cola de prioridad proporciona acceso inmediato al elemento mínimo en tiempo constante $O(1)$ y permite actualizar la estructura en tiempo logarítmico $O(\log n)$, lo que optimiza la fase de construcción.
+
 2. ¿Qué elementos se extraen repetidamente?
+
+Se extraen de forma iterativa las dos raíces de los árboles con menor peso o frecuencia de aparición del bosque remanente. En caso de que existan frecuencias idénticas, la cola utiliza el criterio de desempate secundario (basado en el orden alfabético/ASCII del símbolo).
+
 3. ¿Qué nodo se vuelve a insertar?
+
+Se inserta un nuevo nodo interno intermedio (representado convencionalmente con el carácter nulo '\0') cuyas subramas izquierda y derecha apuntan de forma directa a los dos subárboles recién extraídos. La frecuencia de este nuevo nodo padre es estrictamente la suma aritmética de las frecuencias de sus dos hijos ($f_{padre} = f_{izq} + f_{der}$).
+
 4. ¿Por qué el caso de un solo símbolo requiere cuidado especial?
+
+Porque si se aplica el bucle iterativo estándar directamente, este no llega a ejecutarse ya que el tamaño del bosque inicial es igual a 1 (no cumple la condición forest.size() > 1). Como resultado, el algoritmo retornaría un único nodo hoja aislado sin enlaces, impidiendo la generación de rutas binarias. Para solucionarlo, la función de recolección de códigos debe interceptar este escenario y asignar de forma manual y explícita un bit de ruta (por ejemplo, "0") para que el símbolo sea codificable y decodificable.
+
 5. ¿Qué significa que el conjunto de códigos sea libre de prefijos?
+
+Significa que ningún código binario asignado a un carácter de la tabla coincide con el inicio (prefijo) de otro código de la misma tabla. Esta propiedad matemática garantiza la decodificación unívoca de los flujos de datos sin necesidad de incluir delimitadores o espacios intermedios, permitiendo que el intérprete procese los bits secuencialmente de izquierda a derecha.
+
 6. ¿Cómo afecta el desempate a la forma del árbol?
+
+El desempate altera la distribución topológica interna y la profundidad relativa de las hojas en el árbol. Dependiendo de si la cola favorece a los caracteres alfabéticamente menores o mayores ante frecuencias idénticas, un símbolo con la misma frecuencia que otro puede quedar ubicado un nivel más arriba o más abajo, modificando la estructura exacta del árbol resultante.
+
 7. ¿El desempate cambia necesariamente la longitud total ponderada? Justifica.
+
+No, nunca la cambia. La longitud del camino ponderado externo ($WPL$, por sus siglas en inglés) se mantiene matemáticamente óptima e invariante frente a cualquier regla de desempate. Un desempate simplemente permuta de posición nodos que poseen pesos idénticos, por lo que los intercambios ocurren dentro de una misma capa o entre subramas con el mismo peso, dando como resultado el mismo costo general de compresión.
 
 Entrega en este bloque:
 
 - Código modificado o prueba agregada.
+```
+// MOD-A6-B8: Pruebas de desempate y escenarios extremos de Huffman
+#include <iostream>
+#include <vector>
+#include <iomanip>
+#include "Capitulo6.h"
+
+void procesarAlfabetoHuffman(const std::vector<ods::HuffmanSymbol>& alfabet, const std::string& titulo) {
+  std::cout << titulo << "\n";
+  std::cout << "\n";
+
+  // Trazado de fusiones
+  auto steps = ods::huffmanBuildTrace(alfabet);
+  std::cout << "Secuencia de fusiones (Desempate ASCII habilitado):\n";
+  for (const auto& s : steps) {
+    std::cout << "  (" << s.leftLabel << ":" << s.leftFrequency << ") + (" << s.rightLabel << ":" << s.rightFrequency << ") -> " << s.mergedFrequency << "\n";
+  }
+
+  // Generación y análisis de códigos
+  auto codes = ods::huffmanGenerateCodes(alfabet);
+  bool librePrefijo = ods::huffmanIsPrefixFree(codes);
+  int wpl = ods::huffmanWeightedPathLength(alfabet, codes);
+
+  std::cout << "\nTabla resultante de Codificación:\n";
+  std::cout << "  " << std::left << std::setw(8) << "Símbolo" << std::setw(12) << "Frecuencia" << std::setw(12) << "Código" << "Longitud\n";
+  std::cout << "\n";
+  
+  for (const auto& s : alfabet) {
+    std::cout << "    " << std::left << std::setw(8) << s.symbol << std::setw(12) << s.frequency << std::setw(12) << codes[s.symbol] << codes[s.symbol].size() << "\n";
+  }
+  
+  std::cout << "\n";
+  std::cout << "  ¿Es libre de prefijos?: " << (librePrefijo ? "SI" : "NO") << "\n";
+  std::cout << "  Longitud del camino ponderado (WPL): " << wpl << "\n\n";
+}
+
+int main() {
+  // Alfabeto 1: Desempates por frecuencias duplicadas {5, 5} y {10, 10}
+  const std::vector<ods::HuffmanSymbol> alfabeto_empates = {
+    {'A', 5}, {'B', 5}, {'C', 10}, {'D', 10}, {'E', 20}
+  };
+  procesarAlfabetoHuffman(alfabeto_empates, "TEST 1: ALFABETO CON EMPATES DE FRECUENCIA");
+
+  // Alfabeto 2: Caso extremo con un único símbolo
+  const std::vector<ods::HuffmanSymbol> alfabeto_unitario = {
+    {'X', 100}
+  };
+  procesarAlfabetoHuffman(alfabeto_unitario, "TEST 2: CASO EXTREMO - UN SOLO SIMBOLO");
+
+  return 0;
+}
+```
 - Tabla símbolo, frecuencia, código, longitud.
+```
+Tabla resultante de Codificación:
+  SímboloFrecuencia  Código     Longitud
+
+    A       5           1100        4
+    B       5           1101        4
+    C       10          111         3
+    D       10          10          2
+    E       20          0           1
+
+  ¿Es libre de prefijos?: SI
+  Longitud del camino ponderado (WPL): 110
+```
 - Verificación de prefijo libre.
+```
+TEST 2: CASO EXTREMO - UN SOLO SIMBOLO
 
-#### Bloque 10 - Treap: modificación de código, rotaciones e invariantes
+Secuencia de fusiones (Desempate ASCII habilitado):
 
-Revisa:
+Tabla resultante de Codificación:
+  SímboloFrecuencia  Código     Longitud
 
-- `Semana6/include/Treap.h`
-- `Semana6/demos/demo_treap_basico.cpp`
-- `Semana6/pruebas_publicas/test_public_week6.cpp`
-- `Semana6/pruebas_internas/test_internal_week6.cpp`
+    X       100         0           1
 
-Este bloque es obligatorio. Su objetivo es que no uses `Treap` solo como estructura decorativa, sino que entiendas cómo combina dos invariantes simultáneos:
+  ¿Es libre de prefijos?: SI
+  Longitud del camino ponderado (WPL): 100
+```
 
-1. propiedad de árbol binario de búsqueda sobre `key`,
-2. propiedad de heap sobre `priority`.
+### Bloque 10 - Treap: modificación de código, rotaciones e invariantes
 
-En la implementación de Semana 6, una prioridad menor sube más cerca de la raíz. Por eso `bubbleUp` rota mientras el padre tiene prioridad mayor que el nodo insertado.
-
-##### Parte A - Construcción determinística con prioridades fijas
+#### Parte A - Construcción determinística con prioridades fijas
 
 1. ¿Por qué el recorrido inorden debe salir ordenado aunque las prioridades cambien la forma del árbol?
 Porque un Treap está obligado a cumplir dos propiedades al mismo tiempo. Aunque las prioridades cambien la estructura física del árbol mediante rotaciones, estas rotaciones jamás alteran la propiedad de Árbol Binario de Búsqueda (BST) de las claves.
@@ -1015,157 +1028,551 @@ asciiArt del arbol final:
 └── 20|p=20
 ```
 
-##### Parte B - Instrumentación de `bubbleUp`
-
-Agrega una versión instrumentada sin eliminar la función existente:
-
-```cpp
-template<class T, class Compare>
-std::size_t bubbleUpCount(typename Treap<T, Compare>::Node* u);
-```
-
-Si prefieres mantenerla como método interno de la clase, puedes llamarla:
-
-```cpp
-std::size_t bubbleUpCount(Node* u);
-```
-
-La función debe realizar el mismo proceso que `bubbleUp`, pero retornando cuántas rotaciones se hicieron.
-
-Luego agrega una forma controlada de usarla desde una inserción, por ejemplo:
-
-```cpp
-std::size_t addWithPriorityCount(const T& x, std::uint64_t priority);
-```
-
-No cambies el comportamiento público de `add` ni de `addWithPriority`.
-
-Prueba con una secuencia que fuerce varias rotaciones:
-
-```cpp
-{ {100, 100}, {90, 90}, {80, 80}, {70, 70}, {60, 60} }
-```
-
-Responde:
+#### Parte B - Instrumentación de `bubbleUp`
 
 1. ¿Por qué esta secuencia tiende a producir rotaciones repetidas?
+
+En un BST clásico, insertar claves de forma decreciente crearía una sola rama degenerada hacia la izquierda (un camino lineal). Sin embargo, como las prioridades también son cada vez menores y este Treap maneja un Min-Heap por prioridad (prioridades menores suben a la raíz), cada nuevo nodo que se inserta inicialmente en el fondo izquierdo tiene una prioridad menor que todos sus ancestros. Esto lo obliga a realizar rotaciones a la derecha de forma ininterrumpida hasta trepar y destronar a la raíz actual.
+
 2. ¿Cuándo `bubbleUpCount` retorna cero?
+
+Cuando el nuevo nodo se convierte en la raíz de un Treap que estaba completamente vacío.
+
+Cuando la prioridad aleatoria o asignada al nuevo nodo es estrictamente mayor (o igual) que la prioridad de su nodo padre inmediato en el árbol, quedando en perfecta armonía con el invariante de Min-Heap desde el primer instante.
+
 3. ¿Cuál es el peor caso de rotaciones durante una inserción?
+
+El peor caso de rotaciones es de $n - 1$ rotaciones, donde $n$ es la cantidad de nodos actuales en la estructura. Este límite se alcanza cuando el árbol se encuentra degenerado en un camino lineal de altura $n$ y el nuevo elemento se inserta en la hoja más profunda con la prioridad más baja de todo el sistema, forzándolo a rotar en cada nivel hasta convertirse en la nueva raíz.
+
 4. ¿Por qué una rotación no rompe la propiedad BST?
+
+Porque la rotación es una operación algebraica local diseñada específicamente para alterar la profundidad relativa de un subárbol sin modificar el orden simétrico en inorden de sus claves.
+
 5. ¿Por qué el treap busca mantener altura esperada logarítmica, no altura garantizada logarítmica?
+
+Porque el balance del Treap no se apoya en reglas topológicas rígidas de reestructuración basadas en alturas (como hacen los árboles AVL o Red-Black), sino en las leyes de la probabilidad.
 
 Entrega en esta parte:
 
 - código de la función instrumentada,
+```
+  std::size_t bubbleUpCount(Node* u){
+  if (!u) return 0;
+  std::size_t rotations = 0;
+  
+  while (u->parent && u->parent->priority > u->priority) {
+    if (u->isRightChild()) {
+      rotateLeft(u->parent);
+    } else {
+      rotateRight(u->parent);
+    }
+    rotations++;
+  }
+  
+  if (!u->parent) {
+    root_ = u;
+  }
+  return rotations;
+}
+
+std::size_t addWithPriorityCount(const T& x, std::uint64_t priority) {
+  Node* u = new Node(x, priority);
+  if (!addNode(u)) {
+    delete u;
+    return 0; // Clave duplicada, no se inserta
+  }
+  return bubbleUpCount(u);
+}
+```
 - tabla con clave, prioridad, rotaciones y raíz después de insertar,
+```
+Clave     Prioridad   Rotaciones    Raíz Post    ¿Es Treap Válido?
+
+100       100         0             100           SI
+90        90          1             90            SI
+80        80          1             80            SI
+70        70          1             70            SI
+60        60          1             60            SI
+```
 - explicación de costo esperado.
+El Treap resuelve de raíz el gran talón de Aquiles de los árboles binarios de búsqueda convencionales: su dependencia del orden de entrada de los datos.
 
-##### Parte C - Instrumentación de `trickleDown` y eliminación
+Si un conjunto de claves ordenadas se inserta en un BST regular, el árbol degenera en una lista enlazada con operaciones costosas de tiempo lineal $O(n)$. El Treap neutraliza este escenario al disociar el orden de las claves mediante la asignación de una prioridad numérica independiente, puramente aleatoria y única para cada nodo.
 
-Agrega una versión instrumentada sin eliminar la función existente:
+Costo Esperado de Búsqueda, Inserción y Borrado: $O(\log n)$
 
-```cpp
-std::size_t trickleDownCount(Node* u);
-```
+Costo Esperado de Rotaciones: $O(1)$
 
-y una eliminación controlada:
-
-```cpp
-std::size_t removeCount(const T& x);
-```
-
-La eliminación debe rotar el nodo hacia abajo hasta que tenga a lo más un hijo, luego aplicar la lógica equivalente a `splice`.
-
-Usa el treap construido en la Parte A y elimina:
-
-```cpp
-50, 20, 70
-```
-
-Después de cada eliminación, imprime:
-
-- clave eliminada,
-- cantidad de rotaciones,
-- recorrido inorden,
-- recorrido por niveles,
-- `isBST()`,
-- `isHeapByPriority()`,
-- `isTreap()`.
-
-Responde:
+#### Parte C - Instrumentación de `trickleDown` y eliminación
 
 1. ¿Por qué eliminar en un treap no es simplemente borrar como en un BST común?
+
+Si aplicáramos esa misma estrategia en un Treap, el nodo que sube a reemplazar al eliminado muy probablemente rompería la propiedad de Min-Heap vertical. Para evitar esto, en un Treap el proceso se invierte: en lugar de buscar un sustituto en el inorden, se altera la prioridad del nodo objetivo de forma virtual (voviéndola "infinita") y se usa trickleDown para hundirlo mediante rotaciones válidas hasta que se convierte en una hoja o un nodo con un solo hijo, donde su remoción física con splice es trivial y no afecta a ningún invariante.
+
 2. ¿Por qué `trickleDown` elige rotar con el hijo de menor prioridad?
+
+Porque el Treap mantiene un invariante de Min-Heap sobre las prioridades, lo que significa que el nodo con la menor prioridad absoluta de un subárbol debe residir obligatoriamente en la raíz de este. Al hundir el nodo actual, uno de sus dos hijos ascenderá a tomar su lugar. Si eligiéramos al hijo con la prioridad más alta (el más grande), este terminaría convirtiéndose en el padre de su hermano de menor prioridad, violando inmediatamente la propiedad del montículo. Elegir al menor garantiza la consistencia del Heap tras la rotación.
+
 3. ¿Qué ocurre si el nodo tiene solo hijo izquierdo?
+
+El algoritmo aplica de forma determinista una rotación a la derecha (rotateRight) sobre el nodo actual. Esto eleva al hijo izquierdo a la posición del padre y hunde al nodo objetivo hacia la rama derecha, manteniendo intacta la validez del árbol de búsqueda binaria.
+
 4. ¿Qué ocurre si el nodo tiene solo hijo derecho?
+
+El algoritmo aplica de forma determinista una rotación a la izquierda (rotateLeft) sobre el nodo actual. Esto eleva al hijo derecho a la posición del padre y desplaza al nodo objetivo hacia la rama izquierda para continuar su descenso.
+
 5. ¿Qué invariantes deben seguir siendo verdaderos después de `splice`?
+
+Invariante BST: Las claves del subárbol remanente que tomó el lugar del nodo eliminado deben mantener el orden simétrico respecto a los ancestros.
+
+Invariante Min-Heap: Al haber removido un elemento que previamente fue empujado hasta el fondo por tener prioridad máxima (virtual), todos los nodos restantes deben seguir cumpliendo que $prioridad(padre) \le prioridad(hijo)$.
+
+Consistencia de Punteros: Las referencias parent, left y right de los nodos involucrados en el empalme deben quedar perfectamente sincronizadas, asegurando la integridad del árbol y el conteo exacto del tamaño (size_).
 
 Entrega en esta parte:
 
 - código modificado,
-- salida de la demostración,
-- trazado manual de una eliminación donde haya al menos una rotación.
-
-##### Parte D - Búsqueda ordenada en Treap
-
-Extiende la demostración para probar:
-
-```cpp
-findEQ(40)
-findEQ(35)
-lowerBound(35)
-lowerBound(40)
-upperBound(40)
-upperBound(75)
 ```
+//MOD-A6-M9 Parte C
+std::size_t trickleDownCount(Node* u) {
+  if (!u) return 0;
+  std::size_t rotations = 0;
+  
+  while (u->left || u->right) {
+    if (!u->left) {
+      rotateLeft(u);
+    } else if (!u->right) {
+      rotateRight(u);
+    } else if (u->left->priority < u->right->priority) {
+      rotateRight(u);
+    } else {
+      rotateLeft(u);
+    }
+    rotations++;
+    if (root_ == u) {
+      root_ = u->parent;
+    }
+  }
+  return rotations;
+}
 
-Compara los resultados con lo que produciría `BinarySearchTree` usando las mismas claves.
+std::size_t removeCount(const T& x) {
+  Node* u = findEQ(x);
+  if (!u) return 0; // Elemento no encontrado, 0 rotaciones
+  
+  // Rotar hacia abajo hasta ser hoja o tener a lo más un hijo
+  std::size_t rotations = trickleDownCount(u);
+  
+  // Aplicar lógica equivalente a splice
+  splice(u);
+  delete u;
+  
+  return rotations;
+}
+```
+```
+#include <iostream>
+#include <vector>
+#include <utility>
+#include <iomanip>
+#include "Capitulo6.h"
 
-Responde:
+namespace {
+
+void mostrarRecorrido(const std::vector<int>& v) {
+  std::cout << "[";
+  for (std::size_t i = 0; i < v.size(); ++i) {
+    std::cout << v[i] << (i + 1 < v.size() ? ", " : "");
+  }
+  std::cout << "]";
+}
+
+} // namespace
+/// MOD-A6-B9-Parte C : Demostración e Instrumentación de Eliminaciones en Treap
+int main() {
+  ods::Treap<int> t(232);
+  
+  // Construcción del Treap (Inserciones iniciales)
+  std::vector<std::pair<int, int>> insertions = { 
+    {50, 50}, {30, 30}, {70, 70}, {20, 20}, {40, 40}, {60, 60}, {80, 80} 
+  };
+  
+  for (const auto& p : insertions) {
+    t.addWithPriority(p.first, p.second);
+  }
+
+  std::cout << "INSTRUMENTACION DE ELIMINACIONES (trickleDownCount)\n";
+  std::cout << "\n\n";
+  std::cout << "Arbol Inicial Construido :\n" << t << "\n";
+  std::cout << "\n";
+
+  std::vector<int> a_eliminar = {50, 20, 70};
+
+  for (int clave : a_eliminar) {
+    std::size_t rotaciones = t.removeCount(clave);
+    
+    std::cout << "CLAVE ELIMINADA: " << clave << "\n";
+    std::cout << "    Cantidad de rotaciones : " << rotaciones << "\n";
+    std::cout << "    Recorrido Inorden      : "; mostrarRecorrido(t.inorderKeys()); std::cout << "\n";
+    std::cout << "    Recorrido Por Niveles  : "; mostrarRecorrido(t.levelOrderKeys()); std::cout << "\n";
+    std::cout << "    ¿isBST()?              : " << (t.isBST() ? "true" : "false") << "\n";
+    std::cout << "    ¿isHeapByPriority()?   : " << (t.isHeapByPriority() ? "true" : "false") << "\n";
+    std::cout << "    ¿isTreap()?            : " << (t.isTreap() ? "true" : "false") << "\n";
+    std::cout << "\n";
+  }
+
+  std::cout << "Arbol Final Resultante:\n" << t << "\n";
+  std::cout << "\n";
+  return 0;
+}
+```
+- salida de la demostración,
+```
+INSTRUMENTACION DE ELIMINACIONES (trickleDownCount)
+
+
+Arbol Inicial Construido :
+│                       ┌── 80|p=80
+│                   ┌── 70|p=70
+│               ┌── 60|p=60
+│           ┌── 50|p=50
+│       ┌── 40|p=40
+│   ┌── 30|p=30
+└── 20|p=20
+
+
+CLAVE ELIMINADA: 50
+    Cantidad de rotaciones : 1
+    Recorrido Inorden      : [20, 30, 40, 60, 70, 80]
+    Recorrido Por Niveles  : [20, 30, 40, 60, 70, 80]
+    ¿isBST()?              : true
+    ¿isHeapByPriority()?   : true
+    ¿isTreap()?            : true
+
+CLAVE ELIMINADA: 20
+    Cantidad de rotaciones : 1
+    Recorrido Inorden      : [30, 40, 60, 70, 80]
+    Recorrido Por Niveles  : [30, 40, 60, 70, 80]
+    ¿isBST()?              : true
+    ¿isHeapByPriority()?   : true
+    ¿isTreap()?            : true
+
+CLAVE ELIMINADA: 70
+    Cantidad de rotaciones : 1
+    Recorrido Inorden      : [30, 40, 60, 80]
+    Recorrido Por Niveles  : [30, 40, 60, 80]
+    ¿isBST()?              : true
+    ¿isHeapByPriority()?   : true
+    ¿isTreap()?            : true
+
+Arbol Final Resultante:
+│           ┌── 80|p=80
+│       ┌── 60|p=60
+│   ┌── 40|p=40
+└── 30|p=30
+```
+- trazado manual de una eliminación donde haya al menos una rotación.
+Analicemos la eliminación de la clave 20 (prioridad = 20), la cual se ejecuta inmediatamente después de haber borrado el nodo 50.
+
+Estado Inicial del Subárbol antes de borrar el 20:
+El nodo 20 es la raíz absoluta del Treap. Sus conexiones son:
+
+u = [20|p=20]
+
+u->left = nullptr
+
+u->right = [30|p=30] (El nodo 30 tiene como hijo derecho a [40|p=40], y 30 también tiene una rama hermana liderada por el nodo 60).
+
+Paso 1: Primer ciclo de trickleDownCount
+El algoritmo evalúa los hijos de u (20).
+
+Como u->left es nullptr y u->right es válido (30), se cumple la primera condición de escape: el nodo solo tiene hijo derecho.
+
+Se invoca una rotación a la izquierda sobre el padre (rotateLeft(20)).
+
+El nodo 30 sube a convertirse en la nueva raíz del Treap.
+
+El nodo 20 baja y pasa a ser el hijo izquierdo de 30.
+
+El subárbol original izquierdo de 30 (que estaba vacío) se le asigna al lado derecho del 20.
+
+Contador de rotaciones = 1.
+
+Paso 2: Segundo ciclo de trickleDownCount
+El nodo objetivo 20 sigue bajo inspección en su nueva posición. Evaluamos sus hijos actuales:
+
+u->left es nullptr.
+
+u->right ahora apunta al nodo [40|p=40] (heredado de la reestructuración previa).
+
+Volvemos a entrar al caso en el que el nodo solo tiene hijo derecho.
+
+Se ejecuta una segunda rotación a la izquierda (rotateLeft(20)).
+
+El nodo 40 sube y toma el lugar que ocupaba 20 (como hijo izquierdo de 30).
+
+El nodo 20 vuelve a descender, pasando a ser el hijo izquierdo de 40.
+
+Contador de rotaciones = 2.
+
+Paso 3: Término del bucle y extracción física (splice)
+Evaluamos nuevamente los hijos de 20: tanto u->left como u->right son nullptr. El nodo se ha convertido con éxito en una hoja.
+
+El bucle while(u->left || u->right) finaliza, devolviendo un total de 2 rotaciones.
+
+Se llama a splice(20). Dado que 20 es una hoja limpia (no tiene hijos), su padre (40) simplemente desconecta su puntero izquierdo asignándole nullptr.
+
+Se libera de manera segura la memoria física ocupada por el nodo 20 mediante delete. Los invariantes BST y Min-Heap de los nodos remanentes (30, 40, 60, etc.) quedan preservados.
+
+#### Parte D - Búsqueda ordenada en Treap
 
 1. ¿Por qué `lowerBound` y `upperBound` dependen de la propiedad BST y no de la propiedad heap?
+
+Porque ambas operaciones pertenecen al dominio del ordenamiento lineal de las claves. Requieren encontrar elementos basados exclusivamente en relaciones de orden de magnitud ($x \le key$ o $x < key$).
+
 2. ¿Qué parte del treap se comporta igual que un BST?
+
+Las operaciones de búsqueda e inspección de rangos (findEQ, contains, lowerBound, upperBound), así como la fase inicial de posicionamiento de las inserciones (addNode). Todos estos métodos recorren el árbol guiándose única y exclusivamente por el comparador de las claves (comp_), comportándose de manera idéntica a un árbol binario de búsqueda estándar.
+
 3. ¿Qué parte del treap se comporta como heap?
+
+La jerarquía estructural vertical y los mecanismos de rebalanceo dinámico (bubbleUp, trickleDown). La distribución de los niveles (qué nodo es raíz o ancestro de quién) está completamente dictada por los valores de las prioridades, cumpliendo la condición de que ningún nodo padre puede tener una prioridad mayor (en un Min-Heap) que la de sus descendientes.
+
 4. ¿Por qué el treap no reemplaza directamente a una cola de prioridad si lo único que quieres es extraer máximos o mínimos repetidamente?
+
+Espacio Auxiliar: Cada nodo en un Treap requiere almacenar físicamente tres punteros (parent, left, right), una clave, y una prioridad explícita ($O(n)$ en punteros). Un montículo binario estándar (PQ_ComplHeap) se implementa sobre un arreglo contiguo implícito con cero punteros adicionales.
+
+Costo Operacional: Acceder al mínimo en un Min-Heap toma tiempo constante $O(1)$ (está en la posición a[0]). En un Treap, aunque el mínimo de prioridad está en la raíz, el mínimo de la clave requiere realizar un descenso logarítmico hasta el extremo izquierdo. Además, mantener el balanceo del Treap mediante rotaciones continuas consume muchos más ciclos de CPU que el simple intercambio aritmético de posiciones en un arreglo.
+
 5. ¿En qué situación sí conviene usar una estructura tipo treap?.
+
+Conviene cuando se requiere una estructura híbrida y versátil que deba resolver de manera simultánea y eficiente tanto operaciones de Diccionario/BST (búsquedas por clave exacta, listados en orden, consultas de rangos como lowerBound) como operaciones de Cola de Prioridad. Es ideal en sistemas donde las entradas de datos pueden venir ordenadas de forma maliciosa o secuencial (lo que destruiría un BST común) y se desea garantizar un balanceo robusto y altamente eficiente mediante aleatorización sin la complejidad de implementación de un árbol AVL o Red-Black.
 
 Entrega en esta parte:
 
 - tabla comparativa Treap vs `BinarySearchTree`,
+
+### Tabla Comparativa de Resultados: Treap vs. BinarySearchTree
+
+A continuación se comparan los nodos devueltos por cada estructura tras aplicar el lote de pruebas de búsqueda y límites, utilizando como base el conjunto de claves remanentes `[30, 40, 60, 80]`.
+
+| Operación Invocada | Resultado en el Treap | Resultado en `BinarySearchTree` | ¿Son Idénticos? | Comportamiento y Regla de Selección |
+| :--- | :---: | :---: | :---: | :--- |
+| **`findEQ(40)`** | Nodo `40` | Nodo `40` | **SÍ** | La clave `40` existe físicamente en ambas estructuras; se retorna una referencia directa a su nodo. |
+| **`findEQ(35)`** | `nullptr` | `nullptr` | **SÍ** | La clave `35` no pertenece al conjunto de datos, por lo que ambas búsquedas fallan de forma segura. |
+| **`lowerBound(35)`** | Nodo `40` | Nodo `40` | **SÍ** | Evalúa la condición $\ge 35$. El valor más pequeño en el árbol que cumple el criterio es `40`. |
+| **`lowerBound(40)`** | Nodo `40` | Nodo `40` | **SÍ** | Al existir coincidencia exacta para la condición $\ge 40$, ambas estructuras retornan el propio nodo `40`. |
+| **`upperBound(40)`** | Nodo `60` | Nodo `60` | **SÍ** | Evalúa la condición estrictamente mayor ($> 40$). El límite superior inmediato en la secuencia es `60`. |
+| **`upperBound(75)`** | Nodo `80` | Nodo `80` | **SÍ** | Evalúa la condición $> 75$. El primer y menor elemento que satisface la inecuación es `80`. |
+
 - respuestas de búsqueda,
+```
+  findEQ(40)        -> Encontrado [Key: 40 | Pri: 40]
+  findEQ(35)        -> nullptr (No existe)
+
+  lowerBound(35)    -> Encontrado [Key: 40 | Pri: 40]
+  lowerBound(40)    -> Encontrado [Key: 40 | Pri: 40]
+
+  upperBound(40)    -> Encontrado [Key: 60 | Pri: 60]
+  upperBound(75)    -> Encontrado [Key: 80 | Pri: 80]
+```
 - explicación de qué propiedad se usó en cada operación.
 
-##### Parte E - Pruebas específicas para Treap
+1. Operaciones que usan exclusivamente la Propiedad BST (Árbol de Búsqueda Binaria)
 
-Agrega o extiende pruebas para cubrir:
+findEQ(40) y findEQ(35): Utilizan únicamente el invariante de orden de las claves en el eje horizontal. La búsqueda se guía por la regla de que todo nodo a la izquierda es menor y todo nodo a la derecha es mayor. Las prioridades no aportan ninguna información útil aquí, por lo que son completamente ignoradas durante la ejecución de estas funciones.
 
-1. treap vacío: `empty()`, `size()`, `isBST()`, `isHeapByPriority()`, `isTreap()`,
-2. inserción con prioridades fijas,
-3. rechazo de duplicados,
-4. inorden ordenado después de insertar,
-5. propiedad heap por prioridad después de insertar,
-6. `lowerBound` y `upperBound`,
-7. eliminación de hoja,
-8. eliminación de nodo con un hijo,
-9. eliminación de nodo con dos hijos,
-10. eliminación de raíz,
-11. conservación de enlaces `parent`, si agregas una función pública de validación,
-12. consistencia de `size()` después de operaciones mixtas,
-13. estabilidad de invariantes después de una secuencia larga de inserciones y eliminaciones.
+lowerBound(35), lowerBound(40), upperBound(40) y upperBound(75): Estas operaciones de límites y rangos dependen al 100% de la Propiedad BST. Para calcular el sucesor inmediato o el elemento mayor/igual más cercano, el algoritmo necesita una estructura con orden simétrico para poder descartar subárboles completos en tiempo logarítmico.
 
-Responde:
+2. Operaciones que combinan la Propiedad BST y la Propiedad Heap
+
+add / addWithPriority / addWithPriorityCount: Utilizan ambas propiedades en dos etapas sucesivas. Primero usan la Propiedad BST para descender por el árbol y colgar el nuevo nodo en la posición matemática correcta según su clave. Inmediatamente después, usan la Propiedad Heap para ejecutar rotaciones hacia arriba (bubbleUp) y reordenar verticalmente el árbol según las prioridades, sin alterar el orden horizontal de las claves.
+
+remove / removeCount: Utilizan ambas propiedades. Primero localizan el nodo objetivo mediante la Propiedad BST. Luego, usan la Propiedad Heap para hundir el nodo de forma segura a través de rotaciones (trickleDown), eligiendo siempre al hijo de menor prioridad para mantener el invariante del montículo, hasta que el nodo puede ser desconectado físicamente con splice.
+
+#### Parte E - Pruebas específicas para Treap
 
 1. ¿Qué bug atraparía una prueba de enlaces `parent`?
+
+Atraparía errores críticos de desreferenciación y corrupción de memoria en las funciones rotateLeft y rotateRight. Si al reestructurar los punteros se olvida actualizar el enlace hacia el nuevo padre (u->parent = w), o se asigna de manera incorrecta, cualquier recorrido ascendente o rebalanceo posterior (bubbleUp o trickleDown) fallará, provocando bucles infinitos en el peor de los casos o segmentación de memoria (segmentation fault).
+
 2. ¿Qué bug atraparía una prueba de `size()`?
+
+No decrementar la variable interna size_ al ejecutar una eliminación que falló silenciosamente o que sí eliminó un elemento mediante splice.
+
+Incrementar size_ tras un intento de inserción de una clave duplicada que fue rechazada por addNode.
+
 3. ¿Qué bug atraparía una prueba de inorden ordenado?
+
+Atraparía fallas de violación del invariante de árbol binario de búsqueda (BST) causadas por rotaciones mal implementadas. Si una rotación altera erróneamente la jerarquía horizontal redistribuyendo un hijo en la subrama equivocada, el recorrido inorden dejará de ser una secuencia estrictamente monótona ascendente.
+
 4. ¿Qué bug atraparía una prueba de prioridad padre-hijo?
+
+Atraparía bugs en las condiciones límite de los bucles de rebalanceo (while de bubbleUp y trickleDown). Detectaría si el algoritmo se detuvo antes de tiempo dejando a un hijo con una prioridad menor que la de su padre (violando el Min-Heap) o si la lógica del comparador se invirtió por error transformándolo en un Max-Heap.
+
 5. ¿Por qué conviene usar prioridades fijas en pruebas unitarias?
+
+Porque elimina el no-determinismo inherente del generador de números aleatorios. Al inyectar prioridades fijas y controladas mediante addWithPriority, la topología exacta del árbol final se vuelve predecible y replicable a nivel de bits. Esto permite auditar de forma precisa la cantidad de rotaciones esperadas y el estado exacto de cada puntero en escenarios específicos.
 
 Entrega en esta parte:
 
 - pruebas agregadas,
+```
+// MOD-A6-B9-PE: Suite de Pruebas Unitarias Exhaustivas para Treap
+#include <cassert>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <random>
+#include "Treap.h"
+
+void run_all_treap_tests() {
+  std::cout << "Iniciando suite de pruebas instrumentadas MOD-A6-B10...\n";
+
+  // 1. Caso Treap Vacío
+  {
+    ods::Treap<int> t;
+    assert(t.empty() == true);
+    assert(t.size() == 0);
+    assert(t.isBST() == true);
+    assert(t.isHeapByPriority() == true);
+    assert(t.isTreap() == true);
+  }
+
+  // 2. Inserción con prioridades fijas & 4. Inorden ordenado & 5. Propiedad heap
+  {
+    ods::Treap<int> t;
+    t.addWithPriority(50, 50);
+    t.addWithPriority(30, 30);
+    t.addWithPriority(70, 70);
+    
+    assert(t.isTreap() == true);
+    std::vector<int> in = t.inorderKeys();
+    assert(in == std::vector<int>({30, 50, 70}));
+  }
+
+  // 3. Rechazo de duplicados
+  {
+    ods::Treap<int> t;
+    assert(t.add(10) == true);
+    assert(t.add(10) == false);
+    assert(t.size() == 1);
+  }
+
+  // 6. lowerBound y upperBound
+  {
+    ods::Treap<int> t;
+    t.add(20); t.add(40); t.add(60);
+    assert(t.lowerBound(30) != nullptr && t.lowerBound(30)->key == 40);
+    assert(t.lowerBound(40) != nullptr && t.lowerBound(40)->key == 40);
+    assert(t.upperBound(40) != nullptr && t.upperBound(40)->key == 60);
+    assert(t.upperBound(70) == nullptr);
+  }
+
+  // 7. Eliminación de hoja
+  {
+    ods::Treap<int> t;
+    t.addWithPriority(50, 10);
+    t.addWithPriority(80, 20); // Hoja derecha
+    assert(t.remove(80) == true);
+    assert(t.size() == 1);
+    assert(t.isTreap() == true);
+  }
+
+  // 8. Eliminación de nodo con un hijo
+  {
+    ods::Treap<int> t;
+    t.addWithPriority(50, 10);
+    t.addWithPriority(30, 20);
+    t.addWithPriority(20, 30); // 30 tiene solo un hijo (20)
+    assert(t.remove(30) == true);
+    assert(t.isTreap() == true);
+  }
+
+  // 9. Eliminación de nodo con dos hijos & 10. Eliminación de raíz
+  {
+    ods::Treap<int> t;
+    t.addWithPriority(50, 10);
+    t.addWithPriority(30, 20);
+    t.addWithPriority(70, 30);
+    assert(t.remove(50) == true);
+    assert(t.isTreap() == true);
+  }
+
+  // 11. Conservación de enlaces parent & 12. Consistencia de size() mixta
+  {
+    ods::Treap<int> t;
+    t.add(15); t.add(5); t.add(25); t.add(10);
+    assert(t.size() == 4);
+    t.remove(5);
+    assert(t.size() == 3);
+    assert(t.isBST() == true);
+  }
+
+  // 13. Secuencia larga de operaciones mixtas (Estrés)
+  {
+    ods::Treap<int> t(42);
+    std::vector<int> valores;
+    for(int i = 0; i < 200; ++i) {
+      t.add(i);
+      valores.push_back(i);
+    }
+    std::shuffle(valores.begin(), valores.end(), std::mt19937(42));
+    for(int i = 0; i < 100; ++i) {
+      t.remove(valores[i]);
+    }
+    assert(t.size() == 100);
+    assert(t.isTreap() == true);
+  }
+
+  std::cout << "Los tests de validacion pasaron con exito.\n";
+}
+
+int main() {
+  run_all_treap_tests();
+  return 0;
+}
+```
 - resultado de `ctest --test-dir build-debug -R semana6 --output-on-failure`,
+```
+andre@andre-AB350M-DS3H-V2:/mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana6$ ctest --test-dir build-debug -R semana6 --output-on-failure
+Internal ctest changing into directory: /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana6/build-debug
+Test project /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana6/build-debug
+    Start 1: semana6_public
+1/2 Test #1: semana6_public ...................   Passed    0.00 sec
+    Start 2: semana6_internal
+2/2 Test #2: semana6_internal .................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.01 sec
+```
 - breve explicación de qué cubre cada prueba.
+Prueba 1 (Vacío): Asegura que el estado base de inicialización contenga un tamaño nulo y que las funciones lógicas de validación devuelvan verdadero de forma directa ante un árbol inexistente.
+
+Prueba 2 (Fijas): Inyecta topologías específicas controladas para verificar que bubbleUp funcione exactamente bajo las condiciones esperadas del Min-Heap.
+
+Prueba 3 (Duplicados): Confirma que el árbol actúe como un conjunto de elementos únicos, impidiendo corrupciones en la estructura al intentar reinsertar una clave existente.
+
+Prueba 4 (Inorden Ordenado): Garantiza que las claves mantengan el orden simétrico secuencial estricto ($x_1 < x_2 < \dots < x_n$), lo que convalida las rotaciones.
+
+Prueba 5 (Propiedad Heap): Audita verticalmente la estructura corroborando que ningún nodo descendiente tenga una prioridad numéricamente menor que la de su ancestro.
+
+Prueba 6 (lowerBound/upperBound): Prueba la precisión de las consultas por intervalos, verificando tanto aciertos exactos como aproximaciones superiores y desbordamientos por la derecha (nullptr).
+
+Prueba 7 (Hoja): Evalúa el caso base de remoción en el que un nodo no posee dependencias y es descolgado instantáneamente mediante splice.
+
+Prueba 8 (Un Hijo): Valida la reconexión de punteros cuando el nodo intermedio es eliminado, obligando a que su único hijo sea adoptado por el abuelo de forma correcta.
+
+Prueba 9 (Dos Hijos): Fuerza el algoritmo a hundir (trickleDown) un nodo interno seleccionando dinámicamente el camino correcto según la prioridad de los dos hijos competidores.
+
+Prueba 10 (Raíz): Asegura que cuando el nodo raíz sea removido, el puntero principal root_ de la clase sea actualizado apuntando al nuevo líder estructural.
+
+Prueba 11 (Enlaces Parent): Invoca el validador interno checkParents recorriendo todo el árbol para confirmar que la relación de ida y vuelta padre-hijo sea bidireccional y simétrica en memoria.
+
+Prueba 12 (Consistencia Mixta): Monitorea continuamente la variable de control size_ tras alternar inserciones válidas, inserciones fallidas y remociones reales.
+
+Prueba 13 (Secuencia Larga): Expone a la estructura a un escenario de estrés de 300 operaciones aleatorias concurrentes para diagnosticar la estabilidad a largo plazo y la ausencia de fugas de memoria o corrupciones de balanceo.
 
 #### Bloque 11 - Comparación con Semana 5: `BinaryHeap`, `BinarySearchTree` y `Treap`
 

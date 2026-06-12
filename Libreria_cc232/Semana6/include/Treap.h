@@ -1,6 +1,7 @@
 #pragma once
-
+//MOD-A6-B9 Parte B: Extensión Instrumentada para el análisis de rotaciones en Treaps
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <ostream>
@@ -242,6 +243,71 @@ class Treap {
   bool isBST() const { return isBST(root_, nullptr, nullptr) && checkParents(root_, nullptr); }
   bool isHeapByPriority() const { return isHeapByPriority(root_); }
   bool isTreap() const { return isBST() && isHeapByPriority(); }
+ 
+  //MOD-A6-M9 Parte B
+  std::size_t bubbleUpCount(Node* u){
+  if (!u) return 0;
+  std::size_t rotations = 0;
+  
+  while (u->parent && u->parent->priority > u->priority) {
+    if (u->isRightChild()) {
+      rotateLeft(u->parent);
+    } else {
+      rotateRight(u->parent);
+    }
+    rotations++;
+  }
+  
+  if (!u->parent) {
+    root_ = u;
+  }
+  return rotations;
+}
+
+std::size_t addWithPriorityCount(const T& x, std::uint64_t priority) {
+  Node* u = new Node(x, priority);
+  if (!addNode(u)) {
+    delete u;
+    return 0; // Clave duplicada, no se inserta
+  }
+  return bubbleUpCount(u);
+}
+//MOD-A6-M9 Parte C
+std::size_t trickleDownCount(Node* u) {
+  if (!u) return 0;
+  std::size_t rotations = 0;
+  
+  while (u->left || u->right) {
+    if (!u->left) {
+      rotateLeft(u);
+    } else if (!u->right) {
+      rotateRight(u);
+    } else if (u->left->priority < u->right->priority) {
+      rotateRight(u);
+    } else {
+      rotateLeft(u);
+    }
+    rotations++;
+    if (root_ == u) {
+      root_ = u->parent;
+    }
+  }
+  return rotations;
+}
+
+std::size_t removeCount(const T& x) {
+  Node* u = findEQ(x);
+  if (!u) return 0; // Elemento no encontrado, 0 rotaciones
+  
+  // Rotar hacia abajo hasta ser hoja o tener a lo más un hijo
+  std::size_t rotations = trickleDownCount(u);
+  
+  // Aplicar lógica equivalente a splice
+  splice(u);
+  delete u;
+  
+  return rotations;
+}
 
  private:
   Node* root_{nullptr};

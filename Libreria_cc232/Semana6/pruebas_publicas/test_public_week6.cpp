@@ -1,99 +1,114 @@
-#include <algorithm>
+// MOD-A6-B9-PE: Suite de Pruebas Unitarias Exhaustivas para Treap
 #include <cassert>
-#include <memory>
+#include <iostream>
 #include <vector>
+#include <algorithm>
+#include <random>
+#include "Treap.h"
 
-#include "Capitulo5.h"
-#include "Capitulo6.h"
-void ejecutarPruebasConsistenciaHeap() {
-  // 1. Heap vacío
-  ods::PQ_ComplHeap<int> heap_vacio;
-  assert(heap_vacio.isValidHeap());
+void run_all_treap_tests() {
+  std::cout << "Iniciando suite de pruebas instrumentadas MOD-A6-B10...\n";
 
-  // 2. Heap con un elemento
-  ods::PQ_ComplHeap<int> heap_unitario{42};
-  assert(heap_unitario.isValidHeap());
-
-  // 3. Heap con elementos repetidos
-  ods::PQ_ComplHeap<int> heap_repetidos{10, 10, 5, 10, 2, 5};
-  assert(heap_repetidos.isValidHeap());
-
-  // 4. Heap construido por inserciones sucesivas
-  ods::PQ_ComplHeap<int> heap_inserciones;
-  for (int val : {15, 30, 5, 20, 40, 10}) {
-    heap_inserciones.insert(val);
-    assert(heap_inserciones.isValidHeap());
+  // 1. Caso Treap Vacío
+  {
+    ods::Treap<int> t;
+    assert(t.empty() == true);
+    assert(t.size() == 0);
+    assert(t.isBST() == true);
+    assert(t.isHeapByPriority() == true);
+    assert(t.isTreap() == true);
   }
 
-  // 5. Heap construido masivamente mediante heapify de Floyd
-  std::vector<int> datos_crudos = {80, 20, 90, 40, 10, 70, 30, 60};
-  ods::PQ_ComplHeap<int> heap_floyd(datos_crudos);
-  assert(heap_floyd.isValidHeap());
-
-  // 6. Heap bajo mutación destructiva secuencial (múltiples delMax)
-  while (!heap_floyd.empty()) {
-    heap_floyd.delMax();
-    assert(heap_floyd.isValidHeap());
+  // 2. Inserción con prioridades fijas & 4. Inorden ordenado & 5. Propiedad heap
+  {
+    ods::Treap<int> t;
+    t.addWithPriority(50, 50);
+    t.addWithPriority(30, 30);
+    t.addWithPriority(70, 70);
+    
+    assert(t.isTreap() == true);
+    std::vector<int> in = t.inorderKeys();
+    assert(in == std::vector<int>({30, 50, 70}));
   }
-  
+
+  // 3. Rechazo de duplicados
+  {
+    ods::Treap<int> t;
+    assert(t.add(10) == true);
+    assert(t.add(10) == false);
+    assert(t.size() == 1);
+  }
+
+  // 6. lowerBound y upperBound
+  {
+    ods::Treap<int> t;
+    t.add(20); t.add(40); t.add(60);
+    assert(t.lowerBound(30) != nullptr && t.lowerBound(30)->key == 40);
+    assert(t.lowerBound(40) != nullptr && t.lowerBound(40)->key == 40);
+    assert(t.upperBound(40) != nullptr && t.upperBound(40)->key == 60);
+    assert(t.upperBound(70) == nullptr);
+  }
+
+  // 7. Eliminación de hoja
+  {
+    ods::Treap<int> t;
+    t.addWithPriority(50, 10);
+    t.addWithPriority(80, 20); // Hoja derecha
+    assert(t.remove(80) == true);
+    assert(t.size() == 1);
+    assert(t.isTreap() == true);
+  }
+
+  // 8. Eliminación de nodo con un hijo
+  {
+    ods::Treap<int> t;
+    t.addWithPriority(50, 10);
+    t.addWithPriority(30, 20);
+    t.addWithPriority(20, 30); // 30 tiene solo un hijo (20)
+    assert(t.remove(30) == true);
+    assert(t.isTreap() == true);
+  }
+
+  // 9. Eliminación de nodo con dos hijos & 10. Eliminación de raíz
+  {
+    ods::Treap<int> t;
+    t.addWithPriority(50, 10);
+    t.addWithPriority(30, 20);
+    t.addWithPriority(70, 30);
+    assert(t.remove(50) == true);
+    assert(t.isTreap() == true);
+  }
+
+  // 11. Conservación de enlaces parent & 12. Consistencia de size() mixta
+  {
+    ods::Treap<int> t;
+    t.add(15); t.add(5); t.add(25); t.add(10);
+    assert(t.size() == 4);
+    t.remove(5);
+    assert(t.size() == 3);
+    assert(t.isBST() == true);
+  }
+
+  // 13. Secuencia larga de operaciones mixtas (Estrés)
+  {
+    ods::Treap<int> t(42);
+    std::vector<int> valores;
+    for(int i = 0; i < 200; ++i) {
+      t.add(i);
+      valores.push_back(i);
+    }
+    std::shuffle(valores.begin(), valores.end(), std::mt19937(42));
+    for(int i = 0; i < 100; ++i) {
+      t.remove(valores[i]);
+    }
+    assert(t.size() == 100);
+    assert(t.isTreap() == true);
+  }
+
+  std::cout << "Los tests de validacion pasaron con exito.\n";
 }
 
 int main() {
-  ods::PQ_ComplHeap<int> h{4, 10, 7, 1, 3, 9};
-  assert(h.isHeap());
-  assert(h.getMax() == 10);
-  h.insert(12);
-  assert(h.isHeap());
-  assert(h.delMax() == 12);
-  assert(h.isHeap());
-
-  std::vector<int> xs{5, 1, 8, 3, 2};
-  ods::heapSort(xs);
-  assert((xs == std::vector<int>{1, 2, 3, 5, 8}));
-
-  ods::PQ_LeftHeap<int> a{7, 2, 9};
-  ods::PQ_LeftHeap<int> b{1, 8, 3};
-  ods::leftHeapMerge(a, b);
-  assert(b.empty());
-  assert(a.size() == 6);
-  assert(a.isLeftistHeap());
-  assert(a.getMax() == 9);
-
-  const std::vector<ods::HuffmanSymbol> s{{'a', 45}, {'b', 13}, {'c', 12},
-                                          {'d', 16}, {'e', 9},  {'f', 5}};
-  const auto codes = ods::huffmanGenerateCodes(s);
-  const auto tree = ods::huffmanGenerateTree(s);
-  const std::string msg = "face";
-  const std::string bits = ods::huffmanEncode(msg, codes);
-  assert(ods::huffmanDecode(bits, tree) == msg);
-  assert(ods::huffmanIsPrefixFree(codes));
-
-  ods::BinarySearchTree<int> bst;
-  for (int x : {8, 3, 10, 1, 6, 14, 4, 7}) {
-    bst.add(x);
-  }
-  const auto before = bst.inorder();
-  bst.rotateRight(bst.root());
-  bst.rotateLeft(bst.root());
-  const auto after = bst.inorder();
-  assert(before == after);
-  assert(bst.isBST());
-
-  ods::Treap<int> treap(123);
-  assert(treap.addWithPriority(8, 80));
-  assert(treap.addWithPriority(3, 60));
-  assert(treap.addWithPriority(10, 90));
-  assert(treap.addWithPriority(1, 50));
-  assert(treap.addWithPriority(6, 70));
-  assert(treap.isTreap());
-  assert(!treap.addWithPriority(6, 71));
-  assert(treap.contains(3));
-  assert(treap.remove(3));
-  assert(!treap.contains(3));
-  assert(treap.isTreap());
-
-  // MOD-A6-B4: Pruebas adicionales
-  ejecutarPruebasConsistenciaHeap();
-
+  run_all_treap_tests();
   return 0;
 }

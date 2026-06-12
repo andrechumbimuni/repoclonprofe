@@ -1,39 +1,50 @@
+// MOD-A6-B8: Pruebas de desempate y escenarios extremos de Huffman
 #include <iostream>
 #include <vector>
-
+#include <iomanip>
 #include "Capitulo6.h"
 
-int main() {
-  const std::vector<ods::HuffmanSymbol> alphabet{{'a', 45}, {'b', 13}, {'c', 12},
-                                                 {'d', 16}, {'e', 9},  {'f', 5}};
-  const auto steps = ods::huffmanBuildTrace(alphabet);
+void procesarAlfabetoHuffman(const std::vector<ods::HuffmanSymbol>& alfabet, const std::string& titulo) {
+  std::cout << titulo << "\n";
+  std::cout << "\n";
 
-  std::cout << "Fusiones durante la construccion de Huffman (PQ_ComplHeap):\n";
+  // Trazado de fusiones
+  auto steps = ods::huffmanBuildTrace(alfabet);
+  std::cout << "Secuencia de fusiones (Desempate ASCII habilitado):\n";
   for (const auto& s : steps) {
-    std::cout << "  (" << s.leftLabel << ':' << s.leftFrequency << ") + (" << s.rightLabel
-              << ':' << s.rightFrequency << ") -> " << s.mergedFrequency << '\n';
+    std::cout << "  (" << s.leftLabel << ":" << s.leftFrequency << ") + (" << s.rightLabel << ":" << s.rightFrequency << ") -> " << s.mergedFrequency << "\n";
   }
 
-  const auto codes = ods::huffmanGenerateCodes(alphabet);
-  const auto tree = ods::huffmanGenerateTree(alphabet);
-  const auto leftCodes = ods::huffmanGenerateCodesLeftHeap(alphabet);
+  // Generación y análisis de códigos
+  auto codes = ods::huffmanGenerateCodes(alfabet);
+  bool librePrefijo = ods::huffmanIsPrefixFree(codes);
+  int wpl = ods::huffmanWeightedPathLength(alfabet, codes);
 
-  std::cout << "\nTabla de codigos (heap completo):\n";
-  for (char c : {'a', 'b', 'c', 'd', 'e', 'f'}) {
-    std::cout << "  " << c << " -> " << codes.at(c) << '\n';
+  std::cout << "\nTabla resultante de Codificación:\n";
+  std::cout << "  " << std::left << std::setw(8) << "Símbolo" << std::setw(12) << "Frecuencia" << std::setw(12) << "Código" << "Longitud\n";
+  std::cout << "\n";
+  
+  for (const auto& s : alfabet) {
+    std::cout << "    " << std::left << std::setw(8) << s.symbol << std::setw(12) << s.frequency << std::setw(12) << codes[s.symbol] << codes[s.symbol].size() << "\n";
   }
+  
+  std::cout << "\n";
+  std::cout << "  ¿Es libre de prefijos?: " << (librePrefijo ? "SI" : "NO") << "\n";
+  std::cout << "  Longitud del camino ponderado (WPL): " << wpl << "\n\n";
+}
 
-  std::cout << "\nTabla de codigos (leftist heap):\n";
-  for (char c : {'a', 'b', 'c', 'd', 'e', 'f'}) {
-    std::cout << "  " << c << " -> " << leftCodes.at(c) << '\n';
-  }
+int main() {
+  // Alfabeto 1: Desempates por frecuencias duplicadas {5, 5} y {10, 10}
+  const std::vector<ods::HuffmanSymbol> alfabeto_empates = {
+    {'A', 5}, {'B', 5}, {'C', 10}, {'D', 10}, {'E', 20}
+  };
+  procesarAlfabetoHuffman(alfabeto_empates, "TEST 1: ALFABETO CON EMPATES DE FRECUENCIA");
 
-  const std::string text = "face";
-  const std::string bits = ods::huffmanEncode(text, codes);
-  const std::string decoded = ods::huffmanDecode(bits, tree);
+  // Alfabeto 2: Caso extremo con un único símbolo
+  const std::vector<ods::HuffmanSymbol> alfabeto_unitario = {
+    {'X', 100}
+  };
+  procesarAlfabetoHuffman(alfabeto_unitario, "TEST 2: CASO EXTREMO - UN SOLO SIMBOLO");
 
-  std::cout << "\ntexto original = " << text << '\n';
-  std::cout << "codificado     = " << bits << '\n';
-  std::cout << "decodificado   = " << decoded << '\n';
-  std::cout << "prefijo libre  = " << std::boolalpha << ods::huffmanIsPrefixFree(codes) << '\n';
+  return 0;
 }

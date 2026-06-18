@@ -121,24 +121,62 @@ Revisa:
 Responde:
 
 1. Define formalmente la propiedad BST.
+
+Para cualquier nodo b en un arbol binario de busqueda con una funcion de comparacion estricta x < y:
+
+Si existe un nodo b en el subarbol izquierdo de x, entonces b < x.
+
+Si existe un nodo a en el subarbol derecho de x, entonces x < a.
+
 2. Explica por qué el recorrido inorder de un BST produce una secuencia ordenada.
+
+Como el recorrido inorder visita recursivamente primero el subarbol izquierdo luego el nodo actual y al ultimo el derecho. Por la propiedad del BST sabemos que todos elementos a la izquierda son menores a la raiz actual y todos los elementos de la derecha seran mayores generando una ejecucion de elemento en orden secuencial. 
+
 3. Explica por qué insertar claves ordenadas puede producir un BST degenerado.
+
+Como tomamos a el primer elemento insertado como la raiz si insertamos elementos de forma creciente o decreciente, el nodo insertado sera insertara siempre en el lado derecho o izquierdo, sin elementos en el subarbol derecho o izquierdo de la raiz, la estructura balanceada pasa a ser un camino lineal.
+
 4. Construye manualmente el BST resultante de insertar:
 
 ```cpp
 10, 20, 30, 40, 50, 60, 70
 ```
+10 (Raíz) 
+  \
+   20
+     \
+     30
+       \
+       40
+         \
+         50
+           \
+           60
+             \
+             70
 
 5. Indica la altura del árbol anterior si no hay balanceo.
+
+La altura del arbol es el camino mas largo (max. longitud) : 7
+
 6. Explica por qué una búsqueda en ese árbol puede costar `O(n)`.
+
+La busqueda binaria tendra que pasar por cada nodo en el peor caso.
+
 7. Explica qué problema intenta resolver AVL.
+
+El AVL resuelve el problema de balanceo usando (rotateAt) para reestructurar localmente garantizando que la altura se mantenga de $O(\log n)$.
+
 8. Explica qué problema intenta resolver Red-Black Tree.
+
+Reducir la cantidad rotaciones necesarias cuando se inserten y eliminen nodos, lo hace por coloracion probabilistica (usa nodos rojos y negros) que asegura la altura maxima de $2\log_2(n+1)$.
 
 Entrega en este bloque:
 
 * Dibujo del BST degenerado.
 * Explicación breve de costo.
 * Relación con Semana 5.
+La implementacion del BinarySearchTree de la semana 5, en la semana 7 donde ejecuta operaciones de reestructuracion para compactar el arbol de manera optima.
 
 #### Bloque 3 - AVL: balance por altura
 

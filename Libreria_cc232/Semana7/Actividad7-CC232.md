@@ -143,8 +143,7 @@ Usamos rotateAt(v), que usa el algoritmo connect34, esta funcion reasigna los ap
 
 Las rotaciones respetan el orden inorden ya que la secuencia ordenada de 3 elementos reubica punteros manteniendo intacto que el primero siempre este a la derecha del segundo y este a la izuierda del tercero.  
 
-8. Después de insertar, ¿por qué suele bastar reparar el primer ancestro 
-desbalanceado?
+8. Después de insertar, ¿por qué suele bastar reparar el primer ancestro desbalanceado?
 
 Porque cuando la altura aumente en 1, cuando rotamos ese ancestro, la subestructura reduce la altura en 1, regresando a la misma altura antes de la insercion.
 
@@ -261,100 +260,203 @@ El algoritmo connect34 garantiza de forma matemática la preservación del orden
     /   \   /   \
    T0   T1 T2   T3
 ```
-#### Bloque 5 - Red-Black Tree: balance por colores
-
-Revisa:
-
-* `Semana7/include/RedBlackTree.h`
-* `Semana7/include/BinarySearchTree.h`
-* `Semana7/include/BinaryTree.h`
-* `Semana7/demos/demo_redblack_morin.cpp`
-
-Responde:
+## Bloque 5 - Red-Black Tree: balance por colores
 
 1. ¿Qué propiedad BST mantiene Red-Black Tree?
+
+Mantiene el invariante de orden, las claves del subárbol izquierdo son menores y las del derecho son mayores.
+
 2. ¿Qué propiedades de color debe cumplir un Red-Black Tree?
+
+Debe cumplir los 5 invariantes la raíz negra, hojas negras, no rojos consecutivos y misma altura negra.
+
 3. ¿Por qué la raíz debe terminar negra?
+
+Para garantizar la simetría de la altura negra en todos los caminos posibles y servir como ancla del algoritmo de recoloreo.
+
 4. ¿Qué significa que no pueda haber dos nodos rojos consecutivos?
+
+Un nodo padre rojo nunca puede tener un hijo rojo. Restringe el crecimiento asimétrico del árbol.
+
 5. ¿Qué representa la altura negra?
+
+Representa el número exacto de nodos negros desde la raíz hasta las hojas `nil`, que es la altura real del árbol.
+
 6. ¿Por qué Red-Black Tree permite un balance menos estricto que AVL?
+
+AVL exige diferencias de altura de máximo 1, mientras que un Red-Black permite que el camino más largo sea hasta el doble de largo que el camino más corto (alternando rojo y negro).
+
 7. ¿Qué correcciones pueden aparecer después de insertar?
+
+Pueden ocurrir recoloreos (`pushBlack`) si el tío es rojo, o rotaciones combinadas con cambios de color (`flipLeft`, `flipRight`) si el tío es negro.
+
 8. ¿Qué correcciones pueden aparecer después de eliminar?
+
+Aparece `removeFixup` redistribuyendo la pérdida de carga negra mediante desvíos de color (`pullBlack`), rotaciones laterales y absorciones de la deficiencia.
+
 9. ¿Qué papel cumplen las rotaciones en Red-Black Tree?
+
+Modifican la estructura física del árbol localmente para reducir la longitud de una rama cargada de nodos sin alterar el orden BST.
+
 10. ¿Qué papel cumple el cambio de colores?.
+
+Permite absorber o propagar los cambios de balance entre niveles sin mover punteros físicos de memoria.
 
 Entrega en este bloque:
 
 * Lista de invariantes Red-Black.
+
+1. Color del Nodo: Cada nodo es obligatoriamente o bien Rojo (0) o bien Negro (1).
+2. Propiedad de la Raíz: La raíz del árbol es siempre de color Negro.
+3. Propiedad de las Hojas: Todas las hojas virtuales (nodos `nil`) son estrictamente Negras.
+4. Propiedad del Camino Rojo: Si un nodo es Rojo, sus dos hijos deben ser obligatoriamente Negros. No se permiten dos nodos rojos consecutivos en ninguna ruta.
+5. Propiedad del Camino Negro (Altura Negra): Para cada nodo, cualquier camino simple desde él hasta de sus hojas `nil` contiene la misma cantidad de nodos negros.
+
 * Explicación de una inserción que requiera recoloreo.
+
+Cuando el nodo conflicto tiene a su padre ($w$) y a su tío (el otro hijo del abuelo $g$) ambos de color Rojo, el desbalance no requiere una rotación inmediata, sino una operación de recoloreo usando `pushBlack(g)`:
+
+1. El abuelo $g$ (que era negro) absorbe la carga y se convierte en Rojo.
+2. Los dos hijos del abuelo (el padre $w$ y el tío) cambian su color a Negro.
+3. La altura negra local se preserva intacta porque el camino ahora cruza un solo nodo negro intermedio en vez de la raíz del subárbol. El algoritmo traslada el puntero de análisis hacia el abuelo `u = g` para continuar verificando hacia la raíz que no se haya generado un nuevo conflicto rojo-rojo.
+
 * Evidencia de salida de `demo_redblack_morin.cpp`.
-
-#### Bloque 6 - Comparación: BST, Treap, AVL y Red-Black Tree
-
-Revisa:
-
-* `Semana6/include/Treap.h`
-* `Semana7/demos/demo_compare_avl_vs_redblack.cpp`
-* `Semana7/demos/demo_compare_with_semana5.cpp`
-* `Semana7/demos/demo_capitulo7_panorama.cpp`
-
-Construye una tabla con estas columnas:
-
-* Estructura
-* Propiedad de orden
-* Propiedad adicional
-* Operación de reparación
-* Altura esperada o garantizada
-* Caso donde conviene usarla
-
-Incluye:
-
-1. BST común
-2. Treap
-3. AVL
-4. Red-Black Tree
-
-Responde:
+```
+RB inorder: 2 3 6 7 8 10 11 13 18 22 26 
+Valido RedBlack: si
+Tras borrar 18 y 11: 2 3 6 7 8 10 13 22 26 
+Valido RedBlack: si
+```
+## Bloque 6 - Comparación: BST, Treap, AVL y Red-Black Tree
 
 1. ¿Qué tienen en común BST, Treap, AVL y Red-Black Tree?
+
+Comparten la propiedad del BST. Su recorrido inorder devuelve elementos ordenados.
+
 2. ¿Qué diferencia hay entre prioridad en Treap, altura en AVL y color en Red-Black Tree?
+
+La Prioridad Treap es un número aleatorio que dicta la jerarquía vertical como un Max. Heap.
+
+La Altura AVL es una métrica de distancia física para forzar un balance.
+
+El Color Red-Black es un indicador abstracto de estado que flexibiliza el balanceo para reducir las rotaciones.
+
 3. ¿Por qué Treap depende de prioridades?
+
+Las prioridades aleatorias simulan que los datos fueron insertados en un orden completamente disperso.
+
 4. ¿Por qué AVL suele ser más estricto en altura?
+
+AVL busca la máxima simetría para minimizar los costos de búsqueda en el peor caso.
+
 5. ¿Por qué Red-Black Tree puede ser preferible cuando hay muchas inserciones y eliminaciones?
+
+Al permitir caminos el doble de largos que otros (nodos rojos intercalados), muchas inserciones se solucionan con simples recoloreos y en lugar de usar muchas rotaciones seguidas cuando se eliminan elementos en la AVL.
+
 6. ¿Qué estructura elegirías para defender búsqueda ordenada con balance fuerte?
+
+Elegiría AVL ya que mantiene la menor altura posible de forma determinista optimizando las busquedas.
+
 7. ¿Qué estructura elegirías para explicar balance probabilístico?.
+
+Elegiría Treap ya que su balanceo se sostiene matemáticamente en la aletoriedad de prioridades asignadas dinámicamente a cada clave.
 
 Entrega en este bloque:
 
 * Tabla comparativa.
+
+| Estructura | Propiedad de orden | Propiedad adicional | Operación de reparación | Altura esperada o garantizada | Caso donde conviene usarla |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| BST Común | $Izquierdo < Raíz < Derecho$ | Ninguna (no tiene control de balance). | No tiene mecanismo de reparación. | Peor caso: $O(n)$ (secuencial)<br>Promedio: $O(\log n)$ | Datos dispersos, aleatorios por naturaleza o prototipos rápidos. |
+| 2. Treap | $Izquierdo < Raíz < Derecho$ | Propiedad de Heap Máximo/Mínimo en las prioridades. | Rotaciones simples (`rotateLeft`, `rotateRight`) mediante `bubbleUp`/`trickleDown`. | Esperada: $O(\log n)$ (Probabilístico) | Aplicaciones con accesos concurrentes o donde se busca evitar meta-datos complejos de balanceo. |
+| 3. AVL | $Izquierdo < Raíz < Derecho$ | Balance estricto: diferencia de alturas de subárboles $\le 1$. | Rotaciones simples y dobles (`LL`, `RR`, `LR`, `RL`). | Garantizada: Estrictamente $\le 1.44 \log n$ | Sistemas con lectura intensiva (búsquedas frecuentes) y pocas mutaciones. |
+| 4. Red-Black Tree | $Izquierdo < Raíz < Derecho$ | Invariantes de color (raíz/hojas negras, no dos rojos juntos, igual altura negra). | Recoloreo de nodos y rotaciones físicas puntuales. | Garantizada: Estrictamente $\le 2 \log (n+1)$ | Colecciones generales de propósito común (diccionarios de lenguajes) con inserciones y bajas frecuentes. |
+
 * Respuesta breve de decisión técnica.
+
+1. Común Todos son BST ($Izquierdo < Raíz < Derecho$). Su recorrido *inorder* devuelve los datos ordenados de forma idéntica.
+2. Diferencias: Prioridad (azar/heap), Altura (métrica física/AVL) y Color (abstracción de estado/Red-Black).
+3. Treap: Las prioridades aleatorias simulan una inserción al azar para evitar que el árbol degenere en lista.
+4. AVL estricto: Minimiza la altura total para garantizar el menor tiempo de búsqueda posible.
+5. Red-Black: Tolera mayor asimetría física, permitiendo resolver desbalances con rápidos **recoloreos**.
+6. Balance fuerte: **AVL**
+7. Balance probabilístico: **Treap**
+
 * Conexión explícita con Semana 5 y Semana 6.
 
-#### Bloque 7 - Pruebas, invariantes y defensa oral
+En semana 5, el BST provee la interfaz basica para la busqueda sin resolver lo vulnerable que es si se inserta pruebas ordenadas. En semana 6, el treap usas las rotaciones para eliminar su vulnerabilidad del BST implementando bubbleUpCount y trickleDownCount. En la semana 7, el balanceo es determinista ante insersiones ordenadas con el AVL y Red-Black.
 
-Revisa:
-
-* `Semana7/pruebas_publicas/test_public_week7.cpp`
-* `Semana7/pruebas_internas/test_internal_week7.cpp`
-
-Responde:
+## Bloque 7 - Pruebas, invariantes y defensa oral
 
 1. ¿Qué operaciones valida la prueba pública para AVL?
+
+Valida la inserción con balanceo inmediato (30,20,10), la eliminación de un nodo con hijos (20) y el cálculo correcto de la altura final.
+
 2. ¿Qué operaciones valida la prueba pública para Red-Black Tree?
+
+Valida la inserción exitosa de claves, el rechazo de duplicados (!rb.add(22)), y la eliminación restableciendo las propiedades de color.
+
 3. ¿Qué casos adicionales cubre la prueba interna?
+
+Agrega pruebas masivas (250 elementos), consistencia con un oráculo (std::set), operaciones de fronteras (lowerBound/upperBound), y mutaciones destructivas.
+
 4. ¿Qué significa que una prueba valide el inorder?
+
+Significa comprobar que la estructura mantiene el orden estrictamente ascendente de los datos almacenados.
+
 5. ¿Qué significa que una prueba valide alturas o factores de balance?
+
+Significa verificar matemáticamente que los algoritmos de reparación reestructuraron el árbol para cumplir la cota logarítmica tras una inserción o borrado.
+
 6. ¿Qué significa que una prueba valide colores?
+
+Significa que árbol cumple el contrato estructural Red-Black, garantizando que ninguna rama sea más del doble de larga que otra.
+
 7. ¿Qué no demuestra pasar solo las pruebas públicas?
+
+No demuestra que el código sea correcto bajo estrés, fragmentación de memoria, eliminación de nodos con dos hijos en posiciones bajas o manejo seguro de valores duplicados.
+
 8. ¿Qué evidencia usarías en una sustentación: demostración, prueba, trazado o argumento de complejidad?
+
+Usaría el trazado (trace) junto con argumentos de complejidad.
+
 9. ¿Qué invariante revisarías primero si falla AVL?
+
+Revisaria el factor de balance ($|alt_{izq} - alt_{der}| \le 1$).
+
 10. ¿Qué invariante revisarías primero si falla Red-Black Tree?.
+
+Revisaria la propiedad de los nodos rojos (que la raíz sea negra y no existan dos nodos rojos consecutivos).
 
 Entrega en este bloque:
 
 * Tabla de pruebas revisadas.
+
+### Tabla de Pruebas Revisadas
+
+| Archivo de Prueba | Estructuras Evaluadas | Operaciones Validadas | Casos Específicos Tratados |
+| :--- | :--- | :--- | :--- |
+| `test_public_week7.cpp` | AVL, RedBlack (Morin), AVL Compacto, RedBlack LLRB | Inserción unitaria, rotaciones simples/dobles de corrección inmediata y remoción básica. | Casos mínimos de balanceo rígido (ej. serie 30,20,10) y flujos estándar con pocos nodos. |
+| `test_internal_week7.cpp`| BST (Morin), BST (Deng), AVL (Deng/Compacto), RB (Morin/LLRB), Oracle (`std::set`) | Inserción masiva, búsquedas de límites, eliminación aleatoria intensiva y validación cruzada. | Resistencia con generador aleatorio (`rng`), búsquedas complejas (`lowerBound`/`upperBound`), eliminación de la mitad del árbol (120/250 nodos) y mantenimiento de invariantes bajo estrés. |
+
 * Lista de invariantes que defenderías.
+
+Para AVL:Invariante de Altura / Factor de Balance, invariante de BST:
+
+Para Red-Black Tree:Invariante de Coloración Roja, invariante de Altura Negra.
+
 * Evidencia de ejecución de `ctest`.
+```
+Test project /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana7/build-debug
+    Start 1: semana7_public
+1/2 Test #1: semana7_public ...................   Passed    0.00 sec
+    Start 2: semana7_internal
+2/2 Test #2: semana7_internal .................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.02 sec
+```
 
 #### Bloque 8 - Ejercicios de codificación
 

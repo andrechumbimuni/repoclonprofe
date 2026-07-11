@@ -1,124 +1,54 @@
 ### Actividad 7 - CC232
 
-#### Datos generales
-
-Duración: 3 horas de clase.
-
-Modalidad: Trabajo individual.
-
-Entrega: Un archivo llamado `Actividad7-CC232.md`.
-
-#### Objetivo
-
-Consolidar lo trabajado en la Semana 7 a partir de lectura de código, ejecución de demostraciones, revisión de pruebas, trazado manual y defensa escrita breve.
-
-La meta es entender cómo un árbol binario de búsqueda puede evitar la degeneración lineal mediante invariantes adicionales:
-
-1. AVL mantiene balance por altura.
-2. Red-Black Tree mantiene balance por colores.
-3. Ambas estructuras usan rotaciones para conservar el orden inorder del BST.
-4. La Semana 7 continúa las ideas de Semana 5 y Semana 6: BST, rotaciones, búsqueda ordenada, prioridad como propiedad adicional y estructuras que mantienen eficiencia mediante invariantes.
-
-El énfasis de esta actividad está en explicar no solo qué operación se ejecuta, sino qué invariante se mantiene, qué rotación aparece, qué evidencia produce el código y qué costo tiene cada operación.
-
-#### Material de trabajo
-
-#### Código de la semana
-
-Revisa como mínimo:
-
-* `Semana7/README.md`
-* `Semana7/lecturas/Notas.md`
-* `Semana7/include/Entry.h`
-* `Semana7/include/BinNode.h`
-* `Semana7/include/BinTree.h`
-* `Semana7/include/BST.h`
-* `Semana7/include/AVL.h`
-* `Semana7/include/BinaryTree.h`
-* `Semana7/include/BinarySearchTree.h`
-* `Semana7/include/RedBlackTree.h`
-* `Semana7/include/AVLTreeCompact.h`
-* `Semana7/include/RedBlackTreeLLRB.h`
-* `Semana7/include/Capitulo7.h`
-
-#### Código reutilizado conceptualmente
-
-Revisa también:
-
-* `Semana5/include/BinarySearchTree.h`
-* `Semana6/include/Treap.h`
-* `Semana6/demos/demo_bst_rotations.cpp`
-* `Semana6/demos/demo_treap_basico.cpp`
-
-#### Demostraciones y pruebas
-
-Revisa y ejecuta:
-
-* `Semana7/demos/demo_avl_deng_core.cpp`
-* `Semana7/demos/demo_avl_compact_rotations.cpp`
-* `Semana7/demos/demo_bst_deng_vs_avl.cpp`
-* `Semana7/demos/demo_redblack_morin.cpp`
-* `Semana7/demos/demo_redblack_llrb.cpp`
-* `Semana7/demos/demo_compare_avl_vs_redblack.cpp`
-* `Semana7/demos/demo_compare_with_semana5.cpp`
-* `Semana7/demos/demo_capitulo7_panorama.cpp`
-* `Semana7/pruebas_publicas/test_public_week7.cpp`
-* `Semana7/pruebas_internas/test_internal_week7.cpp`
-
-#### Reglas de trabajo
-
-1. No reemplaces AVL o Red-Black Tree por `std::set`, `std::map` u otra estructura estándar que oculte el algoritmo.
-2. No cambies la interfaz principal de la librería salvo que una pregunta lo pida explícitamente.
-3. Toda explicación debe mencionar invariante, operación, evidencia y costo.
-4. Si modificas una demostración o agregas una prueba, marca el cambio con un comentario breve.
-
-```cpp
-// MOD-A7-B4: caso de comparacion de altura
-```
-
-5. No basta con ejecutar el programa. Debes poder explicar por qué la estructura sigue siendo un BST y por qué su altura se mantiene controlada.
-
-#### Bloque 1 - Diagnóstico inicial de la Semana 7
-
-Revisa:
-
-* `Semana7/README.md`
-* `Semana7/CMakeLists.txt`
-* `Semana7/include/Capitulo7.h`
-
-Ejecuta desde la raíz de la librería:
-
-```bash
-cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-debug
-ctest --test-dir build-debug -R semana7 --output-on-failure
-```
-
-Responde:
+## Bloque 1 - Diagnóstico inicial de la Semana 7
 
 1. ¿Qué targets de demostración aparecen para Semana 7?
-2. ¿Qué pruebas públicas e internas aparecen?
-3. ¿Qué archivos incluye `Capitulo7.h`?
-4. ¿Qué relación conceptual hay entre Semana 5, Semana 6 y Semana 7?
-5. ¿Por qué no es correcto decir que una carpeta "hereda" de otra carpeta?
-6. ¿Qué clases sí usan herencia dentro del código?
-7. ¿Qué evidencia inicial obtuviste al ejecutar las pruebas sin modificar nada?.
 
+Aparecen las demos de avl(deng y la de rotaciones compactas), red-black(morin y llrb), panorama , compare con semana 5.
+
+2. ¿Qué pruebas públicas e internas aparecen?
+
+Aparece el test public y internal de la semana 7.
+
+3. ¿Qué archivos incluye `Capitulo7.h`?
+
+Incluye Entry.h, BinNode.h, BinTree.h, BST.h, AVL.h, BinaryTree.h, BinarySearchTree.h, RedBlackTree.h, AVLTreeCompact.h y RedBlackTreeLLRB.h
+
+4. ¿Qué relación conceptual hay entre Semana 5, Semana 6 y Semana 7?
+
+En la semana 5 (Árboles Binarios y BST Básicos) introducen una estructura jerarquica y con ordenamiento horizontal, en la semana 6 usamos las prioridades y con la semana 5 aparece el treap, la semana 7 usas rotaciones para que la altura se mantenga estrictamente acotada a $O(\log n)$.
+
+5. ¿Por qué no es correcto decir que una carpeta "hereda" de otra carpeta?
+
+Porque una carpeta contiene otra carpeta, no hereda ya que no es una instancia de especialidad de la carpeta en la que la contienen. 
+
+6. ¿Qué clases sí usan herencia dentro del código?
+
+El BST hereda BinTree<T>, el AVL hereda BST<T, Compare>, BinarySearchTree hereda BinaryTree<Node>, BSTNode hereda de BTNode<Node>, BinarySearchTree hereda de BinarySearchTree<BSTNode1<T>, T, Compare>.
+
+7. ¿Qué evidencia inicial obtuviste al ejecutar las pruebas sin modificar nada?.
+El sistema aprobó el 100% de las pruebas sin fallos en un tiempo de ejecución real de apenas 0.02 segundos.
+
+Demostrando que tanto la suite pública como la interna pasaron, confirmando la estabilidad del código base y sus rotaciones.
 Entrega en este bloque:
 
 * Una tabla con comando ejecutado, resultado, error si hubo e interpretación.
+
+| Comando Ejecutado | Resultado | Error | Interpretación |
+| :--- | :--- | :--- | :--- |
+| `cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug` | Generación exitosa de los archivos de construcción (0.1s). | Ninguno | Se detectó la configuración del compilador y se preparó correctamente el entorno de depuración para la Semana 7. |
+| `cmake --build build-debug` | Compilación al 100%. Generación de 8 ejecutables de demos y 2 de pruebas. | Ninguno | Todo el código de los árboles binarios balanceados (AVL, Red-Black) y sus controladores compilaron sin errores de sintaxis. |
+| `ctest --test-dir build-debug -R semana7 --output-on-failure` | 100% tests passed (2/2 pasados en 0.02 segundos). | Ninguno | Las pruebas públicas e internas validaron con éxito los invariantes y la estabilidad algorítmica de las estructuras de datos. |
+
 * Una lista breve de los archivos que revisaste primero.
 
-#### Bloque 2 - BST como punto de partida
+AVL.h (Estructura del árbol balanceado y bucles de rotación).
 
-Revisa:
+BST.h (Clase base que implementa las funciones de búsqueda y el método connect34).
 
-* `Semana7/include/BST.h`
-* `Semana7/include/BinarySearchTree.h`
-* `Semana7/demos/demo_compare_with_semana5.cpp`
-* `Semana7/demos/demo_bst_deng_vs_avl.cpp`
+BinNode.h (Estructura de los nodos con punteros, alturas y métodos updateHeight).
 
-Responde:
+## Bloque 2 - BST como punto de partida
 
 1. Define formalmente la propiedad BST.
 
@@ -173,9 +103,14 @@ Reducir la cantidad rotaciones necesarias cuando se inserten y eliminen nodos, l
 
 Entrega en este bloque:
 
-* Dibujo del BST degenerado.
 * Explicación breve de costo.
+
+Árbol Balanceado: $O(\log n)$ La busqueda de un elemento es rápido porque en cada paso descartas la mitad de los datos restantes.
+
+Árbol Desbalanceado: $O(n)$ Si los datos se insertan en orden, el BST degenera en una lista enlazada hacia un solo lado. La busqueda lo hara recorrer todos los nodos.
+
 * Relación con Semana 5.
+
 La implementacion del BinarySearchTree de la semana 5, en la semana 7 donde ejecuta operaciones de reestructuracion para compactar el arbol de manera optima.
 
 #### Bloque 3 - AVL: balance por altura

@@ -30,3 +30,4 @@ cc232_add_sem7_target(sem7_demo_validate_bst_property "demos/demo_validate_bst_p
 cc232_add_sem7_target(sem7_demo_validate_avl_balance "demos/demo_validate_avl_balance.cpp")
 cc232_add_sem7_target(sem7_demo_compare_bst_avl_height "demos/demo_compare_bst_avl_height.cpp")
 cc232_add_sem7_target(sem7_demo_validate_redblack_basic "demos/demo_validate_redblack_basic.cpp")
+cc232_add_sem7_target(sem7_demo_search_benchmark_week7 "demos/demo_search_benchmark_week7.cpp")

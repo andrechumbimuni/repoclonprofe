@@ -1,4 +1,8 @@
-### Actividad 7 - CC232
+# Actividad 7 - CC232
+
+## Estudiante
+
+- Nombre: Chumbimuni Ricci Andre Dylan
 
 ## Bloque 1 - Diagnóstico inicial de la Semana 7
 
@@ -1093,176 +1097,243 @@ Punteros huérfanos en RBT: Al limpiar secuencialmente el Red-Black Tree con rem
 
 ### Ejercicio 7 - Mini benchmark de búsqueda
 
-Crea una demostración:
-
-```bash
-Semana7/demos/demo_search_benchmark_week7.cpp
-```
-
-Inserta `n` claves en:
-
-1. BST común
-2. AVL
-3. Red-Black Tree
-
-Usa al menos:
-
-```cpp
-n = 1000
-n = 5000
-n = 10000
-```
-
-Mide búsquedas exitosas y fallidas.
-
-Reglas:
-
-* Usa `std::chrono`.
-* No imprimas cada búsqueda individual.
-* Imprime tiempo total por estructura.
-* Usa las mismas claves para todas las estructuras.
-* Separa el caso ordenado del caso aleatorio.
-
-Salida sugerida:
-
-```text
-n = 10000
-Caso ordenado
-BST search time: ...
-AVL search time: ...
-RedBlack search time: ...
-
-Caso aleatorio
-BST search time: ...
-AVL search time: ...
-RedBlack search time: ...
-```
-
-Entrega:
-
 * Código fuente.
+```
+// Semana7/demos/demo_search_benchmark_week7.cpp
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <algorithm>
+#include <random>
+#include <type_traits>
+#include "Capitulo7.h"
+
+struct BenchmarkResult {
+    double bstTime;
+    double avlTime;
+    double rbtTime;
+};
+
+template <typename TreeType>
+void insertKeys(TreeType& tree, const std::vector<int>& keys) {
+    for (int x : keys) {
+        if constexpr (std::is_same_v<TreeType, ods::AVL<int>>) {
+            tree.insert(x);
+        } else {
+            tree.add(x); 
+        }
+    }
+}
+
+template <typename TreeType>
+double profileSearches(TreeType& tree, const std::vector<int>& successKeys, const std::vector<int>& failKeys) {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    // 1. Búsquedas Exitosas
+    for (int x : successKeys) {
+        if constexpr (std::is_same_v<TreeType, ods::AVL<int>>) {
+            // En tu clase AVL, si no tiene find, se busca indirectamente intentando insertar 
+            // un duplicado (retorna falso si ya existe) o usando su método homólogo nativo
+            volatile bool res = !tree.insert(x); 
+            (void)res;
+        } else {
+            // El BST común y el RedBlackTree de ODS usan findEQ para búsquedas exactas
+            volatile auto res = tree.findEQ(x);
+            (void)res;
+        }
+    }
+
+    // 2. Búsquedas Fallidas
+    for (int x : failKeys) {
+        if constexpr (std::is_same_v<TreeType, ods::AVL<int>>) {
+            // Si la inserción es exitosa en el árbol de fallidas, significa que no estaba. 
+            // Para mantener el árbol intacto en el benchmark, limpiamos el nodo insertado erróneamente.
+            if (tree.insert(x)) {
+                tree.remove(x);
+            }
+        } else {
+            volatile auto res = tree.findEQ(x);
+            (void)res;
+        }
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> elapsed = end - start;
+    return elapsed.count();
+}
+
+BenchmarkResult runBenchmark(int n, bool ordered) {
+    std::vector<int> insertKeysVec(n);
+    std::vector<int> failKeysVec(n);
+
+    for (int i = 0; i < n; ++i) {
+        insertKeysVec[i] = i * 2;       
+        failKeysVec[i] = (i * 2) + 1;   
+    }
+
+    if (!ordered) {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(insertKeysVec.begin(), insertKeysVec.end(), g);
+        std::shuffle(failKeysVec.begin(), failKeysVec.end(), g);
+    }
+
+    ods::BinarySearchTree<ods::BSTNode1<int>, int> bst;
+    ods::AVL<int> avl;
+    ods::RedBlackTree1<int> rbt;
+
+    insertKeys(bst, insertKeysVec);
+    insertKeys(avl, insertKeysVec);
+    insertKeys(rbt, insertKeysVec);
+
+    BenchmarkResult res;
+    res.bstTime = profileSearches(bst, insertKeysVec, failKeysVec);
+    res.avlTime = profileSearches(avl, insertKeysVec, failKeysVec);
+    res.rbtTime = profileSearches(rbt, insertKeysVec, failKeysVec);
+
+    return res;
+}
+
+void printResults(int n, const std::string& caseName, const BenchmarkResult& res) {
+    std::cout << "n = " << n << "\n";
+    std::cout << "Caso " << caseName << "\n";
+    std::cout << "BST search time: " << res.bstTime << " ms\n";
+    std::cout << "AVL search time: " << res.avlTime << " ms\n";
+    std::cout << "RedBlack search time: " << res.rbtTime << " ms\n\n";
+}
+
+int main() {
+    std::cout << "\nBENCHMARK\n\n";
+    
+    for (int n : {1000, 5000, 10000}) {
+        BenchmarkResult orderedRes = runBenchmark(n, true);
+        printResults(n, "ordenado", orderedRes);
+
+        BenchmarkResult randomRes = runBenchmark(n, false);
+        printResults(n, "aleatorio", randomRes);
+        std::cout << "\n";
+    }
+
+    return 0;
+}
+```
 * Tabla de resultados.
+
+| Tamaño ($n$) | Caso | BST Común | Árbol AVL | Red-Black Tree |
+| :--- | :--- | :--- | :--- | :--- |
+| **1000** | Ordenado | 5.33 ms | 1.12 ms | 0.20 ms |
+| | Aleatorio | 0.27 ms | 0.99 ms | 0.25 ms |
+| **5000** | Ordenado | 163.02 ms | 8.01 ms | 1.38 ms |
+| | Aleatorio | 2.24 ms | 7.55 ms | 2.06 ms |
+| **10000** | Ordenado | 575.43 ms | 14.00 ms | 2.37 ms |
+| | Aleatorio | 4.06 ms | 13.86 ms | 3.74 ms |
+
 * Interpretación.
+
+BST Degradado (O(n)): Con datos ordenados, el BST común no balancea y se convierte en una lista enlazada, disparando el tiempo de forma cuadrática a 575.43 ms. Con datos aleatorios se balancea por azar y recupera su velocidad.
+
+Impacto del Método en AVL: El AVL muestra más tiempo del esperado (14.00 ms) únicamente porque su interfaz carece de un método de consulta pura (findEQ). Al simular la búsqueda mediante insert/remove, el costo por rebalanceo opaca la velocidad de lectura.
+
+Eficiencia del RBT (O(logn)): El Red-Black Tree es el más rápido y consistente en búsquedas directas de lectura pura (2.37 ms), manteniendo un comportamiento óptimo sin importar el orden de entrada.
+
 * Conclusión sobre altura y costo de búsqueda.
 
-#### Ejercicio 8 - Integración al CMake
+La altura (h) define el peor caso: El costo de buscar una clave depende estrictamente de cuántos nodos pases desde la raíz hasta el fondo. En un BST degenerado (caso ordenado), h≈n, lo que destruye el rendimiento. En los árboles balanceados (AVL y Red-Black), la altura está estrictamente acotada a la zona logarítmica (h∝logn).
 
-Agrega tus demostraciones al `CMakeLists.txt` de Semana 7.
+Si una estructura provee métodos de consulta pura (como el findEQ() del Red-Black Tree), el costo de búsqueda es mínimo. Si la búsqueda debe emularse mediante operaciones que alteran el árbol (como el insert/remove del AVL en este escenario), el costo de procesar la altura y rebalancear opaca por completo la velocidad de la consulta.
 
-Debes poder compilar con:
-
-```bash
-cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-debug
-ctest --test-dir build-debug -R semana7 --output-on-failure
-```
-
-Entrega:
+### Ejercicio 8 - Integración al CMake
 
 * Fragmento modificado de `CMakeLists.txt`.
+```
+cc232_add_sem7_target(sem7_demo_validate_bst_property "demos/demo_validate_bst_property.cpp")
+cc232_add_sem7_target(sem7_demo_validate_avl_balance "demos/demo_validate_avl_balance.cpp")
+cc232_add_sem7_target(sem7_demo_compare_bst_avl_height "demos/demo_compare_bst_avl_height.cpp")
+cc232_add_sem7_target(sem7_demo_validate_redblack_basic "demos/demo_validate_redblack_basic.cpp")
+cc232_add_sem7_target(sem7_demo_search_benchmark_week7 "demos/demo_search_benchmark_week7.cpp")
+```
 * Evidencia de compilación.
+```
+[  6%] Built target sem7_demo_avl_deng_core
+[ 13%] Built target sem7_demo_avl_compact_rotations
+[ 20%] Built target sem7_demo_bst_deng_vs_avl
+[ 26%] Built target sem7_demo_redblack_morin
+[ 33%] Built target sem7_demo_redblack_llrb
+[ 40%] Built target sem7_demo_compare_avl_vs_redblack
+[ 46%] Built target sem7_demo_compare_with_semana5
+[ 53%] Built target sem7_demo_capitulo7_panorama
+[ 60%] Built target sem7_test_public
+[ 66%] Built target sem7_test_internal
+[ 73%] Built target sem7_demo_validate_bst_property
+[ 80%] Built target sem7_demo_validate_avl_balance
+[ 86%] Built target sem7_demo_compare_bst_avl_height
+[ 93%] Built target sem7_demo_validate_redblack_basic
+[ 96%] Building CXX object CMakeFiles/sem7_demo_search_benchmark_week7.dir/demos/demo_search_benchmark_week7.cpp.o
+[100%] Linking CXX executable sem7_demo_search_benchmark_week7
+[100%] Built target sem7_demo_search_benchmark_week7
+```
 * Evidencia de pruebas.
+```
+Internal ctest changing into directory: /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana7/build-debug
+Test project /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana7/build-debug
+    Start 1: semana7_public
+1/2 Test #1: semana7_public ...................   Passed    0.01 sec
+    Start 2: semana7_internal
+2/2 Test #2: semana7_internal .................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.03 sec
+```
 * Explicación de por qué una demostración no necesariamente es una prueba automatizada.
 
-#### Entrega mínima de codificación
+Prueba automatizada: Es determinista y silenciosa. Solo valida si el código es correcto mediante aserciones (assert), retornando éxito (0) o error (1).
 
-Para considerar completo este bloque, debes entregar como mínimo:
-
-1. Dos demostraciones nuevas.
-2. Una prueba pública adicional.
-3. Una tabla de resultados.
-4. Una explicación de invariantes.
-5. Evidencia de compilación.
-6. Evidencia de ejecución.
-7. Evidencia de `ctest`.
+Demostración/Benchmark: Es informativa y visual. Muestra métricas variables (milisegundos) y genera salidas de texto pensadas para análisis humano, por lo que no puede usarse como un chequeo estricto de pasar/fallar.
 
 #### Pregunta final del bloque
 
-Después de implementar los ejercicios, responde:
-
 ¿Por qué en estructuras balanceadas no basta con probar que el inorder está ordenado?
 
-Tu respuesta debe mencionar:
+Que el recorrido inorder devuelva los datos ordenados solo garantiza la correctitud funcional (la propiedad BST básica: los hijos izquierdos son menores y los derechos son mayores). Sin embargo, no asegura la correctitud estructural, que es lo que define a un árbol balanceado.
 
-* Propiedad BST.
-* Altura.
-* Rotaciones.
-* Invariante AVL.
-* Invariante Red-Black.
-* Diferencia entre correctitud funcional y correctitud estructural.
+Una lista enlazada (un árbol totalmente degenerado hacia la derecha) pasará la prueba del inorder ordenado sin problemas, pero su altura será de $O(n)$, destruyendo la eficiencia logarítmica de la estructura.
 
-#### Bloque 9 - Cierre comparativo
+Para evitar esta degradación, las estructuras balanceadas imponen reglas adicionales sobre su forma:
 
-Responde esta pregunta final:
+Invariante AVL: Exige estrictamente que la diferencia de altura entre los dos subárboles de cualquier nodo sea como máximo 1 ($\vert{}alt_{izq} - alt_{der}\vert{} \le 1$).
+
+Invariante Red-Black: Exige reglas de color complejas (como que la raíz y hojas nulas sean negras, y que un nodo rojo no tenga hijos rojos) para garantizar que la rama más larga nunca sea más del doble de larga que la más corta.
+
+Cuando se inserta o elimina un nodo, el árbol puede violar estas reglas de balance. El código debe reaccionar ejecutando rotaciones de punteros para reestructurar el árbol y recuperar el equilibrio.
+
+Probar solo el inorder valida que el árbol sigue siendo un BST, pero es incapaz de detectar si un bug en las rotaciones corrompió las alturas o los colores, dejando el árbol desbalanceado y arruinando su rendimiento.
+
+### Bloque 9 - Cierre comparativo
 
 ¿Qué cambia cuando pasamos de un BST común a estructuras balanceadas como AVL y Red-Black Tree?
 
-La respuesta debe incluir obligatoriamente:
+Cuando pasamos de un BST común a estructuras balanceadas, cambian radicalmente el control estructural y las garantías de rendimiento a través de los siguientes puntos clave:
 
-* Una afirmación sobre degeneración lineal del BST.
-* Una afirmación sobre rotaciones y preservación del inorder.
-* Una afirmación sobre balance por altura en AVL.
-* Una afirmación sobre balance por colores en Red-Black Tree.
-* Una afirmación sobre la diferencia entre balance estricto y balance flexible.
-* Una afirmación sobre el costo esperado o garantizado de búsqueda, inserción y eliminación.
-* Una afirmación sobre cómo esta semana continúa Semana 5 y Semana 6.
-* Una afirmación sobre qué evidencia usarías para defender correctitud: pruebas, demostraciones, invariantes, trazados y complejidad.
+Degeneración lineal del BST: Un BST común carece de control sobre su topología, por lo que entradas ordenadas provocan su degeneración lineal en una lista enlazada de peor caso O(n).
 
-#### Formato sugerido de entrega
+Rotaciones y preservación del inorder: Las estructuras balanceadas introducen operaciones de rotación que reestructuran los punteros para reducir la altura local sin alterar la secuencia ordenada del recorrido inorder.
 
-```markdown
-### Actividad 7 - CC232
+Balance por altura en AVL: El árbol AVL impone un balance por altura estricto, donde la diferencia de altura entre subárboles hermanos nunca excede una unidad.
 
-#### Estudiante
+Balance por colores en Red-Black Tree: El Red-Black Tree gestiona su equilibrio mediante un balance por colores y reglas de asignación que impiden la presencia de nodos rojos consecutivos.
 
-- Nombre:
+Balance estricto vs. balance flexible: Mientras que el AVL mantiene un balance estricto óptimo para lecturas repetitivas, el Red-Black Tree ofrece un balance más flexible que reduce el número de rotaciones, favoreciendo entornos con escrituras frecuentes.
 
-#### Bloque 1 - Diagnóstico inicial
+Costo garantizado: El costo esperado de un BST muta a un costo logarítmico estrictamente garantizado de O(logn) para las operaciones de búsqueda, inserción y eliminación en ambos árboles balanceados.
 
-[Tabla de comandos, resultados e interpretación]
+Continuidad de contenidos: Esta semana continúa directamente los conceptos de árboles de la Semana 5 y Semana 6, elevando el análisis desde la manipulación básica de punteros y recorridos hacia los algoritmos de auto-balanceo adaptativo.
 
-#### Bloque 2 - BST como punto de partida
+Evidencia de correctitud: Para defender la correctitud completa del sistema, se usan pruebas para validar la funcionalidad del inorder, demostraciones/benchmarks para constatar la complejidad empírica, e inspecciones de invariantes y trazados para asegurar que la estructura respete sus leyes de altura y color.
 
-[Respuestas, dibujo y complejidad]
+### Autoevaluación breve
 
-#### Bloque 3 - AVL
-
-[Invariantes, trazado y evidencia]
-
-#### Bloque 4 - Rotaciones AVL
-
-[Tabla LL, RR, LR, RL y dibujos]
-
-#### Bloque 5 - Red-Black Tree
-
-[Invariantes, recoloreo, rotaciones y evidencia]
-
-#### Bloque 6 - Comparación
-
-[Tabla BST, Treap, AVL y Red-Black Tree]
-
-#### Bloque 7 - Pruebas e invariantes
-
-[Tabla de pruebas y defensa]
-
-#### Bloque 8 - Ejercicios de codificación
-
-[Código, evidencias, pruebas e interpretación]
-
-#### Bloque 9 - Cierre comparativo
-
-[Respuesta final]
-
-#### Autoevaluación breve
-
-- Qué puedo defender con seguridad:
-- Qué todavía confundo:
-- Qué evidencia usaría en una sustentación:
-- Qué parte del código debo revisar otra vez:
-```
-
-#### Criterio general de trabajo
-
-Se espera lectura real de los archivos, respuestas breves pero justificadas, tablas con evidencia observable, trazados manuales y conexión explícita entre código, correctitud, costo, representación e invariantes.
-
-No basta con ejecutar el programa: debes poder explicar qué propiedad mantiene cada estructura, qué rotación se aplica, qué color o altura se actualiza, qué caso borde aparece y por qué la operación conserva búsqueda ordenada eficiente.
+- Qué puedo defender con seguridad:La lógica del árbol AVL. Comprendo cómo el cálculo del factor de balance y la aplicación de rotaciones simples o dobles controlan de forma estricta la altura física del árbol para garantizar la eficiencia logarítmica.
+- Qué todavía confundo:La transición exacta en el Red-Black Tree cuando se ejecutan los cambios de colores (recoloring) y cómo se reasignan los roles y punteros entre los nodos (padre, hijo, tío, abuelo) inmediatamente después de dicha mutación.
+- Qué evidencia usaría en una sustentación:Las pruebas unitarias automatizadas (como isAVLValid y verifyRB) para demostrar la correctitud funcional y el cumplimiento de los invariantes, junto con las métricas de los benchmarks empíricos de la demostración para probar gráficamente que el costo de búsqueda se mantiene en O(logn) frente a la degradación lineal del BST.
+- Qué parte del código debo revisar otra vez:El método addFixup (y/o removeFixup) dentro de la implementación del Red-Black Tree, enfocándome específicamente en el rastreo de punteros en los tres casos clásicos de inserción para mecanizar cuándo se rota y cuándo solo se recolorea.

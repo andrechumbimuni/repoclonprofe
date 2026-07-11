@@ -68,9 +68,9 @@ Como tomamos a el primer elemento insertado como la raiz si insertamos elementos
 
 4. Construye manualmente el BST resultante de insertar:
 
-```cpp
-10, 20, 30, 40, 50, 60, 70
 ```
+10, 20, 30, 40, 50, 60, 70
+
 10 (Raíz) 
   \
    20
@@ -84,7 +84,7 @@ Como tomamos a el primer elemento insertado como la raiz si insertamos elementos
            60
              \
              70
-
+```
 5. Indica la altura del árbol anterior si no hay balanceo.
 
 La altura del arbol es el camino mas largo (max. longitud) : 7
@@ -113,72 +113,154 @@ Entrega en este bloque:
 
 La implementacion del BinarySearchTree de la semana 5, en la semana 7 donde ejecuta operaciones de reestructuracion para compactar el arbol de manera optima.
 
-#### Bloque 3 - AVL: balance por altura
-
-Revisa:
-
-* `Semana7/include/AVL.h`
-* `Semana7/include/BST.h`
-* `Semana7/include/BinNode.h`
-* `Semana7/demos/demo_avl_deng_core.cpp`
-
-Responde:
+## Bloque 3 - AVL: balance por altura
 
 1. ¿Qué significa que un nodo esté balanceado en un AVL?
+
+Que la diferencia entre el nivel de altura en su subarbol izquierdo y derecho sea como maximo 1.
+
 2. ¿Cómo se calcula el factor de balance?
+
+El factor de balance es la altura del subarbol izquierdo es menos la altura del subarbol derecho.
+
 3. ¿Qué información de altura debe mantenerse después de insertar o eliminar?
+
+El height se debe recalcular y actualizar en cada insercion o eliminacion.
+
 4. ¿Qué representa `_hot` dentro de la implementación estilo Deng?
+
+Representa un puntero al nodo padre del nodo que se está buscando, insertando o eliminando en ese momento.
+
 5. ¿Por qué AVL puede heredar de `BST<T, Compare>`?
+
+El AVL es como un BST especializado que resuelve el problema de balanceo que sufre el BST no balanceado.
+
 6. ¿Qué operación restaura localmente la forma del árbol?
+
+Usamos rotateAt(v), que usa el algoritmo connect34, esta funcion reasigna los apunteros de un abuelo, padre y hijo para hacerlo simetrico.
+
 7. ¿Por qué una rotación no destruye la propiedad BST?
-8. Después de insertar, ¿por qué suele bastar reparar el primer ancestro desbalanceado?
+
+Las rotaciones respetan el orden inorden ya que la secuencia ordenada de 3 elementos reubica punteros manteniendo intacto que el primero siempre este a la derecha del segundo y este a la izuierda del tercero.  
+
+8. Después de insertar, ¿por qué suele bastar reparar el primer ancestro 
+desbalanceado?
+
+Porque cuando la altura aumente en 1, cuando rotamos ese ancestro, la subestructura reduce la altura en 1, regresando a la misma altura antes de la insercion.
+
 9. Después de eliminar, ¿por qué puede ser necesario seguir revisando hacia la raíz?.
+
+Porque la eliminacion puede disminuir la altura en 1, provocando que un nodo padre se desbalancee, generando que los abuelos tambien lo hagan, lo que obliga a revisar nodo por nodo y rebalancearlos hasta la raiz.
 
 Entrega en este bloque:
 
 * Una explicación de los invariantes AVL.
+
+Invariante de Orden (Propiedad BST): Para cualquier nodo $padre$, todos los elementos de su subárbol izquierdo son estrictamente menores que la clave de $padre$ ($hijo.izquierdo < padre < hijo.derecho$).
+Invariante de Balance (Propiedad AVL): Para cada nodo $x$ en el árbol, la diferencia de altura absoluta entre su hijo izquierdo y su hijo derecho no puede ser mayor a 1.
+
 * Un trazado de inserción con al menos una rotación.
+A`30`, `20` y `10`, la invariante de balance en la raíz y una rotación simple a la derecha (`rotateAt` / `connect34`).
+
+Paso 1: Inserción de 30, 20 y 10.
+```
+g -> 30 (H: 2, BF: 2)  Desbalance en el ancestro
+           /
+     p -> 20 (H: 1, BF: 1)
+         /
+   v -> 10 (H: 0, BF: 0)
+```
+Paso 2: rotateAt(v)
+```
+    20 (H: 1, BF: 0) Altura del subárbol reducida a 1
+    /  \
+  10    30 (H: 0, BF: 0)
+```
 * Evidencia de salida de `demo_avl_deng_core.cpp`.
-
-#### Bloque 4 - Rotaciones AVL: casos LL, RR, LR y RL
-
-Revisa:
-
-* `Semana7/include/AVLTreeCompact.h`
-* `Semana7/demos/demo_avl_compact_rotations.cpp`
-* `Semana7/include/AVL.h`
-
-Ejecuta las demostraciones de rotaciones y construye una tabla con estas columnas:
-
-* Caso
-* Secuencia insertada
-* Nodo desbalanceado
-* Rotación aplicada
-* Inorder antes
-* Inorder después
-* Altura final
-
-Incluye los cuatro casos:
-
-1. LL
-2. RR
-3. LR
-4. RL
-
-Responde:
+```
+AVL inorder: 10 20 22 25 27 30 40 50 
+AVL level-order: 30 20 40 10 25 50 22 27 
+Valido AVL: si
+Tras borrar 20 y 40: 10 22 25 27 30 50 
+Valido AVL: si
+```
+## Bloque 4 - Rotaciones AVL: casos LL, RR, LR y RL
 
 1. ¿Qué diferencia hay entre una rotación simple y una rotación doble?
+
+La rotacion simple es cuando usas al 3 nodos(abuelo, padre y hijo), la rotacion doble usa primero 2 nodos (hijo y padre) y luego otra rotacion con 3 nodos (abuelo, padre y hijo).
+
 2. ¿Por qué LL y RR se corrigen con una sola rotación?
+
+Porque los nodos se encuentran alineados (solo hijos izquiedos o solo hijos derechos) solo necesita una rotacion para distrubuir las los nodos locales equitativamente.
+
 3. ¿Por qué LR y RL requieren dos pasos?
+
+Porque los nodos estan en zig-zag, necesitas uno para que los alinees y otro para restablecer la altura.
+
 4. ¿Qué parte del árbol cambia y qué parte permanece igual?
+
+Cambian las conexiones de punteros entre el abuelo, el padre y el nieto(las raíces de sus 4 subárboles).El resto de la estructura superior del arbol permanece igual.
+
 5. ¿Por qué el inorder debe ser el mismo antes y después de reestructurar?.
+
+Porque el arbol es un BST valido, cambiar el orden inorder romperia la propiedad de busqueda.
 
 Entrega en este bloque:
 
 * Tabla de rotaciones.
+
+| Caso | Secuencia Insertada | Nodo Desbalanceado ($g$) | Rotación Aplicada | Inorder Antes | Inorder Después | Altura Final |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **LL** *(Zig-Zig)* | `30, 20, 10` | `30` | Simple a la Derecha (`connect34`) | `10 20 30` | `10 20 30` | 1 |
+| **RR** *(Zag-Zag)* | `10, 20, 30` | `10` | Simple a la Izquierda (`connect34`) | `10 20 30` | `10 20 30` | 1 |
+| **LR** *(Zig-Zag)* | `30, 10, 20` | `30` | Doble Izquierda-Derecha | `10 20 30` | `10 20 30` | 1 |
+| **RL** *(Zag-Zig)* | `10, 30, 20` | `10` | Doble Derecha-Izquierda | `10 20 30` | `10 20 30` | 1 |
+
 * Cuatro dibujos pequeños.
+
+Caso LL:
+```
+        30                 20
+       /                  /  \
+     20      ->         10    30
+     /
+   10
+```
+Caso RR:
+```
+  10                 20
+   \                /  \
+    20    ->      10    30 
+     \
+     30
+```
+Caso LR:
+```
+   30              30           20
+   /              /            /  \
+ 10      ->      20     ->    10   30
+   \             /
+    20          10
+```
+Caso RL:
+```
+ 10            10               20
+  \             \              /  \
+  30    ->      20     ->    10    30
+  /              \
+ 20              30
+```
 * Argumento de preservación del orden BST.
 
+El algoritmo connect34 garantiza de forma matemática la preservación del orden BST porque mapea de manera fija e invariable los tres nodos (a, b, c) y sus cuatro subárboles ($T_0, T_1, T_2, T_3$).
+```
+         (b)
+       /     \
+     (a)     (c)
+    /   \   /   \
+   T0   T1 T2   T3
+```
 #### Bloque 5 - Red-Black Tree: balance por colores
 
 Revisa:

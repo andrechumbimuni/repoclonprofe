@@ -779,89 +779,319 @@ Mismo inorder: Las rotaciones del AVL reestructuran los enlaces físicos del ár
 
 Altura como evidencia: Es la métrica directa de eficiencia; una menor altura garantiza que la búsqueda en el peor de los casos baje de un costo lineal $O(n)$ a uno logarítmico $O(\log n)$.
 
-#### Ejercicio 5 - Validador básico Red-Black Tree
+### Ejercicio 5 - Validador básico Red-Black Tree
 
-Crea una demostración:
+Entrega:
 
-```bash
-Semana7/demos/demo_validate_redblack_basic.cpp
+* Código fuente.
 ```
+#include <iostream>
+#include <algorithm>
 
-Implementa validaciones básicas para Red-Black Tree:
+enum Color { RED = 0, BLACK = 1 };
 
-1. La raíz debe ser negra.
-2. No debe existir un nodo rojo con hijo rojo.
-3. Todos los caminos desde un nodo hasta hojas nulas deben tener la misma altura negra.
+struct Node {
+    int data;
+    int colour;
+    Node* left;
+    Node* right;
+    Node* parent;
 
-Firmas sugeridas:
+    Node(int val, Color col) : data(val), colour(col), left(nullptr), right(nullptr), parent(nullptr) {}
+};
 
-```cpp
-template <typename Node>
-bool validateNoRedRed(Node* node);
+struct RBValidationResult {
+    bool isRootBlack{false};
+    bool noRedRed{false};
+    bool uniformBlack{false};
+    bool isValid{false};
+};
 
-template <typename Node>
-int computeBlackHeight(Node* node);
+class RedBlackTree {
+private:
+    Node* root;
+    Node* nil; // Nodo centinela
 
-template <typename Node>
-bool validateBlackHeight(Node* node);
+    // Estructura auxiliar para la inspección recursiva
+    struct NodeState {
+        int blackHeight;
+        bool validNoRedRed;
+    };
+
+    void rotateLeft(Node* x) {
+        Node* y = x->right;
+        x->right = y->left;
+        if (y->left != nil) {
+            y->left->parent = x;
+        }
+        y->parent = x->parent;
+        if (x->parent == nullptr) {
+            root = y;
+        } else if (x == x->parent->left) {
+            x->parent->left = y;
+        } else {
+            x->parent->right = y;
+        }
+        y->left = x;
+        x->parent = y;
+    }
+
+    void rotateRight(Node* x) {
+        Node* y = x->left;
+        x->left = y->right;
+        if (y->right != nil) {
+            y->right->parent = x;
+        }
+        y->parent = x->parent;
+        if (x->parent == nullptr) {
+            root = y;
+        } else if (x == x->parent->right) {
+            x->parent->right = y;
+        } else {
+            x->parent->left = y;
+        }
+        y->right = x;
+        x->parent = y;
+    }
+
+    void insertFixup(Node* k) {
+        Node* u;
+        while (k->parent != nullptr && k->parent->colour == RED) {
+            if (k->parent == k->parent->parent->left) {
+                u = k->parent->parent->right; // Tío derecho
+                if (u != nil && u->colour == RED) {
+                    k->parent->colour = BLACK;
+                    u->colour = BLACK;
+                    k->parent->parent->colour = RED;
+                    k = k->parent->parent;
+                } else {
+                    if (k == k->parent->right) {
+                        k = k->parent;
+                        rotateLeft(k);
+                    }
+                    k->parent->colour = BLACK;
+                    k->parent->parent->colour = RED;
+                    rotateRight(k->parent->parent);
+                }
+            } else {
+                u = k->parent->parent->left; // Tío izquierdo
+                if (u != nil && u->colour == RED) {
+                    k->parent->colour = BLACK;
+                    u->colour = BLACK;
+                    k->parent->parent->colour = RED;
+                    k = k->parent->parent;
+                } else {
+                    if (k == k->parent->left) {
+                        k = k->parent;
+                        rotateRight(k);
+                    }
+                    k->parent->colour = BLACK;
+                    k->parent->parent->colour = RED;
+                    rotateLeft(k->parent->parent);
+                }
+            }
+            if (k == root) break;
+        }
+        root->colour = BLACK;
+    }
+
+    NodeState inspectStructure(Node* node) {
+        if (node == nil) {
+            return {1, true}; // Las hojas nil aportan 1 a la altura negra y son válidas
+        }
+
+        NodeState leftState = inspectStructure(node->left);
+        NodeState rightState = inspectStructure(node->right);
+
+        NodeState currentState;
+
+        // 1. Validar Rojo-Rojo (Un nodo rojo no puede tener hijos rojos)
+        if (node->colour == RED) {
+            if ((node->left != nil && node->left->colour == RED) || 
+                (node->right != nil && node->right->colour == RED)) {
+                currentState.validNoRedRed = false;
+            } else {
+                currentState.validNoRedRed = leftState.validNoRedRed && rightState.validNoRedRed;
+            }
+        } else {
+            currentState.validNoRedRed = leftState.validNoRedRed && rightState.validNoRedRed;
+        }
+
+        // 2. Validar Altura Negra Uniforme
+        if (leftState.blackHeight == -1 || rightState.blackHeight == -1 || leftState.blackHeight != rightState.blackHeight) {
+            currentState.blackHeight = -1; // Desbalance detectado
+        } else {
+            currentState.blackHeight = leftState.blackHeight + (node->colour == BLACK ? 1 : 0);
+        }
+
+        return currentState;
+    }
+
+    void destroyTree(Node* node) {
+        if (node == nil || node == nullptr) return;
+        destroyTree(node->left);
+        destroyTree(node->right);
+        delete node;
+    }
+
+public:
+    RedBlackTree() {
+        nil = new Node(0, BLACK);
+        root = nil;
+    }
+
+    ~RedBlackTree() {
+        destroyTree(root);
+        delete nil;
+    }
+
+    void insert(int key) {
+        Node* node = new Node(key, RED);
+        node->left = nil;
+        node->right = nil;
+
+        Node* y = nullptr;
+        Node* x = this->root;
+
+        while (x != nil) {
+            y = x;
+            if (node->data < x->data) {
+                x = x->left;
+            } else {
+                x = x->right;
+            }
+        }
+
+        node->parent = y;
+        if (y == nullptr) {
+            root = node;
+        } else if (node->data < y->data) {
+            y->left = node;
+        } else {
+            y->right = node;
+        }
+
+        if (node->parent == nullptr) {
+            node->colour = BLACK;
+            return;
+        }
+
+        if (node->parent->parent == nullptr) {
+            return;
+        }
+
+        insertFixup(node);
+    }
+
+    RBValidationResult validateBasicProperties() {
+        RBValidationResult result;
+
+        if (root == nil) {
+            result.isRootBlack = true;
+            result.noRedRed = true;
+            result.uniformBlack = true;
+            result.isValid = true;
+            return result;
+        }
+
+        NodeState rootState = inspectStructure(root);
+
+        result.isRootBlack = (root->colour == BLACK);
+        result.noRedRed = rootState.validNoRedRed;
+        result.uniformBlack = (rootState.blackHeight != -1);
+        result.isValid = (result.isRootBlack && result.noRedRed && result.uniformBlack);
+
+        return result;
+    }
+};
+
+int main() {
+    std::cout << "Validacion Red-Black Tree\n";
+
+    RedBlackTree rb;
+
+    // Inserciones que gatillan rotaciones y recoloreos automáticos
+    for (int x : {15, 10, 20, 5, 12}) {
+        rb.insert(x);
+    }
+
+    // El main consume el struct de resultados de manera completamente limpia
+    RBValidationResult check = rb.validateBasicProperties();
+
+    std::cout << "Raiz negra: " << (check.isRootBlack ? "correcto" : "incorrecto") << "\n";
+    std::cout << "Sin rojo-rojo: " << (check.noRedRed ? "correcto" : "incorrecto") << "\n";
+    std::cout << "Altura negra uniforme: " << (check.uniformBlack ? "correcto" : "incorrecto") << "\n";
+    std::cout << "Estado final: " << (check.isValid ? "valido" : "invalido") << "\n";
+
+    return 0;
+}
 ```
-
-Reglas:
-
-* Considera las hojas nulas como negras.
-* Si detectas violación, imprime un mensaje en español.
-* No basta con imprimir el inorder.
-* La validación debe revisar estructura y colores.
-
-Salida esperada:
-
-```text
+* Evidencia de ejecución.
+```
 Validacion Red-Black Tree
 Raiz negra: correcto
 Sin rojo-rojo: correcto
 Altura negra uniforme: correcto
 Estado final: valido
 ```
-
-Entrega:
-
-* Código fuente.
-* Evidencia de ejecución.
 * Explicación de por qué Red-Black Tree permite mayor flexibilidad que AVL.
 
-#### Ejercicio 6 - Prueba pública adicional
+AVL: Su balance se basa en la altura física absoluta de las ramas ($|alt_izq - alt_der| \le 1$). Esto obliga al código a ejecutar rotaciones pesadas de manera continua ante un cambio estructural leve.
 
-Agrega una prueba pública en:
+Red-Black: Tolera que una rama sea físicamente hasta el doble de larga que su pareja ($h \le 2\log(n+1)$) con tal de que ambas conserven el mismo número de nodos negros.
 
-```bash
-Semana7/pruebas_publicas/test_public_week7_extra.cpp
-```
-
-La prueba debe cubrir al menos:
-
-1. Inserción ordenada en AVL.
-2. Validación de inorder.
-3. Validación de altura máxima razonable.
-4. Inserción en Red-Black Tree.
-5. Validación de búsqueda después de varias inserciones.
-
-Ejemplo de intención:
-
-```cpp
-// Verifica que AVL no se degrade cuando recibe claves ordenadas.
-```
-
-No copies exactamente este pseudocódigo. Adáptalo a la interfaz real de la librería.
+### Ejercicio 6 - Prueba pública adicional
 
 Entrega:
 
 * Código de prueba.
+```
+#include <cassert>
+#include <vector>
+#include "Capitulo7.h"
+int main() {
+  { ods::AVL<int> avl; for (int x : {30,20,10}) avl.insert(x); assert((avl.inorder() == std::vector<int>{10,20,30})); assert(avl.isAVLValid()); assert(avl.height() == 1); }
+  { ods::AVL<int> avl; for (int x : {40,20,60,10,30,50,70,25}) avl.insert(x); assert(avl.remove(20)); assert(avl.isAVLValid()); assert((avl.inorder() == std::vector<int>{10,25,30,40,50,60,70})); }
+  { ods::RedBlackTree1<int> rb; for (int x : {7,3,18,10,22,8,11,26}) assert(rb.add(x)); assert(rb.verifyRB()); assert(!rb.add(22)); assert(rb.remove(18)); assert(rb.verifyRB()); }
+  { ods::AVLTreeCompact<int> avl; for (int x : {30,10,20}) avl.insert(x); assert(avl.root() && avl.root()->data == 20); assert(avl.isAVL()); }
+  { ods::RedBlackTreeLLRB<int> rb; for (int x : {30,20,40,10,25,35,50,5,15}) assert(rb.add(x)); assert(rb.isRedBlackTree()); assert(rb.remove(20)); assert((rb.inorder() == std::vector<int>{5,10,15,25,30,35,40,50})); }
+  { ods::AVL<int> avl;for (int i = 1; i <= 20; ++i) { avl.insert(i);} assert(avl.size() == 20);assert(avl.isAVLValid());assert(avl.height() <= 5);}
+  { ods::RedBlackTree1<int> rb;std::vector<int> claves = {50, 25, 75, 12, 37, 62, 87};for (int x : claves) {assert(rb.add(x));}assert(rb.verifyRB());for (int x : claves) {assert(rb.remove(x));assert(rb.verifyRB());}assert(rb.size() == 0); }
+  return 0;
+}
+```
+
 * Comando usado para compilar.
+```
+cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug
+cmake --build build-debug
+```
 * Comando usado para ejecutar.
+```
+ctest --test-dir build-debug -R semana7 --output-on-failure
+```
 * Resultado de `ctest`.
+```
+Internal ctest changing into directory: /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana7/build-debug
+Test project /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Semana7/build-debug
+    Start 1: semana7_public
+1/2 Test #1: semana7_public ...................   Passed    0.00 sec
+    Start 2: semana7_internal
+2/2 Test #2: semana7_internal .................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.01 sec
+```
 * Explicación de qué bug detectaría esta prueba.
 
-#### Ejercicio 7 - Mini benchmark de búsqueda
+Rotaciones rotas en inserción secuencial: Al meter datos ordenados secuencialmente del 1 al 20, obligas al AVL a encadenar rotaciones simples a la izquierda continuamente. Un error menor de asignacion rompería la estructura, haciendo que avl.inorder() falle.
+
+Árboles rígidos: Si las rotaciones se omiten por un cálculo erróneo del factor de balance, el AVL se comporta como un BST lineal. La condición avl.height() <= 5 colapsará de detectando que el árbol tiene altura ilegal.
+
+Punteros huérfanos en RBT: Al limpiar secuencialmente el Red-Black Tree con remove(), si el método removeFixup daña los enlaces compartidos del nodo centinela nil, la función interna de control verifyRB() fallará en las iteraciones siguientes.
+
+### Ejercicio 7 - Mini benchmark de búsqueda
 
 Crea una demostración:
 

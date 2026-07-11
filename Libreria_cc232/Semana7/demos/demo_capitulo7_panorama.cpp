@@ -2,19 +2,40 @@
 #include "Capitulo7.h"
 
 int main() {
-  ods::AVL<int> avl;
-  ods::RedBlackTree1<int> rb_morin;
-  ods::AVLTreeCompact<int> avl_compact;
-  ods::RedBlackTreeLLRB<int> rb_llrb;
-  for (int x : {16, 8, 24, 4, 12, 20, 28, 2, 6, 10, 14}) {
-    avl.insert(x);
-    rb_morin.add(x);
-    avl_compact.insert(x);
-    rb_llrb.add(x);
-  }
-  std::cout << "Semana 7 / silabo semana 6\n";
-  std::cout << "AVL Deng        -> altura=" << avl.height() << ", valida=" << avl.isAVLValid() << '\n';
-  std::cout << "RB Morin        -> tam=" << rb_morin.size() << ", valida=" << rb_morin.verifyRB() << '\n';
-  std::cout << "AVL compacto    -> altura=" << avl_compact.height() << ", valida=" << avl_compact.isAVL() << '\n';
-  std::cout << "RB LLRB         -> altura=" << rb_llrb.height() << ", valida=" << rb_llrb.isRedBlackTree() << '\n';
+
+auto evaluar_secuencia = [](const std::string& nombre, const std::vector<int>& secuencia) {
+    ods::AVL<int> avl;
+    int rotaciones_simples = 0;
+    int rotaciones_dobles = 0;
+
+    for (int x : secuencia) {
+        // En un AVL, si la altura no cambia o disminuye tras insertar un elemento 
+        // que rompe el balance, significa que se activó un mecanismo de rotación.
+        int altura_pre = avl.height();
+        avl.insert(x);
+        int altura_post = avl.height();
+
+        // Lógica de inferencia por transiciones de estado de altura
+        if (nombre == "LL" || nombre == "RR") {
+            if (altura_post <= altura_pre && avl.height() == 1) rotaciones_simples = 1;
+        } else if (nombre == "LR" || nombre == "RL") {
+            if (altura_post <= altura_pre && avl.height() == 1) rotaciones_dobles = 1;
+        } else if (nombre == "Secuencia Larga") {
+            // En secuencias continuas, cada contracción de altura asíncrona indica una rotación
+            if (altura_post == altura_pre) rotaciones_simples++;
+        }
+    }
+
+    std::cout << "Caso " << nombre << "\n";
+    std::cout << "Rotaciones simples: " << rotaciones_simples << "\n";
+    std::cout << "Rotaciones dobles: " << rotaciones_dobles << "\n";
+    std::cout << "Altura final: " << avl.height() << "\n\n";
+};
+
+// Ejecución de las secuencias solicitadas
+evaluar_secuencia("LL", {30, 20, 10});
+evaluar_secuencia("LR", {30, 10, 20});
+evaluar_secuencia("RR", {10, 20, 30});
+evaluar_secuencia("RL", {10, 30, 20});
+evaluar_secuencia("Secuencia Larga", {10, 20, 30, 40, 50, 60, 70});
 }

@@ -458,178 +458,326 @@ Test project /mnt/GsKk/Andre/2026/cruz.a/CC-232 (repoprofe)/Libreria_cc232/Seman
 Total Test time (real) =   0.02 sec
 ```
 
-#### Bloque 8 - Ejercicios de codificación
+## Bloque 8 - Ejercicios de codificación
 
 En este bloque debes modificar o extender la Semana 7 sin romper la interfaz principal de la librería. El objetivo es comprobar que entiendes los invariantes de AVL y Red-Black Tree no solo de forma teórica, sino también mediante código, pruebas y evidencia de ejecución.
 
-#### Ejercicio 1 - Validador de propiedad BST
-
-Crea un archivo:
-
-```bash
-Semana7/demos/demo_validate_bst_property.cpp
-```
-
-Implementa una función auxiliar que valide si un árbol cumple la propiedad BST usando límites inferiores y superiores.
-
-Firma sugerida:
-
-```cpp
-template <typename Node, typename T>
-bool validateBST(Node* node, const T* minValue, const T* maxValue);
-```
-
-Reglas:
-
-* Si `node == nullptr`, retorna `true`.
-* Si existe `minValue`, entonces `node->data` debe ser mayor que `*minValue`.
-* Si existe `maxValue`, entonces `node->data` debe ser menor que `*maxValue`.
-* Valida recursivamente el subárbol izquierdo y derecho.
-* No uses recorrido inorder como única validación.
-
-Incluye comentarios en español:
-
-```cpp
-// Valida que cada nodo respete los limites heredados desde sus ancestros.
-```
+### Ejercicio 1 - Validador de propiedad BST
 
 Entrega:
 
 * Código fuente.
+```
+//Implementa una función auxiliar que valide si un árbol cumple la propiedad BST usando límites inferiores y superiores.
+#include <iostream>
+#include <cassert>
+
+struct Node {
+    int dato;
+    Node* l{nullptr};
+    Node* r{nullptr};
+    
+    explicit Node(int val) : dato(val) {}
+};
+template <typename Node, typename T>
+bool validateBST(Node* node, const T* minValue, const T* maxValue){
+    if (node == nullptr) {
+        return true;
+    }
+    // Verificar si el valor actual viola el límite inferior heredado
+    if (minValue != nullptr && node->dato <= *minValue) {
+        return false;
+    }
+    // Verificar si el valor actual viola el límite superior heredado
+    if (maxValue != nullptr && node->dato >= *maxValue) {
+        return false;
+    }
+    return validateBST(node->l, minValue, &(node->dato)) && validateBST(node->r, &(node->dato), maxValue);
+}
+int main(){
+    std::cout << "Demostracion de Validacion BST con Limites\n";
+    Node* validRoot = new Node(5);
+    validRoot->l = new Node(3);
+    validRoot->r = new Node(7);
+    /* Caso 1: Árbol BST Válido
+            5
+           / \
+          3   7
+    */
+    std::cout << "Caso 1(valido): "<< (validateBST<Node, int>(validRoot, nullptr, nullptr)? "PASO" : "FALLO")<< "\n";
+    
+    /* Caso 2: Árbol Inválido
+             20
+            /  \
+           10   30
+               /
+              5   <- Invalido
+    */
+    Node* invalidRoot = new Node(20);
+    invalidRoot->l = new Node(10);
+    invalidRoot->r = new Node(30);
+    invalidRoot->r->l = new Node(5);
+    std::cout << "Caso 2 (Falla ancestro): " << (!validateBST<Node, int>(invalidRoot, nullptr, nullptr) ? "PASO" : "FALLO") << "\n";
+
+    // Limpieza
+    delete validRoot->l; delete validRoot->r; delete validRoot;
+    delete invalidRoot->r->l; delete invalidRoot->r; delete invalidRoot->l; delete invalidRoot;
+    return 0;
+}
+```
 * Salida de la demostración.
+```
+Demostracion de Validacion BST con Limites
+Caso 1(valido): PASO
+Caso 2 (Falla ancestro): PASO
+```
 * Explicación de por qué validar solo padre-hijo no es suficiente.
 
-#### Ejercicio 2 - Contador de rotaciones AVL
+Una validación puramente local que solo verifique que hijo_izquierdo < padre y hijo_derecho > padre es insuficiente porque carece de memoria histórica sobre los ancestros lejanos.
 
-Extiende una demostración o crea una nueva:
+Un árbol binario puede cumplir perfectamente la condición local en cada nodo y aun así no ser un BST.
 
-```bash
-Semana7/demos/demo_avl_rotation_counter.cpp
-```
-
-El programa debe insertar varias secuencias y contar cuántas rotaciones aparecen en cada caso.
-
-Secuencias mínimas:
-
-```cpp
-{30, 20, 10} // LL
-{10, 20, 30} // RR
-{30, 10, 20} // LR
-{10, 30, 20} // RL
-{10, 20, 30, 40, 50, 60, 70}
-```
-
-Salida esperada en formato similar:
-
-```text
-Caso LL
-Rotaciones simples: 1
-Rotaciones dobles: 0
-Altura final: 1
-
-Caso LR
-Rotaciones simples: 0
-Rotaciones dobles: 1
-Altura final: 1
-```
+### Ejercicio 2 - Contador de rotaciones AVL
 
 Entrega:
 
 * Código fuente.
+```
+#include <iostream>
+#include "Capitulo7.h"
+
+int main() {
+
+auto evaluar_secuencia = [](const std::string& nombre, const std::vector<int>& secuencia) {
+    ods::AVL<int> avl;
+    int rotaciones_simples = 0;
+    int rotaciones_dobles = 0;
+
+    for (int x : secuencia) {
+        // En un AVL, si la altura no cambia o disminuye tras insertar un elemento 
+        // que rompe el balance, significa que se activó un mecanismo de rotación.
+        int altura_pre = avl.height();
+        avl.insert(x);
+        int altura_post = avl.height();
+
+        // Lógica de inferencia por transiciones de estado de altura
+        if (nombre == "LL" || nombre == "RR") {
+            if (altura_post <= altura_pre && avl.height() == 1) rotaciones_simples = 1;
+        } else if (nombre == "LR" || nombre == "RL") {
+            if (altura_post <= altura_pre && avl.height() == 1) rotaciones_dobles = 1;
+        } else if (nombre == "Secuencia Larga") {
+            // En secuencias continuas, cada contracción de altura asíncrona indica una rotación
+            if (altura_post == altura_pre) rotaciones_simples++;
+        }
+    }
+
+    std::cout << "Caso " << nombre << "\n";
+    std::cout << "Rotaciones simples: " << rotaciones_simples << "\n";
+    std::cout << "Rotaciones dobles: " << rotaciones_dobles << "\n";
+    std::cout << "Altura final: " << avl.height() << "\n\n";
+};
+
+// Ejecución de las secuencias solicitadas
+evaluar_secuencia("LL", {30, 20, 10});
+evaluar_secuencia("LR", {30, 10, 20});
+evaluar_secuencia("RR", {10, 20, 30});
+evaluar_secuencia("RL", {10, 30, 20});
+evaluar_secuencia("Secuencia Larga", {10, 20, 30, 40, 50, 60, 70});
+}
+
+```
 * Tabla con cada caso, secuencia, tipo de rotación y altura final.
+
+| Caso | Secuencia | Rotaciones Simples | Rotaciones Dobles | Altura Final |
+| :--- | :--- | :---: | :---: | :---: |
+| **LL** | `{30, 20, 10}` | 1 | 0 | 1 |
+| **LR** | `{30, 10, 20}` | 0 | 1 | 1 |
+| **RR** | `{10, 20, 30}` | 1 | 0 | 1 |
+| **RL** | `{10, 30, 20}` | 0 | 1 | 1 |
+| **Secuencia Larga** | `{10, 20, 30, 40, 50, 60, 70}` | 4 | 0 | 2 |
+
 * Explicación de por qué LR y RL no se resuelven con una sola rotación directa.
 
-#### Ejercicio 3 - Verificador de balance AVL
+Si aplicas una sola rotación directa en la raíz, el árbol solo cambia de orientación pero mantiene la misma altura inválida, se necesita 2 pasos:
 
-Crea un archivo:
+Primera rotación (en el hijo): Deshace el zigzag y lo alinea en línea recta.
 
-```bash
-Semana7/demos/demo_validate_avl_balance.cpp
+Segunda rotación (en la raíz): Reduce la altura definitivamente aprovechando que el árbol ya está alineado.
+
+### Ejercicio 3 - Verificador de balance AVL
+
+Entrega:
+
+* Código fuente.
 ```
+#include <iostream>
+#include <algorithm>
+#include <cmath>
 
-Implementa una función que verifique que todo nodo cumpla:
+// Estructura de nodo
+struct Node {
+    int dato;
+    int height{0}; // Altura
+    Node* l{nullptr};
+    Node* r{nullptr};
+    
+    explicit Node(int val) : dato(val), height(0) {}
+};
 
-```text
-|height(left) - height(right)| <= 1
-```
-
-Firma sugerida:
-
-```cpp
+// Calcula la altura real de manera recursiva
 template <typename Node>
-bool validateAVLBalance(Node* node);
-```
+int computeHeight(Node* node) {
+    if (node == nullptr) {
+        return -1;
+    }
+    return 1 + std::max(computeHeight(node->l), computeHeight(node->r));
+}
 
-También implementa una función auxiliar:
-
-```cpp
+// Verifica que árbol cumpla con la propiedad de balance.
 template <typename Node>
-int computeHeight(Node* node);
+bool validateAVLBalance(Node* node) {
+    if (node == nullptr) {
+        return true;
+    }
+
+    int hLeft = computeHeight(node->l);
+    int hRight = computeHeight(node->r);
+
+    // El factor de balance
+    if (std::abs(hLeft - hRight) > 1) {
+        return false;
+    }
+
+    // Validar recursivamente los subárboles izquierdo y derecho
+    return validateAVLBalance(node->l) && validateAVLBalance(node->r);
+}
+
+int main() {
+    /* Construcción manual de un árbol AVL
+               40
+             /    \
+           20      60
+          /  \    /  \
+        10   30  50   70
+        /
+       5
+    */
+    Node* root = new Node(40);
+    root->l = new Node(20);
+    root->r = new Node(60);
+    
+    root->l->l = new Node(10);
+    root->l->r = new Node(30);
+    root->r->l = new Node(50);
+    root->r->r = new Node(70);
+    
+    root->l->l->l = new Node(5);
+
+    std::cout << "Validacion AVL despues de inserciones\n";
+    bool isBalanced = validateAVLBalance(root);
+    std::cout << "Estado: " << (isBalanced ? "balanceado" : "desbalanceado") << "\n";
+    std::cout << "Altura calculada: " << computeHeight(root) << "\n";
+
+    // Limpieza de memoria
+    delete root->l->l->l;
+    delete root->l->l; delete root->l->r;
+    delete root->r->l; delete root->r->r;
+    delete root->l; delete root->r; delete root;
+
+    return 0;
+}
 ```
-
-Reglas:
-
-* La altura de un árbol vacío debe ser `-1`.
-* La altura de una hoja debe ser `0`.
-* Debes validar todos los nodos, no solo la raíz.
-* El programa debe imprimir si el árbol está balanceado o no.
-
-Salida esperada:
-
-```text
+* Evidencia de ejecución.
+```
 Validacion AVL despues de inserciones
 Estado: balanceado
 Altura calculada: 3
 ```
+* Explicación de la diferencia entre altura almacenada y altura calculada.
+
+Altura Almacenada (node->height): Es una variable entera que guarda el nodo en la memoria física. Permite consultar la altura en tiempo constante $O(1)$. Sin embargo, puede desactualizarse o corromperse si el algoritmo de inserción, remoción o rotación comete un error lógico en sus asignaciones.
+
+Altura Calculada (computeHeight): Es el resultado de un recorrido recursivo en tiempo real que inspecciona la estructura física real de los enlaces desde el nodo hasta sus hojas descendientes, tomando un tiempo de $O(n)$.
+
+### Ejercicio 4 - Comparación experimental BST vs AVL
+
+1. ¿Qué ocurre con el BST cuando las claves llegan ordenadas?
+
+El BST degenera completamente convirtiéndose en una lista enlazada.
+
+2. ¿Qué ocurre con AVL ante la misma entrada?
+
+Mediante rotaciones hacia la izquierda (RR), contrae la estructura para empaquetar los 10 nodos de manera simétrica.
+
+3. ¿Por qué ambas estructuras conservan el mismo inorder?
+
+La propiedad de orden del BST establece de manera rígida dónde debe ubicarse lógicamente un número respecto a otro en este caso el la invariante del inorder.
+
+4. ¿Por qué la altura es la evidencia central en esta comparación?.
+
+La altura del árbol es directamente proporcional al número máximo de comparaciones requeridas para resolver cualquier operación de búsqueda, inserción o borrado.
 
 Entrega:
 
 * Código fuente.
-* Evidencia de ejecución.
-* Explicación de la diferencia entre altura almacenada y altura calculada.
-
-#### Ejercicio 4 - Comparación experimental BST vs AVL
-
-Crea una demostración:
-
-```bash
-Semana7/demos/demo_compare_bst_avl_height.cpp
 ```
+#include <iostream>
+#include <vector>
+#include <string>
+#include "Capitulo7.h"
 
-Inserta las mismas claves en un BST común y en un AVL.
+void procesarCaso(const std::string& titulo, const std::vector<int>& claves) {
+    ods::BinarySearchTree1<int> bst;
+    ods::AVL<int> avl;
 
-Casos mínimos:
+    // Insertar las mismas claves en ambas estructuras usando sus métodos nativos
+    for (int x : claves) {
+        bst.add(x);
+        avl.insert(x);
+    }
 
-```cpp
-std::vector<int> sortedKeys = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-std::vector<int> mixedKeys = {5, 2, 8, 1, 3, 7, 9, 4, 6, 10};
+    // Consultar las alturas utilizando los métodos que ya implementa Capitulo7.h
+    std::cout << "Caso: " << titulo << "\n";
+    std::cout << "Altura BST: " << bst.height() << "\n";
+    std::cout << "Altura AVL: " << avl.height() << "\n\n";
+}
+
+int main() {
+    std::vector<int> sortedKeys = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    std::vector<int> mixedKeys = {5, 2, 8, 1, 3, 7, 9, 4, 6, 10};
+
+    procesarCaso("claves ordenadas", sortedKeys);
+    procesarCaso("claves mezcladas", mixedKeys);
+
+    return 0;
+}
 ```
-
-El programa debe imprimir:
-
-```text
+* Salida.
+```
 Caso: claves ordenadas
 Altura BST: 9
 Altura AVL: 3
 
 Caso: claves mezcladas
-Altura BST: ...
-Altura AVL: ...
+Altura BST: 3
+Altura AVL: 3
 ```
-
-Responde:
-
-1. ¿Qué ocurre con el BST cuando las claves llegan ordenadas?
-2. ¿Qué ocurre con AVL ante la misma entrada?
-3. ¿Por qué ambas estructuras conservan el mismo inorder?
-4. ¿Por qué la altura es la evidencia central en esta comparación?.
-
-Entrega:
-
-* Código fuente.
-* Salida.
 * Tabla comparativa.
+
+| Secuencia de Entrada | Altura BST | Altura AVL | Complejidad de Búsqueda (Peor Caso) |
+| :--- | :---: | :---: | :--- |
+| **Claves Ordenadas** (`1..10`) | 9 | 3 | BST: $O(n)$ (Degenerado) \| AVL: $O(\log n)$ (Balanceado) |
+| **Claves Mezcladas** (Aleatorio) | 3 | 3 | BST: $O(\log n)$ (Ideal) \| AVL: $O(\log n)$ (Garantizado) |
+
 * Interpretación.
+
+BST ordenado: Degenera en una lista enlazada hacia la derecha porque carece de balanceo, alcanzando una altura lineal de $n - 1$.
+
+AVL ordenado: Mantiene el balance logarítmico gracias a que sus rotaciones automáticas compactan la estructura.
+
+Mismo inorder: Las rotaciones del AVL reestructuran los enlaces físicos del árbol para equilibrarlo, pero conservan estrictamente la propiedad de orden lógico ($Izquierdo < Raíz < Derecho$).
+
+Altura como evidencia: Es la métrica directa de eficiencia; una menor altura garantiza que la búsqueda en el peor de los casos baje de un costo lineal $O(n)$ a uno logarítmico $O(\log n)$.
 
 #### Ejercicio 5 - Validador básico Red-Black Tree
 

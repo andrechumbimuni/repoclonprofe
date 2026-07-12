@@ -1309,7 +1309,7 @@ Cuando se inserta o elimina un nodo, el árbol puede violar estas reglas de bala
 
 Probar solo el inorder valida que el árbol sigue siendo un BST, pero es incapaz de detectar si un bug en las rotaciones corrompió las alturas o los colores, dejando el árbol desbalanceado y arruinando su rendimiento.
 
-### Bloque 9 - Cierre comparativo
+## Bloque 9 - Cierre comparativo
 
 ¿Qué cambia cuando pasamos de un BST común a estructuras balanceadas como AVL y Red-Black Tree?
 

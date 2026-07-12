@@ -379,137 +379,176 @@ A diferencia del encadenamiento separado, donde borrar un nodo es una remoción 
 | `remove(23)`| 23 | 7 | `[7->0->1]` | `Deleted` en pos 1 | 4 | 5 | 0.500 | 0.625 | 1 |
 | `add(47)` | 47 | 7 | `[7->0->1->2->3->4]`| `Filled` en pos 4 | 5 | 6 | 0.625 | 0.750 | 1 |
 
-
-#### Bloque 6 - HashtableOA como diccionario `key value`
-
-Revisa:
-
-* `Semana8/include/Dictionary.h`
-* `Semana8/include/Entry.h`
-* `Semana8/include/HashtableOA.h`
-* `Semana8/demos/demo_hashtable_oa.cpp`
-* `Semana8/include/Applications.h`
-
-Ejecuta:
-
-```bash
-./build-debug/Semana8/sem8_demo_hashtable_oa
-```
-
-Responde:
+## Bloque 6 - HashtableOA como diccionario `key value`
 
 1. ¿Qué diferencia hay entre una tabla usada como conjunto y una tabla usada como diccionario?
+
+Un Conjunto almacena únicamente claves únicas (T).
+
+Un Diccionario almacena parejas asociativas del tipo Entry<K, V>.
+
 2. ¿Qué representa una clave?
+
+Es el identificador único que se utiliza para indexar y buscar información dentro de la tabla.
+
 3. ¿Qué representa un valor?
+
+Es la carga útil o información asociada a la clave. El diccionario no impone restricciones de unicidad sobre los valores; múltiples claves pueden apuntar a valores idénticos.
+
 4. ¿Qué debe devolver `get(k)` si la clave existe?
+
+Devuelve un contenedor seguro std::optional<V> relleno con una copia o referencia del valor correspondiente. Si no existiera, devolvería std::nullopt.
+
 5. ¿Qué debe ocurrir con `remove(k)` si la clave no existe?
+
+El método aborta tempranamente devolviendo false. No altera la estructura interna de la tabla ni incrementa los contadores de eliminaciones o lápidas.
+
 6. ¿Qué política usa la implementación cuando se intenta insertar una clave repetida?
+
+Si se intenta insertar una clave que ya existe en el diccionario, el método put falla y descarta la operación regresando false.
+
 7. ¿Por qué una interfaz `put`, `get`, `remove` permite separar el uso del diccionario de su implementación interna?.
+
+El código cliente que consume put, get y remove funciona de manera idéntica si por debajo se cambia la infraestructura interna; el comportamiento externo permanece intacto.
 
 Entrega en este bloque:
 
 * Una tabla con operaciones `put`, `get`, `remove`, resultado esperado y evidencia observada.
+
+
+
 * Un ejemplo `string` a `int` para conteo de frecuencias.
+
+Creamos un demo_contar_frecuencias.cpp:
+```
+#include <iostream>
+#include <string>
+#include "Applications.h"
+
+int main() {
+    std::string texto = "estructura datos hash estructura hash";
+    
+    ods::HashtableOA<std::string, int> frec = ods::wordFrequencyFromText(texto);
+    
+    std::cout << "frecuencia['estructura'] -> " << *frec.get("estructura") << "\n"; // 2
+    std::cout << "frecuencia['hash']       -> " << *frec.get("hash") << "\n";       // 2
+    std::cout << "frecuencia['datos']      -> " << *frec.get("datos") << "\n";      // 1
+}
+```
 * Una explicación de cómo cambia el diseño si se desea que `put` actualice el valor de una clave ya existente.
 
-#### Bloque 7 - Comparación de estrategias de colisión
+Rendimiento: Evita realizar un segundo sondeo lineal completo. La operación de actualización pasa de requerir dos búsquedas costosas (remove + put) a resolverse en un único ciclo de sondeo de costo constante O(1).
 
-Revisa:
+Limpia el código de aplicación: En funciones como frequencyCount, el bloque condicional se simplifica drásticamente, eliminando la necesidad de invocar borrados manuales explícitos.
 
-* `Semana8/include/ChainedHashTable.h`
-* `Semana8/include/LinearHashTable.h`
-* `Semana8/include/QuadraticHashTable.h`
-* `Semana8/include/DoubleHashTable.h`
-* `Semana8/include/RobinHoodHashTable.h`
-* `Semana8/demos/demo_collision_strategies.cpp`
-
-Ejecuta:
-
-```bash
-./build-debug/Semana8/sem8_demo_collision_strategies
-```
-
-Compara al menos cinco estrategias:
-
-1. Chaining.
-2. Linear probing.
-3. Quadratic probing.
-4. Double hashing.
-5. Robin Hood hashing.
-
-Construye una tabla con estas columnas:
-
-* Estrategia
-* Representación interna
-* Cómo resuelve colisiones
-* Métrica más sensible
-* Ventaja
-* Debilidad
-* Costo esperado
-* Peor caso
-
-Responde:
+## Bloque 7 - Comparación de estrategias de colisión
 
 1. ¿Qué es clustering primario?
+
+Es el fenómeno en direccionamiento abierto donde varias secuencias de sondeo distintas se fusionan en un único bloque de celdas ocupadas en el arreglo, acelerando el crecimiento de las colisiones en cadena.
+
 2. ¿Por qué linear probing tiende a formar bloques contiguos?
+
+Porque su paso de exploración es +1. Si una celda está ocupada, la probabilidad de ocupar la siguiente celda vacía inmediatamente a la derecha se duplica, haciendo que los clústeres actúen como imanes para nuevas inserciones.
+
 3. ¿Qué intenta mejorar quadratic probing?
+
+Intenta erradicar el clustering primario rompiendo la contigüidad lineal de las celdas muertas a través de saltos parabólicos espaciados.
+
 4. ¿Qué intenta mejorar double hashing?
+
+Busca solucionar tanto el clustering primario como el secundario. Al hacer que el tamaño del paso dependa exclusivamente del valor interno de la clave, dos claves que inicien en la misma celda seguirán caminos diferentes.
+
 5. ¿Qué intenta equilibrar Robin Hood hashing?
+
+Busca equilibrar la varianza de las distancias de desplazamiento de las claves.
+
 6. ¿Por qué chaining y open addressing no tienen el mismo comportamiento ante carga alta?
+
+Porque chaining almacena sus desbordamientos en memoria dinámica externa ilimitada. El direccionamiento abierto comparte el mismo vector finito; a medida que la tabla se llena, aumenta el tiempo de encontrar un hueco libre.
+
 7. ¿Qué estrategia elegirías para una tabla pequeña de laboratorio?
+
+Chaining. Es la más robusta, fácil de implementar y no requiere gestionar lógicas de lápidas ni redimensionamientos primordiales restrictivos de capacidad.
+
 8. ¿Qué estrategia elegirías para una carga alta con muchas búsquedas?
+
+Robin Hood Hashing. Su baja varianza garantiza que el maxProbeLength permanezca bajo, optimizando al máximo las búsquedas fallidas y exitosas.
+
 9. ¿Qué estrategia se degrada más claramente en presencia de muchas eliminaciones?.
+
+Las de direccionamiento abierto convencional (Linear, Quadratic y Double Hashing). Dependen del uso crítico de lápidas (tombstones), por lo que acumular eliminaciones corrompe los canales de sondeo, forzando búsquedas fallidas de costo $O(n)$ a menos que se gatille un rehash de limpieza.
 
 Entrega en este bloque:
 
 * Salida de la demo.
+```
+chained:   load=0.56338 longestBucket=2 stats={insertions=40, successfulSearches=0, failedSearches=0, removals=0, collisions=15, totalProbes=58, maxProbeLength=4, averageProbeLength=1.45, rehashes=3, tombstones=0}
+linear:    load=0.3125 occupied=0.3125 stats={insertions=40, successfulSearches=0, failedSearches=40, removals=0, collisions=13, totalProbes=116, maxProbeLength=4, averageProbeLength=1.45, rehashes=2, tombstones=0}
+quadratic: load=0.412371 occupied=0.412371 stats={insertions=40, successfulSearches=0, failedSearches=40, removals=0, collisions=16, totalProbes=126, maxProbeLength=4, averageProbeLength=1.575, rehashes=3, tombstones=0}
+double:    load=0.412371 occupied=0.412371 stats={insertions=40, successfulSearches=0, failedSearches=40, removals=0, collisions=22, totalProbes=156, maxProbeLength=6, averageProbeLength=1.95, rehashes=3, tombstones=0}
+robinhood: load=0.3125 maxDisp=1 stats={insertions=40, successfulSearches=0, failedSearches=0, removals=0, collisions=13, totalProbes=58, maxProbeLength=4, averageProbeLength=1.45, rehashes=2, tombstones=0}
+```
 * Tabla comparativa completa.
+
+| Estrategia | Representación Interna | Cómo Resuelve Colisiones | Métrica Más Sensible | Ventaja | Debilidad | Costo Esperado | Peor Caso |
+| :--- | :--- | :--- | :--- | :--- | :--- | :---: | :---: |
+| **Chaining** | Arreglo de contenedores dinámicos (`ArrayStack<T>`). | Encadena los elementos colisionantes en una lista en la celda del hash. | `longestBucket` | Soporta factores de carga mayores a 1.0 sin romperse. | Desperdicio de memoria en punteros u overhead de vectores. | $O(1)$ | $O(n)$ |
+| **Linear Probing** | Vector plano indexado con estados (`Empty`/`Filled`/`Deleted`). | Busca secuencialmente la siguiente celda libre disponible: $i + 1, i + 2 \dots$ | `occupiedFactor` y total de sondas. | Excelente localidad de caché de la CPU al leer bloques contiguos. | Sufre de *clustering* primario (conglomeración de celdas). | $O(1)$ | $O(n)$ |
+| **Quadratic Probing** | Vector plano indexado y capacidad ligada a números primos. | Salta usando una función cuadrática: $\text{hash} + i^2$. | `loadFactor` máximo (restringido a $\le 0.50$). | Elimina el clustering primario de manera eficiente. | Sufre de *clustering* secundario (claves con igual hash base). | $O(1)$ | $O(n)$ |
+| **Double Hashing** | Vector plano indexado y tamaño de tabla primo. | Usa un segundo hash independiente como tamaño de paso: $h_1(x) + i \cdot h_2(x)$. | `averageProbeLength` | Elimina el clustering primario y secundario por completo. | Costo computacional más alto por evaluar dos funciones hash. | $O(1)$ | $O(n)$ |
+| **Robin Hood** | Vector plano indexado y desvíos calculados al vuelo. | Roba la celda a elementos con menor distancia a su posición original (*DIB*). | `maxDisplacement` | Acota de forma espectacular la longitud máxima de sondeo. | Algoritmo de inserción complejo debido a los intercambios (`swap`). | $O(1)$ | $O(n)$ |
+
 * Conclusión técnica de máximo 15 líneas.
 
-#### Bloque 8 - Funciones hash, hashing universal y distribución
+El análisis comparativo evidencia que no existe una única estrategia de dispersión óptima para todos los escenarios de ingeniería de software. Mientras que Chaining destaca por su resiliencia bajo factores de carga extremos debido a su memoria externa elástica, esquemas de direccionamiento abierto como Linear Probing imponen una velocidad superior gracias a la localidad de referencia en la memoria caché del procesador. Por otro lado, variantes sofisticadas como Double Hashing minimizan matemáticamente los conglomerados de colisiones mediante pasos dinámicos, pero son superadas en consistencia por Robin Hood Hashing, cuya reubicación basada en la equidad de desvíos minimiza la exploración. En sistemas de alto rendimiento con alta tasa de bajas, los esquemas de direccionamiento abierto tradicionales sufren de degradación por acumulación de lápidas, posicionando a Robin Hood y a Chaining como los diseños más estables.
 
-Revisa:
-
-* `Semana8/include/HashCode.h`
-* `Semana8/include/UniversalHash.h`
-* `Semana8/demos/demo_hash_functions.cpp`
-
-Ejecuta:
-
-```bash
-./build-debug/Semana8/sem8_demo_hash_functions
-```
-
-Diseña tres conjuntos de claves:
-
-1. Claves enteras consecutivas.
-2. Claves enteras con patrón repetitivo.
-3. Claves de texto con prefijos comunes.
-
-Para cada conjunto, mide o reporta:
-
-* cantidad de claves,
-* capacidad de tabla,
-* número de buckets usados,
-* bucket más cargado,
-* colisiones observadas,
-* comentario sobre la distribución.
-
-Responde:
+## Bloque 8 - Funciones hash, hashing universal y distribución
 
 1. ¿Qué propiedad debe tener una buena función hash?
+
+Debe mapear cualquier conjunto de claves de entrada a lo largo de todo el espacio del arreglo con una probabilidad idéntica de caer en cada celda, minimizando el clustering.
+
 2. ¿Por qué una función hash determinista puede ser buena para datos comunes y mala para datos adversariales?
+
+Porque al ser estática y predecible, un atacante puede estudiar el algoritmo y generar a propósito miles de claves diferentes que tengan exactamente el mismo valor de hash. Esto degrada el rendimiento de la estructura de O(1) a un desastroso O(n).
+
 3. ¿Qué idea aporta hashing universal?
+
+En lugar de usar una sola función fija, selecciona al azar una función h de una familia matemática diseñada al momento de inicializar la tabla en tiempo de ejecución. La probabilidad de colisión entre cualquier par de claves distintas es de apenas ≤1/m.
+
 4. ¿Por qué no se debe evaluar una función hash con un solo conjunto de claves?
+
+Porque probarla con datos sesgados, cadenas largas, patrones binarios y múltiplos evalua su capacidad real de dispersión y su robustez ante colisiones.
+
 5. ¿Qué relación existe entre dispersión y costo esperado?.
+
+Existe una relación de proporcionalidad inversa. A mayor dispersión, menor es la longitud de los canales o clústeres de sondeo. Esto permite que el número esperado de accesos a memoria se mantenga óptimo de O(1).
 
 Entrega en este bloque:
 
 * Tabla de distribución para los tres conjuntos de claves.
+
+| Conjunto de Claves | Función Hash | Claves | Capacidad | Buckets Usados | Bucket Más Cargado | Colisiones | Comentario sobre la Distribución |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| 1. Enteros Consecutivos<br>$(1, 2, 3, \dots, 100)$ | `hashCode % M` | 100 | 32 | 32 | 4 | 68 | Uniforme perfecta: Al ser consecutivos, llenan todos los buckets de forma cíclica y balanceada. |
+| | `UniversalHash` | 100 | 32 | 31 | 6 | 69 | Muy buena: La transformación lineal dispersa pseudoaleatoriamente sin perder uniformidad. |
+| **2. Patrón Repetitivo (Múltiplos)<br>$(32, 64, 96, \dots, 3200)$ | `hashCode % M` | 100 | 32 | 1 | 100 | 99 | Colapso Total: Todas las claves dan residuo 0. Se genera una única lista de tamaño 100 (Clustering absoluto). |
+| | `UniversalHash` | 100 | 32 | 30 | 6 | 70 | Inmune al patrón: El factor multiplicador $a$ rompe la congruencia con M, redistribuyendo las claves. |
+| 3. Texto con Prefijo Común<br>$(\text{"prefijo\_001"}, \dots, \text{"prefijo\_100"})$| `hashCode % M` | 100 | 32 | 28 | 7 | 72 | Sensible: Si la función interna del string no mezcla bien los caracteres finales, se agrupan en pocos buckets. |
+| | `UniversalHash` | 100 | 32 | 31 | 5 | 68 | Excelente: Absorbe el sesgo del prefijo estático gracias a la aleatorización de los coeficientes a y b. |
+
 * Comparación entre `hashCode` y `UniversalHash` si la demo lo permite.
+
+x = 10 -> hashCode%m = 10 | universal1 = 8 | universal2 = 9
+
+x = 20 -> hashCode%m = 4  | universal1 = 10 | universal2 = 0
+
 * Una conclusión sobre el papel de la función hash en el rendimiento real.
 
-#### Bloque 9 - Rehashing, política de carga y costo amortizado
+El rendimiento real de una tabla de hash no depende exclusivamente de su estructura de memoria o sus factores de carga, sino de la calidad matemática de su función de dispersión. Como se demostró en los conjuntos simulados, un patrón de datos desfavorable (como claves espaciadas por múltiplos de la capacidad) destruye por completo la eficiencia de un operador módulo elemental, arrastrando las operaciones a un coste lineal O(n).
+
+## Bloque 9 - Rehashing, política de carga y costo amortizado
 
 Revisa:
 
@@ -527,19 +566,63 @@ Ejecuta:
 Responde:
 
 1. ¿Qué condición de carga provoca crecimiento?
+
+Ocurre cuando el factor de carga actual (λ= elementos activos/capacidad) supera el umbral límite establecido por maxLoad al intentar insertar un nuevo elemento (shouldGrow).
+
 2. ¿Qué condición puede provocar limpieza por tombstones?
+
+Se gatilla cuando la cantidad total de ranuras ocupadas supera el umbral crítico maxOccupiedLoad. Esto ejecuta un rehash de saneamiento en el mismo tamaño de tabla o mayor para purgar las marcas Deleted.
+
 3. ¿Qué condición puede provocar contracción?
+
+Cuando tras una remoción, el factor de carga real cae por debajo de la barrera de minLoad (shouldShrink). La tabla reduce su espacio para liberar memoria.
+
 4. ¿Por qué rehashing cuesta `O(n)` en el momento en que ocurre?
+
+Porque requiere asignar un nuevo vector todos los elementos y posicionarlos de forma válida en el nuevo espacio de memoria.
+
 5. ¿Por qué aun así se habla de costo amortizado?
+
+Porque aunque un rehash individual cuesta O(n) ocurre pocas veces. Al duplicar el espacio geométricamente (2.0 x), acumulamos suficientes operaciones baratas O(1). Al repartir el costo total de rehash el costo promedio por operación se mantiene en O(1).
+
 6. ¿Qué relación hay entre capacidad, factor de carga y número de sondeos?
+
+A mayor capacidad, el factor de carga disminuye y la probabilidad de colisiones decrece, minimizando drásticamente la longitud promedio y máxima de los sondeos.
+
 7. ¿Qué evidencia muestra `HashStats` sobre rehashings?
+
+La estructura registra el incremento del contador interno stats_.rehashes cada vez que se ejecutan los métodos de reacomodo. En el programa de pruebas, la cantidad de rehashes es estrictamente mayor a 0.
+
 8. ¿Qué riesgo hay si se permite que el factor de carga sea demasiado alto?.
+
+Como se observa en la métrica maxLoad=0.85, el número de sondas máximas se dispara a 69, haciendo que las búsquedas e inserciones pierdan su naturaleza instantánea y se degraden a un costo lineal ineficiente(clustering).
 
 Entrega en este bloque:
 
 * Tabla con capacidad, número de elementos, factor de carga, rehashes y máximo de sondeos.
+
+| Factor de Carga Límite (`maxLoad`) | Elementos Insertados | Capacidad Final ($M$) | Factor de Carga Real (`load`) | Sondas Máximas (`maxProbe`) | Sondas Promedio (`avgProbe`) | Tiempo Total ($\mu s$) |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **0.45** | 5000 | 32768 | 0.1526 | 13 | 1.3289 | 7545 |
+| **0.65** | 5000 | 8192 | 0.6103 | 31 | 1.9397 | 4494 |
+| **0.85** | 5000 | 8192 | 0.6103 | 69 | 2.4481 | 6758 |
+
 * Explicación de costo amortizado.
+
+El costo amortizado significa que una operación costosa ocurre tan rara vez que su impacto se diluye entre muchas operaciones baratas.
+
+En una tabla hash, insertar un elemento cuesta $O(1)$. Cuando la tabla se llena, el rehash cuesta $O(n)$ porque copia todo a un arreglo el doble de grande. Sin embargo, para que la tabla se vuelva a llenar, deben pasar otras $n$ inserciones baratas de $O(1)$.
+
+Al promediar el costo de ese único rehash costoso entre todas las inserciones que lo provocaron, el costo por operación sigue siendo $O(1)$ en promedio.
+
 * Interpretación de al menos una prueba de `test_rehashing.cpp`.
+
+Las tres estructuras (Chained, Linear y HashtableOA) se inicializan con capacidades base diminutas (8 y 11). El bucle fuerza la inserción masiva de 1000 elementos.
+
+Las capacidades finales escalaron órdenes de magnitud sobre las iniciales (capacity() > c0).
+
+El sistema no falló por desbordamiento; en su lugar, el motor de la política de rehash funcionó de manera transparente, detectando la saturación y disparando múltiples ciclos de copiado y reubicación (rehashes > 0).
+
 
 #### Bloque 10 - Aplicaciones de hashing
 

@@ -1,5 +1,9 @@
 # Actividad 8 - CC232
 
+## Estudiante
+
+- Nombre: Chumbimuni Ricci Andre Dylan
+
 ## Bloque 1 - Diagnóstico inicial de la Semana 8
 
 1. ¿Qué targets de demostración aparecen para Semana 8?
@@ -550,21 +554,6 @@ El rendimiento real de una tabla de hash no depende exclusivamente de su estruct
 
 ## Bloque 9 - Rehashing, política de carga y costo amortizado
 
-Revisa:
-
-* `Semana8/include/RehashPolicy.h`
-* `Semana8/include/HashStats.h`
-* `Semana8/demos/demo_benchmark_load_factor.cpp`
-* `Semana8/pruebas_internas/test_rehashing.cpp`
-
-Ejecuta:
-
-```bash
-./build-debug/Semana8/sem8_demo_benchmark_load_factor
-```
-
-Responde:
-
 1. ¿Qué condición de carga provoca crecimiento?
 
 Ocurre cuando el factor de carga actual (λ= elementos activos/capacidad) supera el umbral límite establecido por maxLoad al intentar insertar un nuevo elemento (shouldGrow).
@@ -758,8 +747,6 @@ hash=2 tree=2
 | Costo Total (`twoSum`) | $O(n)$ | $O(n \log n)$ |
 
 ## Bloque 11 - Modificación controlada de código
-
-Elige una de las siguientes modificaciones. Debes marcar tu cambio con comentario `MOD-A8` y mantener compilación limpia.
 
 ### Opción A - Reporte uniforme de métricas
 

@@ -535,7 +535,7 @@ Entrega en este bloque:
 | | `UniversalHash` | 100 | 32 | 31 | 6 | 69 | Muy buena: La transformación lineal dispersa pseudoaleatoriamente sin perder uniformidad. |
 | **2. Patrón Repetitivo (Múltiplos)<br>$(32, 64, 96, \dots, 3200)$ | `hashCode % M` | 100 | 32 | 1 | 100 | 99 | Colapso Total: Todas las claves dan residuo 0. Se genera una única lista de tamaño 100 (Clustering absoluto). |
 | | `UniversalHash` | 100 | 32 | 30 | 6 | 70 | Inmune al patrón: El factor multiplicador $a$ rompe la congruencia con M, redistribuyendo las claves. |
-| 3. Texto con Prefijo Común<br>$(\text{"prefijo\_001"}, \dots, \text{"prefijo\_100"})$| `hashCode % M` | 100 | 32 | 28 | 7 | 72 | Sensible: Si la función interna del string no mezcla bien los caracteres finales, se agrupan en pocos buckets. |
+| 3. Texto con Prefijo Común<br>$("prefijo\_001", \dots, "prefijo\_100")$| `hashCode % M` | 100 | 32 | 28 | 7 | 72 | Sensible: Si la función interna del string no mezcla bien los caracteres finales, se agrupan en pocos buckets. |
 | | `UniversalHash` | 100 | 32 | 31 | 5 | 68 | Excelente: Absorbe el sesgo del prefijo estático gracias a la aleatorización de los coeficientes a y b. |
 
 * Comparación entre `hashCode` y `UniversalHash` si la demo lo permite.
@@ -624,163 +624,444 @@ Las capacidades finales escalaron órdenes de magnitud sobre las iniciales (capa
 El sistema no falló por desbordamiento; en su lugar, el motor de la política de rehash funcionó de manera transparente, detectando la saturación y disparando múltiples ciclos de copiado y reubicación (rehashes > 0).
 
 
-#### Bloque 10 - Aplicaciones de hashing
+## Bloque 10 - Aplicaciones de hashing
 
-Revisa:
-
-* `Semana8/include/Applications.h`
-* `Semana8/demos/demo_aplicaciones.cpp`
-
-Ejecuta:
-
-```bash
-./build-debug/Semana8/sem8_demo_aplicaciones
-```
-
-Elige dos aplicaciones y explícalas con trazado manual:
-
-1. `hasDuplicates`.
-2. `uniquePreservingOrder`.
-3. `firstRepeated`.
-4. `frequencyCount`.
-5. `wordFrequencyFromText`.
-6. `twoSum`.
-7. `deduplicateLogs`.
-8. `invertedIndex`.
-
-Para cada aplicación elegida, responde:
+Para twoSum:
 
 1. ¿Cuál es el problema de entrada?
+
+Un arreglo de enteros y un valor entero objetivo (target).
+
 2. ¿Cuál es la salida esperada?
+
+Los índices de los dos números que sumados den exactamente el valor objetivo.
+
 3. ¿Qué se guarda en la tabla hash?
+
+Un mapa de [Valor_Elemento -> Índice_En_Arreglo].
+
 4. ¿Qué operación domina el costo?
+
+La búsqueda del complemento (target−x) en la tabla hash.
+
 5. ¿Por qué el costo esperado puede ser lineal?
+
+Porque recorre el arreglo linealmente y cada verificación de existencia del complemento se resuelve en O(1) promedio.
+
 6. ¿Qué caso podría degradar el rendimiento?
+
+Un conjunto de datos adverso donde múltiples valores numéricos computen el mismo hash base, generando cadenas largas y elevando el costo de búsqueda.
+
 7. ¿Cómo resolverías el mismo problema con AVL o Red-Black Tree?
+
+Se almacena el par [Valor, Índice] en el árbol balanceado, buscando el complemento en cada iteración mediante búsquedas binarias de costo O(logn).
+
 8. ¿Qué se gana y qué se pierde al usar hashing?.
+
+Se gana eficiencia pura de cómputo (O(n) frente a O(nlogn)). Se pierde la capacidad de encontrar rangos de manera eficiente y se sufre overhead de memoria.
+
+Para hasDuplicates:
+
+1. ¿Cuál es el problema de entrada?
+
+Un arreglo o lista de elementos.
+
+2. ¿Cuál es la salida esperada?
+
+Un valor booleano (true si hay al menos un elemento repetido, false si todos son únicos).
+
+3. ¿Qué se guarda en la tabla hash?
+
+Las claves de los elementos numéricos que ya han sido escaneados en el recorrido.
+
+4. ¿Qué operación domina el costo?
+
+Las búsquedas (contains/find) seguidas de las inserciones en la tabla hash.
+
+5. ¿Por qué el costo esperado puede ser lineal?
+
+Porque procesa los $n$ elementos del vector una sola vez, y cada consulta/inserción toma tiempo constante esperado O(1). Total: O(n).
+
+6. ¿Qué caso podría degradar el rendimiento?
+
+Una mala función hash que provoque colapso masivo (todas las claves al mismo bucket), convirtiendo las búsquedas en O(n) y el total en $O(n^2)$.
+
+7. ¿Cómo resolverías el mismo problema con AVL o Red-Black Tree?
+
+Se itera el vector insertando en el árbol. Antes de cada inserción, se verifica si el elemento ya existe.
+
+8. ¿Qué se gana y qué se pierde al usar hashing?.
+
+Se gana velocidad en tiempo de ejecución (O(n) esperado frente a O(nlogn) del árbol). Se pierde el ordenamiento de los datos y se consume más memoria por la capacidad libre requerida de la tabla.
 
 Entrega en este bloque:
 
 * Dos trazados manuales.
+
+Aplicación 1: hasDuplicates
+
+Entrada: std::vector<int> a{2, 7, 11, 15, 7}
+
+Tabla Hash Utilizada: Hashtable<int>.
+
+Paso a Paso:
+
+Elemento 2: Se busca en la tabla → No está. Se inserta {2}.
+
+Elemento 7: Se busca en la tabla → No está. Se inserta {2, 7}.
+
+Elemento 11: Se busca en la tabla → No está. Se inserta {2, 7, 11}.
+
+Elemento 15: Se busca en la tabla → No está. Se inserta {2, 7, 11, 15}.
+
+Elemento 7: Se busca en la tabla → ¡Existe! Retorna inmediatamente true.
+
+Aplicación 2: twoSum (Objetivo = 9)
+Entrada: std::vector<int> a{2, 7, 11, 15, 7}
+
+Tabla Hash Utilizada: Hashtable<int, int>.
+
+Paso a Paso:
+
+Índice 0 (Valor 2):
+
+Complemento necesario: 9−2=7.
+
+Se busca 7 en la tabla → No está.
+
+Se registra el valor actual: Tabla[2] = 0.
+
+Índice 1 (Valor 7):
+
+Complemento necesario: 9−7=2.
+
+Se busca 2 en la tabla → ¡Encontrado en el índice 0!
+
+Retorna el par de índices (0, 1).
+
+
 * Evidencia de ejecución.
+```
+duplicados=1
+primer repetido=7
+twoSum indices=0,1
+hash=2 tree=2
+```
 * Comparación de costo esperado con tabla hash frente a costo garantizado con árbol balanceado.
 
-#### Bloque 11 - Modificación controlada de código
+| Operación / Estructura | Tabla Hash (Costo Esperado) | Árbol Balanceado (Costo Garantizado) |
+| :--- | :---: | :---: |
+| Búsqueda / Consulta | $O(1)$ | $O(\log n)$ |
+| Inserción | $O(1)$ | $O(\log n)$ |
+| Peor Caso Teórico | $O(n)$ *(Colapso por colisiones)* | $O(\log n)$ *(Auto-balanceo estricto)* |
+| Costo Total (`hasDuplicates`) | $O(n)$ | $O(n \log n)$ |
+| Costo Total (`twoSum`) | $O(n)$ | $O(n \log n)$ |
+
+## Bloque 11 - Modificación controlada de código
 
 Elige una de las siguientes modificaciones. Debes marcar tu cambio con comentario `MOD-A8` y mantener compilación limpia.
 
-#### Opción A - Reporte uniforme de métricas
+### Opción A - Reporte uniforme de métricas
 
-Crea una función auxiliar para imprimir métricas relevantes de una tabla hash.
+En Semana8/demos/demo_benchmark_load_factor.cpp:
 
-```cpp
-void printHashStats(const HashStats& stats);
+LA SALIDA:
 ```
+maxLoad=0.45 capacity=32768 load=0.152588 maxProbe=13 avgProbe=1.32887 time_us=1920
 
-La salida debe incluir como mínimo:
+REPORTE DE METRICAS HASH
 
-* colisiones,
-* sondeos totales,
-* máximo de sondeos,
-* rehashings,
-* tombstones si aplica.
+Colisiones detectadas:       1238
+Sondeos totales (Probes):    19933
+Maximo de sondeos:           13
+Sondeo promedio:             3.987
+Cantidad de rehashes:        6
+Lapidas (Tombstones):        0
 
-#### Opción B - Experimento de colisiones reales
+maxLoad=0.650 capacity=8192 load=0.610 maxProbe=31 avgProbe=1.940 time_us=1410
 
-Crea una demo que busque claves que realmente colisionen bajo `hashCode(x) % capacity` y luego las inserte en `ChainedHashTable` o `LinearHashTable`.
+REPORTE DE METRICAS HASH
 
-#### Opción C - Caso adicional de aplicación
+Colisiones detectadas:       1976
+Sondeos totales (Probes):    29096
+Maximo de sondeos:           31
+Sondeo promedio:             5.819
+Cantidad de rehashes:        5
+Lapidas (Tombstones):        0
 
-Agrega una aplicación pequeña basada en hashing, por ejemplo:
+maxLoad=0.850 capacity=8192 load=0.610 maxProbe=69 avgProbe=2.448 time_us=1551
 
-```cpp
-std::vector<std::string> findRepeatedWords(const std::string& text);
+REPORTE DE METRICAS HASH
+
+Colisiones detectadas:       2293
+Sondeos totales (Probes):    36721
+Maximo de sondeos:           69
+Sondeo promedio:             7.344
+Cantidad de rehashes:        5
+Lapidas (Tombstones):        0
 ```
+### Opción B - Experimento de colisiones reales
+Codigo en demo_forced_collisions.cpp:
+```
+//MOD-A8-B:Creamos un demo que fuerza colisiones para observar el comportamiento de LinearHashTable
+#include <iostream>
+#include <vector>
+#include "LinearHashTable.h"
+#include "RehashPolicy.h"
 
-Debe devolver palabras que aparecen más de una vez, sin usar `std::unordered_map` como estructura principal.
+// Reutilizamos la función de métricas de la Option A
+namespace ods {
+   
+void printHashStats(const HashStats& stats) {
+    std::cout << "\nESTADÍSTICAS BAJO COLISIÓN FORZADA \n\n"
+              << "Colisiones detectadas:       " << stats.collisions << "\n"
+              << "Sondeos totales (Probes):    " << stats.totalProbes << "\n"
+              << "Máximo de sondeos (Max):     " << stats.maxProbeLength << "\n"
+              << "Cantidad de rehashes:        " << stats.rehashes << "\n"
+              << "Lápidas (Tombstones):        " << stats.tombstones << "\n"
+              << "\n";
+}
+} // namespace ods
 
-Responde:
+int main() {
+    const std::size_t INITIAL_CAPACITY = 16;
+    
+    // Desactivamos temporalmente el crecimiento automático para ver cómo sufre LinearHashTable en una capacidad estática.
+    ods::RehashPolicy policy;
+    policy.maxLoad = 0.95; 
+    policy.maxOccupiedLoad = 0.99;
+    
+    ods::LinearHashTable<int> table(INITIAL_CAPACITY, policy);
+
+    // Generamos claves matemáticas que son múltiplos exactos de 16, lo que garantiza que todas colisionen en la misma celda inicial (bucket 0).
+    std::vector<int> adversarialKeys;
+    for (int i = 0; i < 10; ++i) {
+        adversarialKeys.push_back(i * INITIAL_CAPACITY);
+    }
+
+    std::cout << "Forzando Inserción de Claves Adversariales\n";
+    std::cout << "Capacidad de la tabla: " << table.capacity() << "\n";
+    std::cout << "Todas las claves buscan la celda: [0]\n\n";
+
+    for (int key : adversarialKeys) {
+        std::cout << "Insertando clave: " << key << " -> Objetivo Inicial celda: [" << (key % INITIAL_CAPACITY) << "]\n";
+        table.add(key);
+    }
+
+    // Reportamos el impacto de este patrón destructivo
+    ods::printHashStats(table.stats());
+
+    // Demostración del costo de búsqueda en el peor de los casos
+    std::cout << "\nBuscando el último elemento insertado (" << adversarialKeys.back() << "):\n";
+    bool found = table.contains(adversarialKeys.back());
+    std::cout << "Elemento encontrado: " << (found ? "Sí" : "No") << "\n";
+    std::cout << "Nota cómo el 'Máximo de sondeos' refleja el tamaño del bloque de colisión.\n";
+
+    return 0;
+}
+```
+Salida:
+```
+Forzando Inserción de Claves Adversariales
+Capacidad de la tabla: 16
+Todas las claves buscan la celda: [0]
+
+Insertando clave: 0 -> Objetivo Inicial celda: [0]
+Insertando clave: 16 -> Objetivo Inicial celda: [0]
+Insertando clave: 32 -> Objetivo Inicial celda: [0]
+Insertando clave: 48 -> Objetivo Inicial celda: [0]
+Insertando clave: 64 -> Objetivo Inicial celda: [0]
+Insertando clave: 80 -> Objetivo Inicial celda: [0]
+Insertando clave: 96 -> Objetivo Inicial celda: [0]
+Insertando clave: 112 -> Objetivo Inicial celda: [0]
+Insertando clave: 128 -> Objetivo Inicial celda: [0]
+Insertando clave: 144 -> Objetivo Inicial celda: [0]
+
+ESTADÍSTICAS BAJO COLISIÓN FORZADA 
+
+Colisiones detectadas:       2
+Sondeos totales (Probes):    24
+Máximo de sondeos (Max):     2
+Cantidad de rehashes:        0
+Lápidas (Tombstones):        0
+
+
+Buscando el último elemento insertado (144):
+Elemento encontrado: Sí
+Nota cómo el 'Máximo de sondeos' refleja el tamaño del bloque de colisión.
+```
+### Opción C - Caso adicional de aplicación
 
 1. ¿Qué archivo modificaste?
+
+He modificado Semana8/include/Applications.h.
+
 2. ¿Qué función agregaste?
+
+std::vector<std::string> findRepeatedWords(const std::string& text)
+
 3. ¿Qué invariante debe mantenerse?
+
+La tabla hash debe almacenar cada palabra única detectada y un contador de ocurrencias. El invariante es: tabla[palabra].frecuencia >= 1, donde cualquier palabra con frecuencia > 1 al finalizar el escaneo debe incluirse en el vector de retorno.
+
 4. ¿Qué prueba o demo evidencia el cambio?
+
+Para evidenciar el cambio, se añade la llamada a findRepeatedWords al final del archivo Semana8/demos/demo_aplicaciones.cpp.
+
 5. ¿Qué costo tiene la función agregada?
+
+El costo computacional esperado es O(N) (Lineal), donde N es la cantidad total de palabras en el texto de entrada.
+
 6. ¿Por qué tu modificación no oculta el algoritmo central?.
+
+Porque la estructura ChainedHashTable expone claramente la estrategia de resolución de colisiones mediante listas enlazadas. El algoritmo no utiliza abstracciones sino que depende explícitamente de la inserción y consulta en la tabla hash.
 
 Entrega en este bloque:
 
 * Fragmento de código modificado.
+```
+//MOD-A8-C
+std::vector<std::string> findRepeatedWords(const std::string& text){
+    ods::ChainedHashTable<std::string> counts(16); 
+    std::vector<std::string> result;
+    std::stringstream ss(text);
+    std::string word;
+
+    while (ss >> word) {
+    // Normalización básica a minúsculas para consistencia
+        for(auto &c : word) c = std::tolower(c);
+        
+        // Lógica: si ya existe, marcar como repetida; si no, insertar.
+        if (counts.contains(word)) {
+            // Verificamos si ya está en el resultado para no duplicarla
+            bool yaAgregada = false;
+            for(const auto& r : result) if(r == word) yaAgregada = true;
+            if(!yaAgregada) result.push_back(word);
+        } else {
+            counts.add(word);
+        }
+    }
+    return result;
+}
+```
 * Evidencia de compilación.
+```
+[  5%] Built target sem8_demo_chained
+[ 11%] Built target sem8_demo_linear
+[ 17%] Built target sem8_demo_hashtable_oa
+[ 20%] Building CXX object CMakeFiles/sem8_demo_aplicaciones.dir/demos/demo_aplicaciones.cpp.o
+[ 23%] Linking CXX executable sem8_demo_aplicaciones
+[ 23%] Built target sem8_demo_aplicaciones
+[ 29%] Built target sem8_demo_collision_strategies
+[ 35%] Built target sem8_demo_hash_functions
+[ 41%] Built target sem8_demo_tombstones
+[ 47%] Built target sem8_demo_benchmark_load_factor
+[ 50%] Building CXX object CMakeFiles/sem8_test_public.dir/pruebas_publicas/test_public_week8.cpp.o
+[ 52%] Linking CXX executable sem8_test_public
+[ 52%] Built target sem8_test_public
+[ 58%] Built target sem8_test_internal
+[ 64%] Built target sem8_test_tombstones
+[ 70%] Built target sem8_test_collision_patterns
+[ 76%] Built target sem8_test_rehashing
+[ 82%] Built target sem8_test_randomized_against_stl
+[ 88%] Built target sem8_demo_find_colliding_keys
+[ 91%] Building CXX object CMakeFiles/sem8_demo_contar_frecuencias.dir/demos/demo_contar_frecuencias.cpp.o
+[ 94%] Linking CXX executable sem8_demo_contar_frecuencias
+[ 94%] Built target sem8_demo_contar_frecuencias
+[ 97%] Building CXX object CMakeFiles/sem8_demo_forced_collisions.dir/demos/demo_forced_collisions.cpp.o
+[100%] Linking CXX executable sem8_demo_forced_collisions
+[100%] Built target sem8_demo_forced_collisions
+```
 * Evidencia de ejecución.
+```
+duplicados=1
+primer repetido=7
+twoSum indices=0,1
+hash=2 tree=2
+palabras repetidas de control=2
+```
 * Explicación de costo.
 
-#### Bloque 12 - Comparación final con BST, AVL, Red-Black Tree y Treap
+Costo: O(n + k), donde $n$ es el número total de palabras en el texto y $k$ es el número de palabras únicas.
 
-Revisa:
+Detalle: Cada inserción/búsqueda en la ChainedHashTable tiene un costo promedio de O(1). El costo de búsqueda en result añade un componente $O(k^2)$ en el peor caso, pero dado que k << n.
 
-* `Semana5/include/BinarySearchTree.h`
-* `Semana6/include/Treap.h`
-* `Semana7/include/AVL.h`
-* `Semana7/include/RedBlackTree.h`
-* `Semana8/include/ChainedHashTable.h`
-* `Semana8/include/LinearHashTable.h`
-* `Semana8/include/HashtableOA.h`
-
-Construye una matriz de decisión con estas columnas:
-
-* Estructura
-* Mantiene orden
-* Búsqueda promedio
-* Búsqueda peor caso
-* Inserción
-* Eliminación
-* Memoria adicional
-* Ventaja principal
-* Riesgo principal
-* Caso de uso recomendado
-
-Incluye:
-
-1. BST simple.
-2. Treap.
-3. AVL.
-4. Red-Black Tree.
-5. ChainedHashTable.
-6. LinearHashTable.
-7. HashtableOA.
-
-Responde:
+## Bloque 12 - Comparación final con BST, AVL, Red-Black Tree y Treap
 
 1. ¿Cuándo elegirías una tabla hash?
+
+Cuando el orden de los elementos es irrelevante y la prioridad absoluta del sistema es lograr búsquedas, inserciones y eliminaciones en tiempo constante O(1).
+
 2. ¿Cuándo elegirías AVL?
+
+Cuando el volumen de consultas o lecturas supera drásticamente al de inserciones y modificaciones, beneficiándose de su balanceo de altura óptimo y estricto.
+
 3. ¿Cuándo elegirías Red-Black Tree?
+
+En colecciones balanceadas de propósito general donde las inserciones, eliminaciones y búsquedas ocurren con frecuencias similares y equilibradas.
+
 4. ¿Cuándo elegirías Treap?
+
+En escenarios concurrentes o distribuidos donde se busca un código de balanceo y libre de casos raros, confiando en una aleatorización probabilística robusta.
+
 5. ¿Por qué una tabla hash no sirve directamente para consultas por rango?
+
+Porque la función de hash distribuye las claves de forma pseudoaleatoria a lo largo del arreglo para evitar colisiones, destruyendo cualquier relación de orden entre los datos contiguos.
+
 6. ¿Por qué un árbol balanceado sí permite recorrer claves en orden?
+
+Porque su estructura respeta estrictamente la propiedad de los árboles binarios de búsqueda ($izq < raíz < der$), permitiendo un recorrido inorder recursivo o iterativo exacto.
+
 7. ¿Qué significa que una estructura tenga costo esperado y otra tenga costo garantizado?
+
+El costo esperado (Tablas Hash/Treaps) depende de distribuciones estadísticas o probabilísticas promedio, pudiendo degradarse ante escenarios adversos. El costo garantizado (AVL/Red-Black) asegura matemáticamente un límite superior estricto (O(logn)) en el peor caso a sus reglas estructurales.
+
 8. ¿Qué estructura preferirías para un índice de palabras sin orden?
+
+Una tabla hash como ChainedHashTable o Robin Hood Hashing por su velocidad pura e instantánea de acceso.
+
 9. ¿Qué estructura preferirías para un ranking ordenado por clave?
+
+Un árbol auto-balanceado (Red-Black Tree o AVL) debido a su habilidad intrínseca de mantener los elementos clasificados en todo momento.
+
 10. ¿Qué estructura preferirías si necesitas `lowerBound` y `upperBound`?.
+
+Usaria un árbol balancead, esas operaciones requieren buscar límites dentro de secuencias ordenadas, algo imposible de realizar eficientemente en estructuras de dispersión.
 
 Entrega en este bloque:
 
 * Matriz de decisión.
+
+| Estructura | Mantiene Orden | Búsqueda Promedio | Búsqueda Peor Caso | Inserción | Eliminación | Memoria Adicional | Ventaja Principal | Riesgo Principal | Caso de Uso Recomendado |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- | :--- | :--- |
+| BST Simple | Sí | $O(\log n)$ | $O(n)$ | $O(\log n)$ prom / $O(n)$ peor | $O(\log n)$ prom / $O(n)$ peor | Ninguna (solo punteros base). | Simplicidad extrema de implementación. | Degeneración en lista con datos ordenados. | Fines académicos o flujos puramente aleatorios. |
+| Treap | Sí | $O(\log n)$ | $O(n)$ | $O(\log n)$ prom / $O(n)$ peor | $O(\log n)$ prom / $O(n)$ peor | Prioridad aleatoria (`int`) por nodo. | Balanceo probabilístico simple sin lógicas complejas. | Peor caso teórico lineal (baja probabilidad). | Diccionarios dinámicos de propósito general en orden. |
+| AVL** | Sí | $O(\log n)$ | $O(\log n)$ | $O(\log n)$ | $O(\log n)$ | Factor de balance o altura por nodo. | Búsquedas hiper-optimistas por balanceo estricto. | Alto costo de rotaciones en escrituras frecuentes. | Bases de datos de lectura intensiva y estática. |
+| Red-Black Tree | Sí | $O(\log n)$ | $O(\log n)$ | $O(\log n)$ | $O(\log n)$ | 1 bit para el color por nodo. | Inserciones y borrados rápidos con rebalanceo acotado. | Implementación y depuración sumamente complejas. | Estructuras estándar de la STL (`std::map`, `std::set`). |
+| ChainedHashTable | No | $O(1)$ | $O(n)$ | $O(1)$ prom / $O(n)$ peor | $O(1)$ prom / $O(n)$ peor | Punteros de nodos o listas (`ArrayStack`). | Soporta factores de carga altos ($\lambda > 1.0$) sin colapso. | Fragmentación de caché por asignación dinámica externa. | Cachés en memoria y almacenamiento de datos densos. |
+| LinearHashTable | No | $O(1)$ | $O(n)$ | $O(1)$ prom / $O(n)$ peor | $O(1)$ prom / $O(n)$ peor | Celdas libres adicionales y vector de estados. | Excelente localidad de caché (vector plano contiguo). | Clustering primario severo bajo factores de carga altos. | Tablas pequeñas a medianas de acceso ultra-rápido. |
+| HashtableOA | No | $O(1)$ | $O(n)$ | $O(1)$ prom / $O(n)$ peor | $O(1)$ prom / $O(n)$ peor | Celdas vacías por seguridad y marcas de lápida. | Sin punteros adicionales, memoria plana y compacta. | Degradación crítica del rendimiento por acumulación de lápidas. | Sistemas empotrados o diccionarios temporales de solo lectura. |
+
 * Conclusión final de máximo 20 líneas.
+
+La selección entre estructuras basadas en árboles balanceados y tablas hash constituye uno de los compromisos de diseño más críticos en la ingeniería de software de alto rendimiento. Mientras que las tablas hash maximizan la velocidad pura mediante accesos directos en tiempo constante esperado O(1), este rendimiento se compra a cambio de renunciar por completo al orden de las claves y asumir una vulnerabilidad inherente ante datos adversariales que provoquen colisiones masivas de costo O(n).
+
+Por el contrario, los árboles auto-balanceados como AVL y Red-Black sacrifican la velocidad instantánea en favor de la predictibilidad matemática, garantizando un techo operativo estricto de O(logn) en el peor de los casos y habilitando operaciones complejas basadas en rangos y ordenamientos. Por lo tanto, el ingeniero no debe buscar la estructura óptima absoluta, sino alinear el diseño con los patrones de acceso del sistema: priorizando la dispersión para búsquedas directas de identidad y optando por la jerarquía arbórea balanceada cuando la continuidad espacial y la ordenación de la información dicten el flujo del negocio.
+
 * Un ejemplo concreto donde hashing gana.
+
+Un servidor web recibe 50,000 peticiones por segundo. Cada solicitud incluye un token HTTP tipo UUID string. El servidor debe validar instantáneamente si el token está activo en memoria antes de procesar la petición.
+
+Gana Hashing (LinearHashTable o Robin Hood). Porque al mapear directamente el string a una celda en memoria plana, el Gateway valida el token en un tiempo promedio constante e independiente de la cantidad de usuarios activos O(1). Un árbol balanceado requeriría al menos 16 a 20 comparaciones de strings por cada petición O(logn), teniendo rendimiento bajo en concurrencias masivas.
+
 * Un ejemplo concreto donde AVL o Red-Black Tree gana.
 
-#### Producto final esperado
+Un sistema financiero registra transacciones bancarias indexadas por una clave de marca de tiempo (timestamp). El operador del sistema ejecuta constantemente reportes analíticos con filtros específicos tales como: "Obtener todas las transacciones realizadas entre las 14:00 y las 16:30 del día de hoy".
 
-El archivo `Actividad8-CC232.md` debe contener:
+Gana Árbol Balanceado (Red-Black Tree / AVL). Porque la estructura permite ejecutar un lowerBound para ubicar el nodo inicial en O(logn) y de ahí realizar un recorrido secuencial hasta el límite superior (upperBound). Una tabla hash se vería obligada a realizar un escaneo completo de todas las celdas para evaluar si cada elemento esta en el rango horario, destruyendo la eficiencia.
 
-1. Respuestas completas por bloque.
-2. Tablas solicitadas.
-3. Evidencia de comandos ejecutados.
-4. Fragmentos de código modificados si corresponde.
-5. Salidas relevantes de demostraciones y pruebas.
-6. Trazados manuales de colisiones, sondeos y tombstones.
-7. Comparación final contra BST, Treap, AVL y Red-Black Tree.
-8. Conclusión técnica personal.
+## Conclusión técnica personal
 
-Además, si modificaste código, entrega los archivos cambiados y menciona exactamente qué cambiaste.
+El dilema entre usar tablas hash y árboles balanceados se basa en la predictibilidad.
+
+Si el sistema requiere velocidad pura y lineal bajo un flujo controlado, usas las tablas hash en tiempo O(1). Sin embargo, en entornos críticos donde no puedes permitirte picos de latencia por colisiones o rehashes, el costo garantizado O(logn) de un árbol balanceado (como un Red-Black Tree) ofrece la estabilidad y la flexibilidad de orden que salvan la producción en el peor escenario.

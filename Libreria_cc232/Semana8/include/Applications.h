@@ -103,5 +103,27 @@ inline HashtableOA<std::string, std::vector<int>> invertedIndex(const std::vecto
     }
     return index;
 }
+//MOD-A8-C
+std::vector<std::string> findRepeatedWords(const std::string& text){
+    ods::ChainedHashTable<std::string> counts(16); 
+    std::vector<std::string> result;
+    std::stringstream ss(text);
+    std::string word;
 
+    while (ss >> word) {
+    // Normalización básica a minúsculas para consistencia
+        for(auto &c : word) c = std::tolower(c);
+        
+        // Lógica: si ya existe, marcar como repetida; si no, insertar.
+        if (counts.contains(word)) {
+            // Verificamos si ya está en el resultado para no duplicarla
+            bool yaAgregada = false;
+            for(const auto& r : result) if(r == word) yaAgregada = true;
+            if(!yaAgregada) result.push_back(word);
+        } else {
+            counts.add(word);
+        }
+    }
+    return result;
+}
 }  // namespace ods

@@ -38,6 +38,8 @@ cc232_add_sem8_target(sem8_test_randomized_against_stl "pruebas_internas/test_ra
 
 cc232_add_sem8_target(sem8_demo_find_colliding_keys "demos/demo_find_colliding_keys.cpp")
 cc232_add_sem8_target(sem8_demo_contar_frecuencias "demos/demo_contar_frecuencias.cpp")
+#MOD-A8-B
+cc232_add_sem8_target(sem8_demo_forced_collisions "demos/demo_forced_collisions.cpp")
 add_test(NAME semana8_public COMMAND sem8_test_public)
 add_test(NAME semana8_internal COMMAND sem8_test_internal)
 add_test(NAME semana8_tombstones COMMAND sem8_test_tombstones)

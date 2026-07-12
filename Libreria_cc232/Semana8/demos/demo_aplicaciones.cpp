@@ -14,4 +14,9 @@ int main() {
 
     auto freq = ods::wordFrequencyFromText("Hash hash TREE, tree hashing.");
     std::cout << "hash=" << *freq.get("hash") << " tree=" << *freq.get("tree") << "\n";
+
+    // MOD-A8-C
+    auto rep_words = ods::findRepeatedWords("Hash hash TREE tree hashing.");
+    std::cout << "palabras repetidas de control=" << rep_words.size() << "\n";
+
 }

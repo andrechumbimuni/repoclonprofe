@@ -36,9 +36,12 @@ cc232_add_sem8_target(sem8_test_collision_patterns "pruebas_internas/test_collis
 cc232_add_sem8_target(sem8_test_rehashing "pruebas_internas/test_rehashing.cpp")
 cc232_add_sem8_target(sem8_test_randomized_against_stl "pruebas_internas/test_randomized_against_stl.cpp")
 
+cc232_add_sem8_target(sem8_demo_find_colliding_keys "demos/demo_find_colliding_keys.cpp")
+
 add_test(NAME semana8_public COMMAND sem8_test_public)
 add_test(NAME semana8_internal COMMAND sem8_test_internal)
 add_test(NAME semana8_tombstones COMMAND sem8_test_tombstones)
 add_test(NAME semana8_collision_patterns COMMAND sem8_test_collision_patterns)
 add_test(NAME semana8_rehashing COMMAND sem8_test_rehashing)
 add_test(NAME semana8_randomized_against_stl COMMAND sem8_test_randomized_against_stl)
+

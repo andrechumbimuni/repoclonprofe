@@ -118,50 +118,81 @@ Entrega en este bloque:
 
 El hashing destruye por completo el orden de los datos. Al distribuir los elementos de manera seudoaleatoria mediante funciones matemáticas, se pierde la relación de vecindad entre claves. Operaciones críticas como encontrar el elemento mínimo o máximo, imprimir los datos en orden alfabético o numérico (inorder), o realizar búsquedas por rangos se vuelven extremadamente costosas en una tabla hash, requiriendo un escaneo lineal completo $O(n)$ de todo el arreglo.
 
-#### Bloque 3 - Chaining: buckets, colisiones y longitud máxima
-
-Revisa:
-
-* `Semana8/include/ChainedHashTable.h`
-* `Semana8/include/ArrayStack.h`
-* `Semana8/include/HashCode.h`
-* `Semana8/demos/demo_chained.cpp`
-
-Ejecuta:
-
-```bash
-./build-debug/Semana8/sem8_demo_chained
-```
-
-Construye una tabla con estas columnas:
-
-* Operación
-* Clave
-* Bucket calculado
-* Tamaño del bucket antes
-* Tamaño del bucket después
-* Colisión observada
-* `loadFactor()`
-* `longestBucket()`
-
-Responde:
+## Bloque 3 - Chaining: buckets, colisiones y longitud máxima
 
 1. ¿Qué diferencia hay entre el arreglo principal y los buckets?
+
+El arreglo principal (table_) es un contenedor contiguo y estático indexable en tiempo constante $O(1)$ y los buckets son subestructuras dinámicas e independientes para almacenar los datos colisionantes.
+
 2. ¿Por qué chaining puede almacenar más elementos que la cantidad de posiciones del arreglo principal?
+
+Porque los elementos no compiten por el espacio físico de las celdas del arreglo principal. Al estar encadenados externamente, el arreglo solo guarda referencias a las listas, permitiendo un factor de carga $\alpha > 1.0$.
+
 3. ¿Qué significa que un bucket crezca demasiado?
+
+Significa que la función hash asignó un número desproporcionado de claves al mismo índice.
+
 4. ¿Por qué `longestBucket()` es una métrica importante?
-5. ¿En qué caso la búsqueda en chaining deja de parecerse a `O(1)` esperado?
+
+Mide la severidad del peor caso local. Revela si la dispersión de datos es uniforme o si existe un cuello de botella que ralentizará dramáticamente las búsquedas puntuales dentro de esa cubeta específica.
+
+5. ¿En qué caso la búsqueda en chaining deja de parecerse a `O(1)` 
+esperado?
+
+Cuando todas o la gran mayoría de las claves mapean a un número muy reducido de cubetas.
+
 6. ¿Qué costo tiene recorrer un bucket de longitud `k`?
+
+Un costo lineal estricto de $O(k)$ comparaciones, se inspeccionara secuencialmente cada uno de los elementos contenidos en el ArrayStack.
+
 7. ¿Qué parte del costo depende de la función hash y qué parte depende de la distribución de claves?.
+
+La función hash define la aleatoriedad matemática pura del mapeo inicial.
+
+La distribución de claves define la naturaleza de los datos de entrada. 
 
 Entrega en este bloque:
 
 * Salida relevante de `demo_chained.cpp`.
+```
+ChainedHashTable
+size=6 capacity=17 load=0.352941 longestBucket=2
+contains(26)=1 contains(99)=0
+insertions=6, successfulSearches=1, failedSearches=1, removals=0, collisions=4, totalProbes=14, maxProbeLength=3, averageProbeLength=1.75, rehashes=1, tombstones=0
+```
 * Tabla de operaciones.
+
+| Operación | Clave | Bucket Inicial ($h(x) \bmod 8$) | Bucket Post-Rehash ($h(x) \bmod 17$) | Tam. Antes | Tam. Después | Colisión | `loadFactor()` | `longestBucket()` |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `add` | $c_1$ | $idx_1$ | - | 0 | 1 | No | 0.125 | 1 |
+| `add` | $c_2$ | $idx_2$ | - | 0 | 1 | No | 0.250 | 1 |
+| `add` | $c_3$ | $idx_3$ | - | 0 | 1 | No | 0.375 | 1 |
+| `add` | $c_4$ | $idx_4$ | - | 0 | 1 | No | 0.500 | 1 |
+| `add` | $c_5$ | $idx_5$ | - | 1 | 2 | **Sí** | 0.625 | 2 |
+| `add` | $c_6$ | *Dispara Rehash* | $idx_{new}$ | 0 | 1 | **Sí** (acum.)| 0.353 | 2 |
+| `contains`| 26 | - | $idx_{26}$ | 2 | 2 | No | 0.353 | 2 |
+| `contains`| 99 | - | $idx_{99}$ | 1 | 1 | No | 0.353 | 2 |
+
 * Dibujo de una tabla hash con al menos 8 buckets y 10 claves.
+
+Arreglo Principal (table)
+[ Índice ] -> [ Bucket Externo]
+  [ 0 ]    -> [ Vacío ]
+  [ 1 ]    -> [ Clave A ] -> [ Clave B ]
+  [ 2 ]    -> [ Clave C ]
+  [ 3 ]    -> [ Vacío]
+  [ 4 ]    -> [ Clave D ] -> [ Clave E ] -> [ Clave F ]  <- Bucket (k=3)
+  [ 5 ]    -> [ Clave G ]
+  [ 6 ]    -> [ Clave H ] -> [ Clave I ]
+  [ 7 ]    -> [ Clave J ]
+
 * Explicación breve de costo esperado y peor caso.
 
-#### Bloque 4 - Colisiones controladas sin asumir hash de identidad
+Costo Esperado ($O(1)$): Bajo la suposición de hashing uniforme simple, las claves se distribuyen equitativamente entre las $m$ cubetas. El tamaño promedio de cada lista es el factor de carga $\alpha = n/m$. Manteniendo un $\alpha \le 0.70$ mediante políticas de redimensionamiento, inspeccionar una cubeta toma un número constante y pequeño de pasos.
+
+Peor Caso ($O(n)$): Ocurre si la función hash es defectuosa o si un atacante introduce claves diseñadas maliciosamente para generar exactamente el mismo índice. Las $n$ claves terminan amontonadas en una única lista, transformando el acceso directo en una búsqueda lineal exhaustiva.
+
+## Bloque 4 - Colisiones controladas sin asumir hash de identidad
 
 Revisa:
 
@@ -188,63 +219,166 @@ hashCode(x) % capacity == targetBucket
 Responde:
 
 1. ¿Por qué `0, 8, 16, 24` solo garantiza colisión si la función hash efectiva es `h(x) = x mod m`?
+
+Porque esa secuencia asume que el entero ingresa directamente a la operación aritmética de módulo. Bajo ese esquema lineal e ingenuo, cualquier múltiplo de la capacidad $m$ mapeará idénticamente al índice $0$.
+
 2. ¿Qué ocurre si antes se aplica una mezcla como `hashCode(x)`?
+
+La mezcla rompe la correlación lineal. Aplica corrimientos binarios y multiplicaciones por constantes primas gigantes que dispersan los bits. Provoca que enteros consecutivos o múltiplos regulares terminen en ubicaciones del arreglo completamente impredecibles y distantes.
+
 3. ¿Qué claves encontraste para un mismo bucket con capacidad `8` o `16`?
+
+Para capacidad 8 y cubeta destino 3, las primeras cuatro claves numéricas en colisionar consecutivamente fueron: 0, 6, 12, 17. Nótese que ya no siguen un patrón aritmético simple de +8.
+
 4. ¿Cómo cambia el experimento si usas cadenas en lugar de enteros?
+
+El principio de búsqueda por fuerza bruta es idéntico, pero en lugar de incrementar un contador numérico current++, se deben generar strings de forma combinatoria pasándolos por el hash polinomial de HashCode.h hasta encontrar colisiones de índices compartidos.
+
 5. ¿Por qué este bloque es importante para defender evidencia experimental honesta?.
+
+Porque demuestra rigurosidad matemática en tu sustentación. En lugar de asumir ciegamente la teoría, compruebas que entiendes la arquitectura de tu software interceptando los efectos de la mezcla de bits intermedia antes de evaluar los límites de las cubetas.
 
 Entrega en este bloque:
 
 * Código de la función auxiliar.
+```
+std::vector<int> findCollidingKeys(std::size_t capacity, std::size_t targetBucket, std::size_t needed) {
+    std::vector<int> found;
+    int current = 0;
+    while (found.size() < needed) {
+        if (ods::hashCode(current) % capacity == targetBucket) {
+            found.push_back(current);
+        }
+        current++;
+    }
+    return found;
+}
+```
 * Lista de claves encontradas.
+Para una capacidad fija de m = 17 y buscando colisiones puras en el bucket 3, las primeras cuatro claves enteras consecutivas que saltan la mezcla de bits de mix64 y colisionan son:12, 17, 35, 36.
+
 * Tabla con clave, valor hash normalizado y bucket.
+
+| Clave ($x$) | Valor Hash Producido (`hashCode(x)`) | Bucket Final ($\text{hash} \bmod 17$) |
+| :---: | :--- | :---: |
+| 12 | $10682531704454680323$ | 3 |
+| 17 | $9260656408219841379$ | 3 |
+| 35 | $5574532911583637595$ | 3 |
+| 36 | $16839827797137734171$ | 3 |
+
 * Evidencia de que esas claves sí producen colisiones en tu ejecución.
+```
+CLAVES ENCONTRADAS PARA BUCKET: 3
 
-#### Bloque 5 - Linear probing: estados, sondeo y tombstones
+ Clave (x)              hashCode(x)  hashCode(x)%m
 
-Revisa:
+        12     10682531704454680323              3
+        17      9260656408219841379              3
+        35      5574532911583637595              3
+        36     16839827797137734171              3
 
-* `Semana8/include/LinearHashTable.h`
-* `Semana8/include/Bitmap.h`
-* `Semana8/include/HashStats.h`
-* `Semana8/demos/demo_linear.cpp`
-* `Semana8/demos/demo_tombstones.cpp`
-
-Ejecuta:
-
-```bash
-./build-debug/Semana8/sem8_demo_linear
-./build-debug/Semana8/sem8_demo_tombstones
+Validando colision en ChainedHashTable (capacidad fija sin rehash)...
+Resultado -> Longitud del bucket 3: 4
+Estadisticas de colisiones: 3
 ```
 
-Construye una tabla con estas columnas:
-
-* Operación
-* Clave
-* Posición hash inicial
-* Secuencia de sondeo
-* Estado final de la celda
-* `size`
-* `occupied`
-* `loadFactor()`
-* `occupiedFactor()`
-* `tombstoneCount()`
-
-Responde:
+## Bloque 5 - Linear probing: estados, sondeo y tombstones
 
 1. ¿Qué representan los estados `Empty`, `Filled` y `Deleted`?
+
+Empty: La celda está completamente virgen. Detiene inmediatamente cualquier búsqueda.
+
+Filled: La celda contiene un elemento activo válido.
+
+Deleted: La celda tuvo un elemento que fue borrado. Permite almacenar nuevos datos en un add, pero obliga a que un contains continúe el sondeo.
+
 2. ¿Por qué `Deleted` no puede tratarse igual que `Empty`?
+
+Si se tratara como Empty, rompería las secuencias de sondeo previas. Si insertamos A y luego B, al borrar A, una búsqueda posterior de B vería la celda vacía y reportaría erróneamente que B no existe en la tabla.
+
 3. ¿Qué diferencia hay entre `size` y `occupied`?
+
+size cuenta únicamente los elementos activos y recuperables actuales. occupied incluye los activos más todos los registros que quedaron marcados de forma perezosa como Deleted.
+
 4. ¿Por qué `loadFactor()` y `occupiedFactor()` pueden divergir después de muchas eliminaciones?
+
+Porque al remover elementos, size disminuye inmediatamente, mientras que occupied se mantiene intacto porque las celdas retenidas pasan a ser tombstones.
+
 5. ¿Qué problema aparece si se acumulan demasiados tombstones?
+
+Degrada el rendimiento de las búsquedas fallidas y exitosas hacia un costo lineal de O(n), ya que los algoritmos se ven obligados a atravesar interminables cadenas de celdas muertas antes de dar con un hueco verdaderamente Empty.
+
 6. ¿Cuándo debe hacerse rehashing por carga ocupada aunque haya pocos elementos activos?
+
+Cuando occupiedFactor supera el umbral crítico configurado. En este punto, aunque haya pocos elementos activos, la tabla está saturada de lápidas y requiere una purga.
+
 7. ¿Qué costo tiene una búsqueda fallida cuando hay clustering?.
+
+Es proporcional a la longitud total del bloque o conglomerado contiguo de celdas ocupadas/eliminadas.
 
 Entrega en este bloque:
 
 * Salida relevante de `demo_linear.cpp` y `demo_tombstones.cpp`.
+```
+1. demo_linear:
+
+LinearHashTable
+size=5 capacity=8 activeLoad=0.625 occupiedLoad=0.625 tombstones=0
+insertions=6, successfulSearches=1, failedSearches=6, removals=1, collisions=1, totalProbes=17, maxProbeLength=4, averageProbeLength=1.21429, rehashes=0, tombstones=0
+
+2.tombstones:
+
+Linear tombstones=4 activeLoad=0.125 occupiedLoad=0.1875
+HashtableOA tombstones=4 activeLoad=0.216216 occupiedLoad=0.324324
+```
 * Trazado manual de al menos una búsqueda exitosa y una búsqueda fallida.
+
+Tomando el estado final de la tabla anterior donde la celda 1 es Deleted:
+
+Búsqueda Exitosa de la clave 31:
+
+Calcula el índice inicial: $\text{idx}(31) = 7$.
+
+Celda 7 es Filled pero no es el elemento $\rightarrow$ salta a next(7) = 0 (Sondeos = 2).
+
+Celda 0 es Filled pero no es el elemento $\rightarrow$ salta a next(0) = 1 (Sondeos = 3).
+
+Celda 1 es Deleted $\rightarrow$ no se detiene, continúa a next(1) = 2 (Sondeos = 4).
+
+Celda 2 es Filled y contiene 31 $\rightarrow$ Éxito. Retorna índice 2.
+
+Búsqueda Fallida de la clave 23 (Eliminada previamente):
+
+Calcula el índice inicial: $\text{idx}(23) = 7$.
+
+Celda 7 es Filled $\rightarrow$ continúa a la celda 0.
+
+Celda 0 es Filled $\rightarrow$ continúa a la celda 1.
+
+
+Celda 1 es Deleted $\rightarrow$ continúa (si se detuviera aquí fallaría por corte erróneo, ocultando a las claves 31 y 39 que están más adelante).
+
+Celdas 2, 3, 4 son Filled $\rightarrow$ continúa escaneando.
+
+Celda 5 es Empty $\rightarrow$ Fin del bucle. Retorna falso (Búsqueda fallida).
+
 * Explicación de por qué open addressing necesita una política cuidadosa de eliminación.
+
+A diferencia del encadenamiento separado, donde borrar un nodo es una remoción física instantánea de una lista, el direccionamiento abierto comparte el mismo espacio vectorial indexado para todo el ecosistema. Si una tabla no limpia de forma perezosa y cíclica sus lápidas mediante disparadores en su RehashPolicy (shouldCleanOrGrow), la estructura se vuelve víctima de su propio historial operativo.
+
+* Tabla de simulaciones:
+
+| Operación | Clave | Posición hash inicial | Secuencia de sondeo | Estado final de la celda | `size` | `occupied` | `loadFactor()` | `occupiedFactor()` | `tombstoneCount()` |
+| :---: | :---: | :---: | :---: | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Inicio** | - | - | - | - | 0 | 0 | 0.000 | 0.000 | 0 |
+| `add(7)` | 7 | 7 | `[7]` | `Filled` en pos 7 | 1 | 1 | 0.125 | 0.125 | 0 |
+| `add(15)` | 15 | 7 | `[7->0]` | `Filled` en pos 0 | 2 | 2 | 0.250 | 0.250 | 0 |
+| `add(23)` | 23 | 7 | `[7->0->1]` | `Filled` en pos 1 | 3 | 3 | 0.375 | 0.375 | 0 |
+| `add(31)` | 31 | 7 | `[7->0->1->2]` | `Filled` en pos 2 | 4 | 4 | 0.500 | 0.500 | 0 |
+| `add(39)` | 39 | 7 | `[7->0->1->2->3]` | `Filled` en pos 3 | 5 | 5 | 0.625 | 0.625 | 0 |
+| `remove(23)`| 23 | 7 | `[7->0->1]` | `Deleted` en pos 1 | 4 | 5 | 0.500 | 0.625 | 1 |
+| `add(47)` | 47 | 7 | `[7->0->1->2->3->4]`| `Filled` en pos 4 | 5 | 6 | 0.625 | 0.750 | 1 |
+
 
 #### Bloque 6 - HashtableOA como diccionario `key value`
 

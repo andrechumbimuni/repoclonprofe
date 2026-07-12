@@ -1,159 +1,122 @@
-### Actividad 8 - CC232
+# Actividad 8 - CC232
 
-#### Datos generales
-
-Duración: 3 horas de clase.
-
-Modalidad: Trabajo individual.
-
-Entrega: Un archivo llamado `Actividad8-CC232.md` y los archivos modificados solicitados.
-
-#### Objetivo
-
-Consolidar lo trabajado en la Semana 8 a partir de lectura de código, ejecución de demostraciones, revisión de pruebas, comparación experimental, modificación controlada y defensa escrita breve.
-
-La meta es entender cómo se implementan diccionarios no ordenados mediante hashing y cómo se comparan con las estructuras estudiadas en las semanas anteriores:
-
-1. Semana 5 introduce árboles binarios, BST, búsqueda ordenada y costo dependiente de la altura.
-2. Semana 6 distingue interfaz, representación, prioridad, heaps y medición experimental.
-3. Semana 7 estudia AVL y Red-Black Tree como diccionarios ordenados con altura controlada.
-4. Semana 8 contrasta esas estructuras con tablas hash, donde el costo esperado puede ser constante si la función hash, la política de colisión, el factor de carga y el rehashing están bien diseñados.
-
-El énfasis de esta actividad está en explicar no solo qué operación se ejecuta, sino qué invariante se mantiene, qué métrica se observa, qué evidencia produce el código y qué costo tiene cada decisión de diseño.
-
-#### Material de trabajo
-
-#### Código de la semana
-
-Revisa como mínimo:
-
-* `Semana8/README.md`
-* `Semana8/lecturas/Lectura14-Morin.md`
-* `Semana8/include/Dictionary.h`
-* `Semana8/include/Entry.h`
-* `Semana8/include/ArrayStack.h`
-* `Semana8/include/Bitmap.h`
-* `Semana8/include/PrimeUtils.h`
-* `Semana8/include/HashCode.h`
-* `Semana8/include/HashStats.h`
-* `Semana8/include/RehashPolicy.h`
-* `Semana8/include/UniversalHash.h`
-* `Semana8/include/ChainedHashTable.h`
-* `Semana8/include/LinearHashTable.h`
-* `Semana8/include/HashtableOA.h`
-* `Semana8/include/QuadraticHashTable.h`
-* `Semana8/include/DoubleHashTable.h`
-* `Semana8/include/RobinHoodHashTable.h`
-* `Semana8/include/Applications.h`
-* `Semana8/include/Capitulo9.h`
-
-#### Código reutilizado conceptualmente
-
-Revisa también:
-
-* `Semana5/include/BinarySearchTree.h`
-* `Semana6/include/Treap.h`
-* `Semana7/include/AVL.h`
-* `Semana7/include/RedBlackTree.h`
-* `Semana7/demos/demo_compare_avl_vs_redblack.cpp`
-* `Semana7/demos/demo_capitulo7_panorama.cpp`
-
-#### Demostraciones y pruebas
-
-Revisa y ejecuta:
-
-* `Semana8/demos/demo_chained.cpp`
-* `Semana8/demos/demo_linear.cpp`
-* `Semana8/demos/demo_hashtable_oa.cpp`
-* `Semana8/demos/demo_aplicaciones.cpp`
-* `Semana8/demos/demo_collision_strategies.cpp`
-* `Semana8/demos/demo_hash_functions.cpp`
-* `Semana8/demos/demo_tombstones.cpp`
-* `Semana8/demos/demo_benchmark_load_factor.cpp`
-* `Semana8/pruebas_publicas/test_public_week8.cpp`
-* `Semana8/pruebas_internas/test_internal_week8.cpp`
-* `Semana8/pruebas_internas/test_tombstones.cpp`
-* `Semana8/pruebas_internas/test_collision_patterns.cpp`
-* `Semana8/pruebas_internas/test_rehashing.cpp`
-* `Semana8/pruebas_internas/test_randomized_against_stl.cpp`
-* `Semana8/CMakeLists.txt`
-
-#### Reglas de trabajo
-
-1. No reemplaces las estructuras principales por `std::unordered_map`, `std::unordered_set`, `std::map`, `std::set` u otra estructura estándar que oculte el algoritmo central.
-2. Puedes usar estructuras estándar solo como referencia externa de comparación cuando una prueba o pregunta lo indique explícitamente.
-3. No cambies la interfaz principal de la librería salvo que una pregunta lo pida explícitamente.
-4. Toda explicación debe mencionar invariante, operación, evidencia y costo.
-5. Si modificas una demostración, una prueba o una función auxiliar, marca el cambio con un comentario breve.
-
-```cpp
-// MOD-A8-B4: medicion de tombstones despues de eliminaciones
-```
-
-6. No basta con ejecutar el programa. Debes poder explicar por qué una operación conserva la tabla en estado válido y por qué su costo es esperado, amortizado o de peor caso.
-7. Cuando fuerces colisiones, no asumas que las claves `0, 8, 16, 24` colisionan si la función hash no es identidad. Si el código usa mezcla hash, debes verificar el bucket real o construir claves colisionantes mediante un pequeño experimento.
-
-#### Bloque 1 - Diagnóstico inicial de la Semana 8
-
-Revisa:
-
-* `Semana8/README.md`
-* `Semana8/CMakeLists.txt`
-* `Semana8/include/Capitulo9.h`
-
-Ejecuta desde la raíz de la librería:
-
-```bash
-cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-debug
-ctest --test-dir build-debug -R semana8 --output-on-failure
-```
-
-Responde:
+## Bloque 1 - Diagnóstico inicial de la Semana 8
 
 1. ¿Qué targets de demostración aparecen para Semana 8?
+
+Aparecen 8 targets: sem8_demo_chained, sem8_demo_linear, sem8_demo_hashtable_oa, sem8_demo_aplicaciones, sem8_demo_collision_strategies, sem8_demo_hash_functions, sem8_demo_tombstones y sem8_demo_benchmark_load_factor.
+
 2. ¿Qué pruebas públicas e internas aparecen?
+
+Públicas: semana8_public.
+
+Internas: semana8_internal, semana8_tombstones, semana8_collision_patterns, semana8_rehashing y semana8_randomized_against_stl.
+
 3. ¿Qué archivos incluye `Capitulo9.h`?
+
+Incluye cabeceras Applications.h, ArrayStack.h, Bitmap.h, ChainedHashTable.h, Dictionary.h, DoubleHashTable.h, Entry.h, HashCode.h, HashStats.h, HashtableOA.h, LinearHashTable.h, PrimeUtils.h, QuadraticHashTable.h, RehashPolicy.h, RobinHoodHashTable.h, UniversalHash.h y array.h.
+
 4. ¿Qué relación conceptual hay entre Semana 5, Semana 6, Semana 7 y Semana 8?
+
+Las Semanas 5, 6 y 7 usan enfoques basados en árboles donde los elementos se ordenan jerárquicamente mediante comparaciones. La Semana 8 rompe el esquema de comparaciones e introduce el Hasheo, logrando acceso directo mediante funciones matemáticas(problemas de diccionario).
+
 5. ¿Por qué no es correcto decir que una tabla hash siempre tiene costo `O(1)` garantizado?
+
+Porque el costo $O(1)$ es un escenario promedio y no una garantía estricta de peor caso. Si ocurren demasiadas colisiones (debido a una mala función de hash) o si el factor de carga es muy alto, la complejidad se degrada a un costo lineal $O(n)$.
+
 6. ¿Qué evidencia inicial obtuviste al ejecutar las pruebas sin modificar nada?
+
+La evidencia es un éxito rotundo del 100%. Los 6 tests asignados a la suite de la semana pasaron limpiamente (Passed) en un tiempo real de ejecución extremadamente bajo de 0.03 segundos, indicando que la base inicial del repositorio es estable.
+
 7. ¿Qué diferencia práctica hay entre compilar todo el proyecto y compilar solo los targets de Semana 8?.
+
+Compilar todo el proyecto compila múltiples sub-módulos ajenos (Semanas previas), lo que consume más tiempo y ciclos de CPU. Compilar los targets de la Semana 8 reduce drásticamente el alcance del flujo de construcción a los ejecutables definidos en el sub-directorio actual.
 
 Entrega en este bloque:
 
 * Una tabla con comando ejecutado, resultado, error si hubo e interpretación.
+
+| Comando Ejecutado | Resultado | Error detectado | Interpretación |
+| :--- | :--- | :--- | :--- |
+| `cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug` | Configuración exitosa, archivos de construcción generados en `build-debug`. | Ninguno | El entorno detectó correctamente el compilador GCC 13.3.0 y preparó las dependencias de CMake para la compilación. |
+| `cmake --build build-debug` | Compilación exitosa de 8 demos y 6 ejecutables de pruebas unitarias. Targets al 100%. | Ninguno | Todos los archivos de código fuente y cabeceras de tablas hash compilaron sin errores de sintaxis ni enlazado. |
+| `ctest --test-dir build-debug -R semana8 --output-on-failure` | **100% tests passed** (6 de 6 pruebas superadas en 0.03 segundos). | Ninguno | El sistema de pruebas corroboró que las operaciones públicas e internas de hasheo funcionan perfectamente bajo las aserciones actuales. |
+
 * Una lista breve de los archivos que revisaste primero.
+
+Semana8/CMakeLists.txt (Para mapear la estructura de ejecutables, demos y definiciones de tests).
+
+Semana8/include/Capitulo9.h (Para conocer las dependencias, componentes de dispersión y colisión integrados).
+
+Semana8/README.md (Para entender la guía de actividades y el contexto teórico de la semana).
+
 * Una conclusión inicial de máximo 8 líneas sobre el estado de la semana.
 
-#### Bloque 2 - Núcleo conceptual de hashing y diccionarios
+El entorno de la Semana 8 se encuentra en un estado inicial completamente limpio para el desarrollo. Toda la infraestructura de compilación está en CMake, y los archivos cabecera se acoplan limpiamente sin reportar fallos. El paso exitoso del 100% de los tests iniciales confirma la robustez funcional del esqueleto del código.
 
-Revisa:
-
-* `Semana8/lecturas/Notas.md`
-* `Semana8/lecturas/GuiaHashing.md`
-* `Semana8/include/Dictionary.h`
-* `Semana8/include/Entry.h`
-* `Semana8/include/HashCode.h`
-* `Semana8/include/HashStats.h`
-* `Semana8/include/RehashPolicy.h`
-
-Responde:
+## Bloque 2 - Núcleo conceptual de hashing y diccionarios
 
 1. Define con precisión qué es un diccionario abstracto.
+
+Es un Tipo Abstracto de Datos que representa una colección mutable de asociaciones clave-valor, donde cada clave es única. Provee un mapeo unidireccional y eficiente para la inserción, búsqueda y eliminación.
+
 2. Explica la diferencia entre diccionario, mapa, conjunto y tabla hash.
+
+Diccionario: Es la interfaz abstracta pura.
+
+Mapa: Es un sinónimo práctico de diccionario en muchas librerías.
+
+Conjunto: Es una variante del diccionario que solo almacena claves únicas sin valores asociados.
+
+Tabla Hash: Es una estructura de datos física e implementación concreta que usa funciones matemáticas e indexación sobre arreglos para resolver el TAD Diccionario.
+
 3. Explica qué representa un `Entry<K,V>`.
+
+Representa un par ordenado que empaqueta físicamente una clave y su valor asociado dentro de una sola celda en la estructura.
+
 4. Explica qué hace una función hash.
+
+Toma un elemento de un universo y lo transforma en un número entero de tamaño fijo. Este valor se reduce para transformarlo en un índice válido de un arreglo.
+
 5. Explica por qué pueden existir colisiones aunque la función hash sea razonable.
+
+El universo de claves posibles es mayor que el tamaño de almacenamiento (m). Por pura restricción matemática, múltiples claves distintas inevitablemente generarán el mismo índice de destino.
+
 6. Explica qué significa factor de carga.
+
+Es la relación aritmética entre la cantidad de elementos en la tabla y su capacidad total.
+
 7. Explica qué significa rehashing.
+
+Es el proceso estructural de crear un nuevo arreglo, recalcular el hash de cada clave activa presente y reinsertarla. Se gatilla para reducir las colisiones y restablecer la eficiencia cuando la tabla se llena o acumula demasiadas bajas.
+
 8. Explica qué mide `HashStats`.
+
+Registra el total de inserciones, búsquedas exitosas y fallidas, remociones, conteo de colisiones, cantidad de saltos de sondeo, rehashings totales ejecutados y la acumulación de marcas de borrado.
+
 9. Explica qué decide `RehashPolicy`.
+
+Establece los umbrales de tolerancia (máximos y mínimos) para decidir cuándo la tabla hash debe expandir su memoria (shouldGrow), encogerse (shouldShrink) o limpiar los registros eliminados perezosamente (shouldCleanOrGrow).
+
 10. Compara el costo esperado de una tabla hash con el costo garantizado de AVL y Red-Black Tree.
+
+La tabla hash ofrece un costo esperado (promedio) de O(1) para buscar, insertar y borrar, pero en el peor caso colapsa a un costo lineal de O(n). Los árboles balanceados garantizan que en el peor caso sea O(logn).
 
 Entrega en este bloque:
 
 * Una tabla conceptual con las columnas: concepto, definición, archivo relacionado y ejemplo.
+
+| Concepto | Definición | Archivo Relacionado | Ejemplo |
+| :--- | :--- | :--- | :--- |
+| Diccionario | Interfaz abstracta para gestionar pares clave-valor únicos. | `Dictionary.h` | Un padrón electoral donde buscas los datos de un ciudadano mediante su DNI. |
+| Entrada | Estructura que empaqueta físicamente una clave y su valor asociado. | `Entry.h` | El registro `{ "codigo_23", "Juan Pérez" }` guardado en memoria. |
+| Dispersión | Transformación matemática de un objeto en un índice numérico de arreglo. | `HashCode.h` | Pasar el string `"hola"` por `mix64` para obtener el entero `14695981039...`. |
+| Estadísticas | Contador dinámico de rendimiento de operaciones y colisiones. | `HashStats.h` | Registrar que se hicieron 4 evaluaciones de celdas antes de hallar una clave. |
+| Política de Rehash| Estrategia de control de límites de carga para redimensionamiento. | `RehashPolicy.h` | Decidir duplicar el arreglo cuando el 70% de las celdas estén ocupadas. |
+
 * Una explicación de máximo 12 líneas sobre por qué hashing no reemplaza completamente a los árboles balanceados.
+
+El hashing destruye por completo el orden de los datos. Al distribuir los elementos de manera seudoaleatoria mediante funciones matemáticas, se pierde la relación de vecindad entre claves. Operaciones críticas como encontrar el elemento mínimo o máximo, imprimir los datos en orden alfabético o numérico (inorder), o realizar búsquedas por rangos se vuelven extremadamente costosas en una tabla hash, requiriendo un escaneo lineal completo $O(n)$ de todo el arreglo.
 
 #### Bloque 3 - Chaining: buckets, colisiones y longitud máxima
 
